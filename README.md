@@ -1,50 +1,44 @@
-# React + TypeScript + Vite
+# Advanced Web App
+- This is a full-stack web application with a frontend built using React, TypeScript, and Vite, and a backend built using Node.js, Express, and MongoDB.
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+- **Application target**: in the development process.
 
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## Project Structure
+```bash
+advanced-web-app/
+├── api/               # Backend (Node.js, Express, MongoDB)
+├── public/            # Public assets (frontend)
+├── src/               # Frontend source code (React + TypeScript)
+├── .gitignore
+├── package.json       # Frontend dependencies and scripts
+├── README.md
+├── tsconfig.json      # TypeScript configuration
+├── vite.config.ts     # Vite configuration for frontend
+├── ...                # Other files for configuration
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## Requirements
+- Node.js (v14 or higher)
+- MongoDB (local instance or cloud-based)
+- React 16+
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+## Installation and Setup
+- ### 1. Clone the Repository
+~~~~
+git clone https://github.com/your-username/advanced-web-app.git
+cd advanced-web-app
+~~~~
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
+- ### 2. Install Dependencies
+- #### 2.1 Install frontend dependencies (in root folder):
+```bash
+npm install
 ```
+
+- #### 2.2 Install backend dependencies (in api folder)
+~~~
+cd api
+npm install
+~~~
+
+## 3. Update later
