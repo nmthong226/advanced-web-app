@@ -31,14 +31,31 @@ cd advanced-web-app
 
 - ### 2. Install Dependencies
 - #### 2.1 Install frontend dependencies (in root folder):
-```bash
+```python
 npm install
 ```
 
 - #### 2.2 Install backend dependencies (in api folder)
-~~~
+```python
 cd api
 npm install
-~~~
+```
+
+
+- ### 3. Configure Environment Variables
+- #### 3.1 Create a .env file in the api folder for the backend and add your MongoDB connection string:
+```bash
+# Backend Environment Variables
+MONGO_URI=YOUR_MONGO_URI
+PORT=5000
+```
+
+- #### 3.2 Create a .env file in the api folder for the backend and add your MongoDB connection string:
+```bash
+VITE_API_BASE=YOUR_API_URL
+VITE_PUSHER_KEY=YOUR_PUSHER_KEY
+VITE_PUSHER_CLUSTER=YOUR_PUSHER_CLUSTER
+```
+    
 
 ## 3. Update later
