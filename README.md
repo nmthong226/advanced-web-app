@@ -58,4 +58,4 @@ VITE_PUSHER_CLUSTER=YOUR_PUSHER_CLUSTER
 ```
     
 
-## 3. Update later
+## Update later
