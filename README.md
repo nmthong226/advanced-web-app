@@ -25,7 +25,7 @@ advanced-web-app/
 ## Installation and Setup
 - ### 1. Clone the Repository
 ~~~~
-git clone https://github.com/your-username/advanced-web-app.git
+git clone [This project repository]
 cd advanced-web-app
 ~~~~
 
