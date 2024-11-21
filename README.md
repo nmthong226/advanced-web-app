@@ -6,15 +6,16 @@
 ## Project Structure
 ```bash
 advanced-web-app/
-├── api/               # Backend (Node.js, Express, MongoDB)
-├── public/            # Public assets (frontend)
-├── src/               # Frontend source code (React + TypeScript)
-├── .gitignore
-├── package.json       # Frontend dependencies and scripts
-├── README.md
-├── tsconfig.json      # TypeScript configuration
-├── vite.config.ts     # Vite configuration for frontend
-├── ...                # Other files for configuration
+├── backend/               # Backend (Node.js, Express, MongoDB)
+├── frontend
+├──── public/            # Public assets (frontend)
+├──── src/               # Frontend source code (React + TypeScript)
+├──── .gitignore
+├──── package.json       # Frontend dependencies and scripts
+├──── README.md
+├──── tsconfig.json      # TypeScript configuration
+├──── vite.config.ts     # Vite configuration for frontend
+├──── ...                # Other files for configuration
 ```
 
 ## Requirements
