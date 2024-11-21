@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import Home from './pages/Home.tsx'
-import About from './pages/About'
+import About from './pages/About.tsx'
 import Layout from '@/layouts/PublicLayout.tsx'
 
 function App() {
