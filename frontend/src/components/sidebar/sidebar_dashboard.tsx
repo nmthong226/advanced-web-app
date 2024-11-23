@@ -6,6 +6,8 @@ import { TbDragDrop2 } from "react-icons/tb";
 import { ChevronsUpDown } from "lucide-react"
 import { MdFolderOpen } from "react-icons/md";
 import { FaChevronLeft } from "react-icons/fa";
+import { IoMdMore } from "react-icons/io";
+import { FiPlusCircle } from "react-icons/fi";
 
 //Import components
 import { Button } from "../../components/ui/button"
@@ -14,15 +16,16 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../../components/ui/collapsible"
+import DraggableItem from '../draggable/DraggableItem';
 
 const SideBarDashboard = () => {
     const [isOpenCourses, setIsOpenCourses] = useState(false);
     const [isOpenActivities, setIsOpenActivities] = useState(false);
     return (
-        <div className='flex flex-col w-[16%] h-full relative'>
+        <div className='flex flex-col w-[14%] h-full relative'>
             <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative">
                 <div className="flex justify-between items-center p-1.5 w-[90%] bg-gradient-to-t from-indigo-500 to-blue-400 text-white rounded-lg hover:cursor-default">
-                    <p>Drag a custom event</p>
+                    <p>Add an event</p>
                     <TbDragDrop2 className="size-5" />
                 </div>
                 <hr className="my-2 border-[1px]" />
@@ -47,27 +50,26 @@ const SideBarDashboard = () => {
                                     </h4>
                                 </div>
                             </div>
-                            <div className="hover:cursor-pointer">
-                                <p className="text-sm font-semibold text-indigo-600">+ Add new</p>
+                            <div className="flex text-sm font-semibold text-indigo-600 hover:cursor-pointer">
+                                <FiPlusCircle className='size-5 mr-1' />
+                                Add
                             </div>
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-purple-100 border-l-[5px] border-l-purple-600 hover:cursor-grab">
-                            Economics
-                        </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-cyan-100 border-l-[5px] border-l-cyan-600 hover:cursor-grab">
+                        <DraggableItem text='Economics' type='course' />
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-cyan-100 border-l-[5px] border-l-cyan-600 hover:cursor-grab">
                             Math
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-orange-100 border-l-[5px] border-l-orange-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-orange-100 border-l-[5px] border-l-orange-600 hover:cursor-grab">
                             History
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-pink-100 border-l-[5px] border-l-pink-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-pink-100 border-l-[5px] border-l-pink-600 hover:cursor-grab">
                             Psychology
                         </div>
                         <CollapsibleContent className="space-y-2">
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-green-100 border-l-[5px] border-l-green-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-green-100 border-l-[5px] border-l-green-600 hover:cursor-grab">
                                 Advanced Web Application Development
                             </div>
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-sky-100 border-l-[5px] border-l-sky-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-sky-100 border-l-[5px] border-l-sky-600 hover:cursor-grab">
                                 Game development
                             </div>
                         </CollapsibleContent>
@@ -93,36 +95,37 @@ const SideBarDashboard = () => {
                                     </h4>
                                 </div>
                             </div>
-                            <div className="hover:cursor-pointer">
-                                <p className="text-sm font-semibold text-indigo-600">+ Add new</p>
+                            <div className="flex text-sm font-semibold text-indigo-600 hover:cursor-pointer">
+                                <FiPlusCircle className='size-5 mr-1' />
+                                Add
                             </div>
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
                             Morning Routine
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
                             Lunch
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-indigo-50 border-l-[5px] border-l-indigo-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-indigo-50 border-l-[5px] border-l-indigo-600 hover:cursor-grab">
                             Workout
                         </div>
-                        <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-gray-50 border-l-[5px] border-l-gray-600 hover:cursor-grab">
+                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-gray-50 border-l-[5px] border-l-gray-600 hover:cursor-grab">
                             Power Nap
                         </div>
                         <CollapsibleContent className="space-y-2">
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-green-50 border-l-[5px] border-l-green-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-green-50 border-l-[5px] border-l-green-600 hover:cursor-grab">
                                 Dinner
                             </div>
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
                                 Me Time
                             </div>
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
                                 Bedtime Routine
                             </div>
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-pink-50 border-l-[5px] border-l-pink-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-pink-50 border-l-[5px] border-l-pink-600 hover:cursor-grab">
                                 Laundry
                             </div>
-                            <div className="rounded-md border px-4 py-3 ml-5 font-mono text-sm truncate bg-violet-50 border-l-[5px] border-l-violet-600 hover:cursor-grab">
+                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-violet-50 border-l-[5px] border-l-violet-600 hover:cursor-grab">
                                 Brunch
                             </div>
                         </CollapsibleContent>
