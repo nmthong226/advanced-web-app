@@ -31,8 +31,6 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 
 const Dashboard = () => {
     const [isOpenTask, setIsOpenTask] = useState(false);
-
-
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="flex items-start w-full h-full">
@@ -65,7 +63,7 @@ const Dashboard = () => {
                     </div>
                     <div className="flex w-full h-full overflow-y-auto custom-scrollbar">
                         {/* Timeline Sidebar (1-hour span) */}
-                        <div className="w-[5%] grid grid-rows-[auto_repeat(24,1fr)] gap-1 text-center">
+                        <div className="w-[5%] grid grid-rows-[auto_repeat(24,1fr)] gap-[8px] text-center">
                             {/* Empty placeholder for the first row (day header alignment) */}
                             <div className="h-20"></div>
                             {/* Hourly slots */}

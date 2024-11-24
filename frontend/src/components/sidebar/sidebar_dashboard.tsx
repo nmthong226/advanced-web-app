@@ -6,7 +6,6 @@ import { TbDragDrop2 } from "react-icons/tb";
 import { ChevronsUpDown } from "lucide-react"
 import { MdFolderOpen } from "react-icons/md";
 import { FaChevronLeft } from "react-icons/fa";
-import { IoMdMore } from "react-icons/io";
 import { FiPlusCircle } from "react-icons/fi";
 
 //Import components
@@ -55,23 +54,13 @@ const SideBarDashboard = () => {
                                 Add
                             </div>
                         </div>
-                        <DraggableItem text='Economics' type='course' />
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-cyan-100 border-l-[5px] border-l-cyan-600 hover:cursor-grab">
-                            Math
-                        </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-orange-100 border-l-[5px] border-l-orange-600 hover:cursor-grab">
-                            History
-                        </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-pink-100 border-l-[5px] border-l-pink-600 hover:cursor-grab">
-                            Psychology
-                        </div>
+                        <DraggableItem id='' title='Economics' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-purple-100 border-l-[5px] border-l-purple-600' />
+                        <DraggableItem id='' title='Math' type='activity' description='' startTime='' endTime='' date='' duration={30} color='bg-cyan-100 border-l-[5px] border-l-cyan-600' />
+                        <DraggableItem id='' title='History' type='activity' description='' startTime='' endTime='' date='' duration={15} color='bg-orange-100 border-l-[5px] border-l-orange-600' />
+                        <DraggableItem id='' title='Psychology' type='activity' description='' startTime='' endTime='' date='' duration={15} color='bg-pink-100 border-l-[5px] border-l-pink-600' />
                         <CollapsibleContent className="space-y-2">
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-green-100 border-l-[5px] border-l-green-600 hover:cursor-grab">
-                                Advanced Web Application Development
-                            </div>
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-sky-100 border-l-[5px] border-l-sky-600 hover:cursor-grab">
-                                Game development
-                            </div>
+                            <DraggableItem id='' title='Advanced Web Application Development' type='activity' description='' startTime='' duration={60} endTime='' date='' color='bg-green-100 border-l-[5px] border-l-green-600' />
+                            <DraggableItem id='' title='Game development' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-sky-100 border-l-[5px] border-l-sky-600' />
                         </CollapsibleContent>
                     </Collapsible>
                     <hr className="my-2 border-[1px]" />
@@ -100,34 +89,16 @@ const SideBarDashboard = () => {
                                 Add
                             </div>
                         </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
-                            Morning Routine
-                        </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
-                            Lunch
-                        </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-indigo-50 border-l-[5px] border-l-indigo-600 hover:cursor-grab">
-                            Workout
-                        </div>
-                        <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-gray-50 border-l-[5px] border-l-gray-600 hover:cursor-grab">
-                            Power Nap
-                        </div>
+                        <DraggableItem id='' title='Morning Routine' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-red-50 border-l-[5px] border-l-red-600' />
+                        <DraggableItem id='' title='Lunch' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-yellow-50 border-l-[5px] border-l-yellow-600' />
+                        <DraggableItem id='' title='Workout' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-indigo-50 border-l-[5px] border-l-indigo-600' />
+                        <DraggableItem id='' title='Power Nap' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-gray-50 border-l-[5px] border-l-gray-600' />
                         <CollapsibleContent className="space-y-2">
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-green-50 border-l-[5px] border-l-green-600 hover:cursor-grab">
-                                Dinner
-                            </div>
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-red-50 border-l-[5px] border-l-red-600 hover:cursor-grab">
-                                Me Time
-                            </div>
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-yellow-50 border-l-[5px] border-l-yellow-600 hover:cursor-grab">
-                                Bedtime Routine
-                            </div>
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-pink-50 border-l-[5px] border-l-pink-600 hover:cursor-grab">
-                                Laundry
-                            </div>
-                            <div className="rounded-md border px-4 py-3 font-mono text-sm truncate bg-violet-50 border-l-[5px] border-l-violet-600 hover:cursor-grab">
-                                Brunch
-                            </div>
+                            <DraggableItem id='' title='Dinner' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-green-50 border-l-[5px] border-l-green-600' />
+                            <DraggableItem id='' title='Me Time' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-red-50 border-l-[5px] border-l-red-600' />
+                            <DraggableItem id='' title='Bedtime Routine' type='activity' description='' startTime='' endTime='' duration={60} date='' color='bg-yellow-50 border-l-[5px] border-l-yellow-600' />
+                            <DraggableItem id='' title='Laundry' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-pink-50 border-l-[5px] border-l-pink-600' />
+                            <DraggableItem id='' title='Brunch' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-violet-50 border-l-[5px] border-l-violet-600' />
                         </CollapsibleContent>
                     </Collapsible>
                 </div>
