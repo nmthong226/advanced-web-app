@@ -1,4 +1,9 @@
 // Define a type for Activity and Task
+type Style = {
+    backgroundColor: string;
+    textColor: string;
+}
+
 type Activity = {
     id: string;
     title: string;
@@ -6,7 +11,7 @@ type Activity = {
     type: 'activity';
     startTime: string; 
     endTime: string;
-    color: string;
+    style: Style;
     duration: number;
 };
 

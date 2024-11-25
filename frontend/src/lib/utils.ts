@@ -41,24 +41,31 @@ export const getCurrentDateInfo = () => {
 
 export const getCurrentWeek = () => {
   const today = new Date();
-  const daysOfWeek = [
-    "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-  ];
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+  // Calculate the difference to find the previous Sunday
+  const dayOffset = today.getDay(); // `getDay()` returns 0 (Sunday) to 6 (Saturday)
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - dayOffset); // Go back to the previous Sunday
 
   const currentWeekDate = [];
 
+  // Iterate from Sunday to Saturday
   for (let i = 0; i < 7; i++) {
-    const newDate = new Date(today);
-    newDate.setDate(today.getDate() + i); // Set the date to the next i-th day
+    const newDate = new Date(startOfWeek);
+    newDate.setDate(startOfWeek.getDate() + i); // Set the date to the current week day (Sunday + i)
+
     const fullDateString = `${String(newDate.getDate()).padStart(2, '0')}-${String(newDate.getMonth() + 1).padStart(2, '0')}-${newDate.getFullYear()}`;
+
     currentWeekDate.push({
       dayOfWeek: daysOfWeek[newDate.getDay()],
       dayOfMonth: newDate.getDate(),
       month: newDate.toLocaleString('default', { month: 'long' }),
       year: newDate.getFullYear(),
-      fullDate: fullDateString
+      fullDate: fullDateString,
     });
   }
+
   return currentWeekDate;
 };
 
@@ -115,4 +122,43 @@ export const getTimeSlotIndex = (formattedTime: string): number => {
   const slotIndex = (hours * 4) + (minutes / 15);
 
   return slotIndex;
+};
+
+// Utility function to format time range
+export const formatTimeRange = (startTime: string, endTime: string): string => {
+  // Helper function to format time with AM/PM
+  const formatTime = (time: string, removePeriod: boolean): string => {
+    const [hour, minuteWithPeriod] = time.split(':'); // Split hour and minute part
+    const formattedHour = hour.startsWith('0') ? hour.substring(1) : hour; // Remove leading zero from hour
+    const [minute, period] = minuteWithPeriod.split(' '); // Extract minutes and AM/PM period
+    
+    // If minutes are 00, return just the hour with period; otherwise, return hour:minute with period
+    if (removePeriod) {
+      return minute === '00' ? `${formattedHour}` : `${formattedHour}:${minute}`;
+    }
+    return minute === '00' ? `${formattedHour} ${period}` : `${formattedHour}:${minute} ${period}`;
+  };
+
+  // Extract period from startTime and endTime
+  const [startPeriod] = startTime.split(' ')[1].split(' '); // Extract AM/PM from startTime
+  const [endPeriod] = endTime.split(' ')[1].split(' '); // Extract AM/PM from endTime
+
+  // Determine whether to remove the period from startTime
+  const removeStartPeriod = startPeriod === endPeriod;
+
+  // Format both startTime and endTime with the condition
+  const startFormatted = formatTime(startTime, removeStartPeriod);
+  const endFormatted = formatTime(endTime, false); // Always include period in endTime
+
+  return `${startFormatted} - ${endFormatted}`;
+};
+
+// Helper function to transform bg color to text color and adjust shade
+export const transformBgColorToTextColor = (bgColor: string): string => {
+  // Example: 'bg-red-50' -> 'text-red-500'
+  return bgColor.replace(/bg-(\w+)-(\d+)/, (_, colorName, shade) => {
+      // Replace the 'bg' with 'text' and change the shade from '50' to '500'
+      const newShade = Math.min(parseInt(shade, 10) * 10, 500); // Adjusting the shade to '500'
+      return `text-${colorName}-${newShade}`;
+  });
 };

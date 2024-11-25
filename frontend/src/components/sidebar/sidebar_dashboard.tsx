@@ -54,13 +54,13 @@ const SideBarDashboard = () => {
                                 Add
                             </div>
                         </div>
-                        <DraggableItem id='' title='Economics' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-purple-100 border-l-[5px] border-l-purple-600' />
-                        <DraggableItem id='' title='Math' type='activity' description='' startTime='' endTime='' date='' duration={30} color='bg-cyan-100 border-l-[5px] border-l-cyan-600' />
-                        <DraggableItem id='' title='History' type='activity' description='' startTime='' endTime='' date='' duration={15} color='bg-orange-100 border-l-[5px] border-l-orange-600' />
-                        <DraggableItem id='' title='Psychology' type='activity' description='' startTime='' endTime='' date='' duration={15} color='bg-pink-100 border-l-[5px] border-l-pink-600' />
+                        <DraggableItem id='' title='Economics' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-purple-100 border-l-[5px] border-l-purple-600' textColor='text-purple-500' />
+                        <DraggableItem id='' title='Math' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-cyan-100 border-l-[5px] border-l-cyan-600' textColor='text-cyan-500'/>
+                        <DraggableItem id='' title='History' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-orange-100 border-l-[5px] border-l-orange-600' textColor='text-orange-500'/>
+                        <DraggableItem id='' title='Psychology' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-pink-100 border-l-[5px] border-l-pink-600' textColor='text-pink-500'/>
                         <CollapsibleContent className="space-y-2">
-                            <DraggableItem id='' title='Advanced Web Application Development' type='activity' description='' startTime='' duration={60} endTime='' date='' color='bg-green-100 border-l-[5px] border-l-green-600' />
-                            <DraggableItem id='' title='Game development' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-sky-100 border-l-[5px] border-l-sky-600' />
+                            <DraggableItem id='' title='Advanced Web Application Development' type='activity' description='' startTime='' duration={60} endTime='' date='' backgroundColor='bg-green-100 border-l-[5px] border-l-green-600' textColor='text-green-500'/>
+                            <DraggableItem id='' title='Game development' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-sky-100 border-l-[5px] border-l-sky-600' textColor='text-sky-500'/>
                         </CollapsibleContent>
                     </Collapsible>
                     <hr className="my-2 border-[1px]" />
@@ -89,16 +89,16 @@ const SideBarDashboard = () => {
                                 Add
                             </div>
                         </div>
-                        <DraggableItem id='' title='Morning Routine' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-red-50 border-l-[5px] border-l-red-600' />
-                        <DraggableItem id='' title='Lunch' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-yellow-50 border-l-[5px] border-l-yellow-600' />
-                        <DraggableItem id='' title='Workout' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-indigo-50 border-l-[5px] border-l-indigo-600' />
-                        <DraggableItem id='' title='Power Nap' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-gray-50 border-l-[5px] border-l-gray-600' />
+                        <DraggableItem id='' title='Morning Routine' type='activity' description='a' startTime='' endTime='' date='' duration={60} backgroundColor='bg-red-50 border-l-[5px] border-l-red-600' textColor='text-red-500'/>
+                        <DraggableItem id='' title='Lunch' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-yellow-50 border-l-[5px] border-l-yellow-600' textColor='text-yellow-500'/>
+                        <DraggableItem id='' title='Workout' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-indigo-50 border-l-[5px] border-l-indigo-600' textColor='text-indigo-500'/>
+                        <DraggableItem id='' title='Power Nap' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-gray-50 border-l-[5px] border-l-gray-600' textColor='text-gray-500'/>
                         <CollapsibleContent className="space-y-2">
-                            <DraggableItem id='' title='Dinner' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-green-50 border-l-[5px] border-l-green-600' />
-                            <DraggableItem id='' title='Me Time' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-red-50 border-l-[5px] border-l-red-600' />
-                            <DraggableItem id='' title='Bedtime Routine' type='activity' description='' startTime='' endTime='' duration={60} date='' color='bg-yellow-50 border-l-[5px] border-l-yellow-600' />
-                            <DraggableItem id='' title='Laundry' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-pink-50 border-l-[5px] border-l-pink-600' />
-                            <DraggableItem id='' title='Brunch' type='activity' description='' startTime='' endTime='' date='' duration={60} color='bg-violet-50 border-l-[5px] border-l-violet-600' />
+                            <DraggableItem id='' title='Dinner' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-green-50 border-l-[5px] border-l-green-600' textColor='text-green-500'/>
+                            <DraggableItem id='' title='Me Time' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-red-50 border-l-[5px] border-l-red-600' textColor='text-red-500'/>
+                            <DraggableItem id='' title='Bedtime Routine' type='activity' description='' startTime='' endTime='' duration={60} date='' backgroundColor='bg-yellow-50 border-l-[5px] border-l-yellow-600' textColor='text-yellow-500'/>
+                            <DraggableItem id='' title='Laundry' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-pink-50 border-l-[5px] border-l-pink-600' textColor='text-pink-500'/>
+                            <DraggableItem id='' title='Brunch' type='activity' description='' startTime='' endTime='' date='' duration={60} backgroundColor='bg-violet-50 border-l-[5px] border-l-violet-600' textColor='text-violet-500'/>
                         </CollapsibleContent>
                     </Collapsible>
                 </div>

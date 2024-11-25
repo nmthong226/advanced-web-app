@@ -15,6 +15,7 @@ const CalendarGrid = () => {
         setCalendarData((prevData) => {
             const updatedData = prevData.map((day) => {
                 if (day.date === date) {
+                    console.log(true);
                     const updatedActivities = [...day.schedule.activies, item];
                     return {
                         ...day,
@@ -78,12 +79,9 @@ const CalendarGrid = () => {
                                     key={`${day}-${index}`}
                                     time={formattedTime}
                                     date={currentWeek[day].fullDate}
-                                    color={calendarData[day]?.schedule?.activies
-                                        .find(activity => activity.startTime === formattedTime)?.color || ''}
-                                    activity={calendarData[day]?.schedule?.activies
-                                        .find(activity => activity.startTime === formattedTime)?.title || []}
+                                    activity={activity}
                                     onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                    className={shouldSpanRows ? 'row-span-4 h-full' : 'h-5'}
+                                    className={shouldSpanRows ? 'row-span-4 h-full rounded-md shadow-md border-none p-2' : 'h-5 text-[10px]'}
                                     style={{
                                         gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                     }}

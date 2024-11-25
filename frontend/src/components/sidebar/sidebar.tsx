@@ -17,6 +17,9 @@ const SideBar = () => {
   const navigateToDashboard = () => {
     navigate('/dashboard');
   }
+  const navigateToTimer = () => {
+    navigate('/timer');
+  }
   return (
     <aside className="flex flex-col w-14 h-full border-r-[1px] items-center py-2 justify-between ">
       <div className="flex flex-col">
@@ -45,7 +48,8 @@ const SideBar = () => {
               Tasks
             </span>
           </div>
-          <div className="relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer">
+          <div className="relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer"
+            onClick={navigateToTimer}>
             <TfiTimer className="text-zinc-800 w-6 h-6" />
             <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
               Timer
