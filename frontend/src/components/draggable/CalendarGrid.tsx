@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import CalendarCell from "./CalendarCell";
 import { formatTime, getCurrentWeek } from '@/lib/utils';
-import { initialCalendarData } from '@/mocks/mockCalendar';
+import { initialCalendarData } from '@/mocks/MockData';
 
 // Define the type for the draggable item.
 const CalendarGrid = () => {
