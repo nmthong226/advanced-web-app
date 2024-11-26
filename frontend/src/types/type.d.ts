@@ -37,3 +37,18 @@ type DaySchedule = {
 
 // Main calendar data type
 type CalendarData = DaySchedule[];
+
+type ItemEvent = {
+    id: string;
+    title: string;
+    backgroundColor: string;
+    textColor: string;
+};
+
+type DefinedEvents = {
+    id: string;
+    name: string;
+    item: ItemEvent[];
+};
+
+type UserEvent = DefinedEvents[];
