@@ -2,11 +2,9 @@
 import { useState } from 'react'
 
 //Import icons
-import { TbDragDrop2 } from "react-icons/tb";
 import { ChevronsUpDown } from "lucide-react"
 import { MdFolderOpen } from "react-icons/md";
 import { FaChevronLeft } from "react-icons/fa";
-import { FiPlusCircle } from "react-icons/fi";
 
 //Import components
 import { Button } from "../../components/ui/button"
@@ -15,21 +13,14 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../../components/ui/collapsible";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from "../../components/ui/dialog"
 import DraggableItem from '../draggable/DraggableItem';
 import { mockUserEvents } from '@/mocks/MockData';
-import { Label } from '../ui/label';
-import { Input } from '../ui/input';
+import AddEventItemsDialog from '../dialogs/createEventItems';
+import AddEvent from '../dialogs/createEvent';
 
 const SideBarDashboard = () => {
+    const [events, setEvents] = useState(mockUserEvents); // State for managing events list
+
     // Initialize state for managing open/close for each category
     const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
         Courses: false,
@@ -45,27 +36,18 @@ const SideBarDashboard = () => {
         }));
     };
 
-    const [newCategoryName, setNewCategoryName] = useState<string>(''); // State to manage new category name
-    const [events, setEvents] = useState(mockUserEvents); // State for managing events list
-
-    const [newEventItemTitle, setNewEventItemTitle] = useState<string>('');
-    const [selectedColor, setSelectedColor] = useState<string>('');
-
     // Function to handle new category submission
-    const handleAddNewCategory = () => {
-        if (!newCategoryName.trim()) return; // Prevent empty category names
-
+    const handleAddNewCategory = (name: string) => {
+        if (!name.trim()) return; // Prevent empty category names
         const newCategory = {
             id: `cat-${Date.now()}`, // Unique ID using current timestamp
-            name: newCategoryName,
+            name: name,
             item: [], // Initialize with an empty item list
         };
-
         setEvents([...events, newCategory]); // Update events with the new category
-        setNewCategoryName(''); // Clear input field after submission
     };
 
-    const handleAddEvent = (categoryId: string, eventData: { title: string, backgroundColor: string, textColor?: string }) => {
+    const handleAddEvenItem = (categoryId: string, newEventItemTitle: string, newEventItemColor: string, newEventItemTextColor: string) => {
         // Find the category by its ID
         const categoryIndex = events.findIndex((eventCategory) => eventCategory.id === categoryId);
         if (categoryIndex === -1) return; // Category not found
@@ -73,9 +55,9 @@ const SideBarDashboard = () => {
         // Create a new event item with a unique ID
         const newEventItem = {
             id: `event-${Date.now()}`, // Unique ID using current timestamp
-            title: eventData.title,
-            backgroundColor: eventData.backgroundColor,
-            textColor: eventData.textColor || '', // Optional text color
+            title: newEventItemTitle,
+            backgroundColor: newEventItemColor,
+            textColor: newEventItemTextColor, // Optional text color
         };
 
         // Create a copy of the events array and push the new item to the top of the corresponding category's item list
@@ -85,59 +67,10 @@ const SideBarDashboard = () => {
         setEvents(updatedEvents); // Update state with the new events array
     };
 
-    const handleColorSelect = (color: string) => {
-        setSelectedColor(color);
-    };
-
-    const getButtonClasses = (color: string) => {
-        return selectedColor === color
-            ? 'p-0.5 rounded-md focus:outline-1 focus:ring-1 focus:ring-black' // Highlight selected
-            : 'p-0.5 rounded-md'; // Default style
-    };
-
-
     return (
         <div className='flex flex-col w-[14%] h-full relative'>
             <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative overflow-y-hidden">
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <div>
-                            <button className="flex justify-between items-center p-1.5 w-[90%] bg-gradient-to-t from-indigo-500 to-blue-400 text-white rounded-lg">
-                                <p>Add an event</p>
-                                <TbDragDrop2 className="size-5" />
-                            </button>
-                        </div>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Add New Event Category</DialogTitle>
-                            <DialogDescription>
-                                Create a new category to help organize your events.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="grid gap-4 py-4">
-                            <div className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor="name" className="text-left">
-                                    Name
-                                </Label>
-                                <Input
-                                    id="name"
-                                    placeholder='How you want to call it'
-                                    value={newCategoryName}
-                                    onChange={(e) => setNewCategoryName(e.target.value)}
-                                    className="col-span-3"
-                                />
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button
-                                type="submit"
-                                onClick={handleAddNewCategory}>
-                                Confirm
-                            </Button>
-                        </DialogFooter>
-                    </DialogContent>
-                </Dialog>
+                <AddEvent onAddEvent={handleAddNewCategory} />
                 <hr className="my-2 border-[1px]" />
                 <div className="px-2 overflow-y-auto custom-scrollbar">
                     {events.map((eventCategory, index) => (
@@ -163,117 +96,7 @@ const SideBarDashboard = () => {
                                             </h4>
                                         </div>
                                     </div>
-                                    <Dialog>
-                                        <DialogTrigger asChild>
-                                            <div>
-                                                <button className="flex text-sm font-semibold text-indigo-600 hover:cursor-pointer">
-                                                    <FiPlusCircle className="size-5 mr-1" />
-                                                    Add
-                                                </button>
-                                            </div>
-                                        </DialogTrigger>
-                                        <DialogContent>
-                                            <DialogHeader>
-                                                <DialogTitle>Add New Event In {eventCategory.name}</DialogTitle>
-                                                <DialogDescription>
-                                                    Create a new event for you to track.
-                                                </DialogDescription>
-                                            </DialogHeader>
-                                            <div className="grid gap-4 py-4">
-                                                <div className="grid grid-cols-4 items-center gap-4">
-                                                    <Label htmlFor="name" className="text-left">
-                                                        Name
-                                                    </Label>
-                                                    <Input
-                                                        id="name"
-                                                        placeholder='How you want to call it'
-                                                        value={newEventItemTitle}
-                                                        onChange={(e) => setNewEventItemTitle(e.target.value)}
-                                                        className="col-span-3"
-                                                    />
-                                                </div>
-                                                <Label htmlFor="name" className="text-left">
-                                                    Color Badge
-                                                </Label>
-                                                <div className='flex flex-col col-span-3 row-span-2 gap-2'>
-                                                    <div className='flex gap-2'>
-                                                        <button
-                                                            className={getButtonClasses('yellow')}
-                                                            onClick={() => handleColorSelect('yellow')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-yellow-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('orange')}
-                                                            onClick={() => handleColorSelect('orange')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-orange-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('red')}
-                                                            onClick={() => handleColorSelect('red')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-red-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('purple')}
-                                                            onClick={() => handleColorSelect('purple')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-purple-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('pink')}
-                                                            onClick={() => handleColorSelect('pink')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-pink-100 rounded-md border' />
-                                                        </button>
-                                                    </div>
-                                                    <div className='flex gap-2'>
-                                                        <button
-                                                            className={getButtonClasses('cyan')}
-                                                            onClick={() => handleColorSelect('cyan')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-cyan-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('green')}
-                                                            onClick={() => handleColorSelect('green')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-green-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('sky')}
-                                                            onClick={() => handleColorSelect('sky')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-sky-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('gray')}
-                                                            onClick={() => handleColorSelect('gray')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-gray-100 rounded-md border' />
-                                                        </button>
-                                                        <button
-                                                            className={getButtonClasses('emerald')}
-                                                            onClick={() => handleColorSelect('emerald')}
-                                                        >
-                                                            <div className='w-8 h-6 bg-emerald-100 rounded-md border' />
-                                                        </button>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <DialogFooter>
-                                                <Button
-                                                    type="submit"
-                                                    onClick={() => {
-                                                        // Assuming categoryId is the ID of the current category
-                                                        handleAddEvent(eventCategory.id, { title: newCategoryName, backgroundColor: 'yellow' });
-                                                    }}>
-                                                    Confirm
-                                                </Button>
-                                            </DialogFooter>
-                                        </DialogContent>
-                                    </Dialog>
+                                    <AddEventItemsDialog eventCategory={eventCategory} onAddEvent={handleAddEvenItem} />
                                 </div>
                                 {/* Render DraggableItems for each item in the category */}
                                 {eventCategory.item.slice(0, 4).map((item) => (
@@ -309,9 +132,21 @@ const SideBarDashboard = () => {
                                         />
                                     ))}
                                 </CollapsibleContent>
+                                <div className="flex items-center justify-between">
+                                    <div className="flex space-x-2 items-center">
+                                        <CollapsibleTrigger asChild>
+                                            <Button variant="ghost" size="sm" className="p-0">
+                                                <div className="flex items-center space-x-1 px-2">
+                                                    <h4 className="text-[12px] text-indigo-600">
+                                                        {openCategories[eventCategory.name] ? "Show less" : `Show more (${eventCategory.item.length - 4})`}                                                    </h4>
+                                                </div>
+                                            </Button>
+                                        </CollapsibleTrigger>
+                                    </div>
+                                </div>
                             </Collapsible>
                             <hr
-                                className={`my-5 border-[1px] ${index === events.length - 1 ? 'hidden' : ''}`}
+                                className={`my-2 border-[1px] ${index === events.length - 1 ? 'hidden' : ''}`}
                             />
                         </>
                     ))}

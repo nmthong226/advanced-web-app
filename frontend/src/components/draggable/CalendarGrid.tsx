@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import CalendarCell from "./CalendarCell";
-import { formatTime, getCurrentWeek } from '@/lib/utils';
+import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
 import { initialCalendarData } from '@/mocks/MockData';
 
 // Define the type for the draggable item.
@@ -31,9 +31,34 @@ const CalendarGrid = () => {
         });
     };
 
+    const handleResize = (id: string, date: string, newDuration: number) => {
+        // Find the activity in the data and adjust its duration
+        setCalendarData((prevData) =>
+            prevData.map((day) => {
+                if (day.date === date) {
+                    const updatedActivities = day.schedule.activies.map((act) => {
+                        if (act.id === id) { // Match by id
+                            return {
+                                ...act,
+                                duration: newDuration,
+                                endTime: addMinutesToTime(act.startTime, newDuration), // Update the end time
+                            };
+                        }
+                        return act;
+                    });
+                    return {
+                        ...day,
+                        schedule: { ...day.schedule, activies: updatedActivities },
+                    };
+                }
+                return day;
+            })
+        );
+    };
 
     const interval = 15; // 15-minute intervals
     const slotsPerDay = (60 / interval) * 24; // 96 slots for 15-minute intervals
+
     console.log("calendar", calendarData);
 
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
@@ -58,30 +83,40 @@ const CalendarGrid = () => {
                             if (occupiedSlots[day][index]) {
                                 return null;
                             }
-                            // Check if the activity should span 2 rows
+
+                            // Find the activity that starts at the current formattedTime
                             const activity = calendarData[day]?.schedule?.activies
                                 .find(activity => activity.startTime === formattedTime);
 
-                            const shouldSpanRows = activity && activity.duration === 60;
+                            const shouldSpanRows = activity && activity.duration > 0;
+
+                            // Dynamically calculate the row span based on activity duration
+                            let spanRows = 1; // Default to 1 row
+                            if (shouldSpanRows) {
+                                spanRows = Math.ceil(activity.duration / interval); // Calculate based on duration and interval
+                            }
+
                             // Mark subsequent rows as occupied if this cell spans rows
                             if (shouldSpanRows) {
-                                for (let offset = 0; offset < 4; offset++) {
+                                for (let offset = 0; offset < spanRows; offset++) {
                                     if (index + offset < slotsPerDay) {
                                         occupiedSlots[day][index + offset] = true;
                                     }
                                 }
                             }
-                            // Manually calculate the row span using style if needed
+
+                            // Manually calculate the grid row start and end
                             const gridRowStart = index + 1;
-                            const gridRowEnd = shouldSpanRows ? gridRowStart + 4 : gridRowStart + 1;
+                            const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
                             return (
                                 <CalendarCell
                                     key={`${day}-${index}`}
                                     time={formattedTime}
                                     date={currentWeek[day].fullDate}
                                     activity={activity}
+                                    onResize={handleResize}
                                     onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                    className={shouldSpanRows ? 'row-span-4 h-full rounded-md shadow-md border-none p-2' : 'h-5 text-[10px]'}
+                                    className={shouldSpanRows ? `row-span-12 h-full rounded-md shadow-md border-none p-2` : 'h-5 text-[10px]'}
                                     style={{
                                         gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                     }}
