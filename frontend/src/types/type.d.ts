@@ -9,7 +9,7 @@ type Activity = {
     title: string;
     description: string;
     type: 'activity';
-    startTime: string; 
+    startTime: string;
     endTime: string;
     style: Style;
     duration: number;
@@ -52,3 +52,17 @@ type DefinedEvents = {
 };
 
 type UserEvent = DefinedEvents[];
+
+type User = {
+    id: string;
+    name: string;
+    email: string;
+    avatar?: string;
+    calendar: CalendarData;
+    events: UserEvent;
+    settings?: {
+        theme: 'light' | 'dark';
+        notifications: boolean;
+        language: string;
+    };
+};

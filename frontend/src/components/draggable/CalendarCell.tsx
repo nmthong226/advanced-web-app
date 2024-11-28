@@ -1,6 +1,7 @@
 import { addMinutesToTime, cn, formatTimeRange } from '@/lib/utils';
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { useDrop } from 'react-dnd';
+import { Rnd } from 'react-rnd';
 
 type CalendarCellProps = {
     time: string;
@@ -9,7 +10,7 @@ type CalendarCellProps = {
     className: string;
     style: React.CSSProperties;
     onDrop: (item: Activity, time: string, date: string) => void;
-    onResize: (id: string, date: string, newDuration: number) => void; // Add a resize handler
+    onResize: (id: string, date: string, newDuration: number) => void;
 };
 
 const CalendarCell: React.FC<CalendarCellProps> = ({
@@ -20,92 +21,64 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
     className,
     onResize,
 }) => {
-    const [isResizing, setIsResizing] = useState(false);
-    const resizingEdgeRef = useRef<'top' | 'bottom' | null>(null);
-    const [resizeStartY, setResizeStartY] = useState(0);
-
     const [{ isOver }, drop] = useDrop<Activity, void, { isOver: boolean }>({
         accept: 'ITEM',
         drop: (item) => {
-            const updatedEndTime = addMinutesToTime(time, 60);
-            const updatedItem = {
-                ...item,
-                startTime: time,
-                endTime: updatedEndTime,
-                date: date,
-            };
-            onDrop(updatedItem, time, date);
+            // Ensure the dropped item matches the current activity
+            if (item.id === activity?.id) {
+                const updatedEndTime = addMinutesToTime(time, 60);
+                const updatedItem = {
+                    ...item,
+                    startTime: time,
+                    endTime: updatedEndTime,
+                    date: date,
+                };
+                onDrop(updatedItem, time, date);
+            }
         },
         collect: (monitor) => ({
             isOver: !!monitor.isOver(),
         }),
     });
 
-    const handleMouseMove = (e: MouseEvent) => {
-        if (isResizing && activity && resizingEdgeRef.current) {
-            const deltaY = e.clientY - resizeStartY;
-            const heightChange = deltaY; // Change in height in pixels
-    
-            // Calculate duration change based on height change
-            const durationChange = Math.floor(heightChange / 20) * 15; // 20px per 15 minutes
-            let newDuration = activity.duration;
-    
-            if (resizingEdgeRef.current === 'top') {
-                newDuration = Math.max(15, activity.duration - durationChange); // Reduce duration from the top
-            } else if (resizingEdgeRef.current === 'bottom') {
-                newDuration = Math.max(15, activity.duration + durationChange); // Increase duration at the bottom
-            }
-    
-            // Ensure duration reflects increments/decrements of 15 minutes
-            if (newDuration !== activity.duration) {
-                onResize(activity.id, date, newDuration);
-            }
-        }
-    };
-
-    const handleMouseDown = (e: React.MouseEvent, edge: 'top' | 'bottom') => {
-        e.stopPropagation(); // Prevent event from bubbling to other elements
-        resizingEdgeRef.current = edge;
-        setIsResizing(true);
-        setResizeStartY(e.clientY);
-
-        window.addEventListener('mousemove', handleMouseMove);
-        window.addEventListener('mouseup', handleMouseUp);
-    };
-
-    const handleMouseUp = () => {
-        resizingEdgeRef.current = null;
-        setIsResizing(false);
-        window.removeEventListener('mousemove', handleMouseMove);
-        window.removeEventListener('mouseup', handleMouseUp);
-    };
-
     return (
         <div
             ref={drop}
             className={cn(
-                `relative flex flex-col h-full ${isOver ? 'bg-indigo-100' : 'bg-gray-50 p-1'}`,
+                `relative flex flex-col h-full bg-gray-50 p-1 ${isOver ? 'bg-indigo-100' : 'bg-gray-50 p-1'}`,
                 activity?.style.backgroundColor,
                 className
             )}
         >
             {activity && (
-                <>
+                <Rnd
+                    size={{
+                        width: '100%', // Adjust width as necessary
+                        height: '100%', // Set initial height based on activity duration
+                    }}
+                    position={{ x: 1, y: 3 }}
+                    onResizeStop={(e, direction, ref, delta, position) => {
+                        // Only proceed if the resized activity matches the active one
+                        const newHeight = ref.offsetHeight;
+                        const newDuration = Math.max(15, Math.floor(newHeight / 20) * 15); // Calculate new duration based on height
+                        onResize(activity.id, date, newDuration);
+                    }}
+                    minWidth={100} // Minimum width for resizing (can be customized)
+                    minHeight={20} // Minimum height for resizing (can be customized)
+                    enableResizing={{
+                        top: false,
+                        right: false,
+                        bottom: true,
+                        left: false,
+                    }}
+                    disableDragging={true} // Disable dragging to prevent moving the activity around
+                    className={`${activity?.style.backgroundColor} ${className} z-10`}
+                >
                     <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                         {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                     </p>
                     <p className="text-sm font-bold text-zinc-600">{activity.title}</p>
-                    {/* Top resize handle */}
-                    <div
-                        onMouseDown={(e) => handleMouseDown(e, 'top')}
-                        className="absolute top-0 left-0 w-full h-2 cursor-ns-resize"
-                    />
-                    {/* Bottom resize handle */}
-                    <div
-                        onMouseDown={(e) => handleMouseDown(e, 'bottom')}
-                        className="absolute bottom-0 left-0 w-full h-2 cursor-ns-resize"
-                    />
-                </>
+                </Rnd>
             )}
         </div>
     );

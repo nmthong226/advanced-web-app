@@ -1,5 +1,6 @@
 // Import frameworks
 import { useEffect, useState } from 'react';
+
 //Import components
 import {
     Sheet,
@@ -21,6 +22,16 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../../components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs"
 
 // Import icons
 import { FaRegChartBar } from "react-icons/fa";
@@ -33,8 +44,12 @@ import {
     Trash2,
 } from "lucide-react"
 import { BsFillSkipEndFill } from "react-icons/bs";
-import { FaArrowRotateLeft } from "react-icons/fa6";
-
+import { LuClock2 } from "react-icons/lu";
+import { BsListTask } from "react-icons/bs";
+import { AiOutlineSound } from "react-icons/ai";
+import { GiStarShuriken } from "react-icons/gi";
+import { IoMdArrowDropup } from "react-icons/io";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 const Timer = () => {
     // State to keep track of the current mode
@@ -145,10 +160,93 @@ const Timer = () => {
                                 <FaRegChartBar className="mr-2" />
                                 Report
                             </button>
-                            <button className="flex items-center rounded-md p-1 px-4 bg-white/70 text-zinc-700 font-semibold">
-                                <IoMdSettings className="mr-2" />
-                                Settings
-                            </button>
+                            <Dialog>
+                                <DialogTrigger asChild>
+                                    <button className="flex items-center rounded-md p-1 px-4 bg-white/70 text-zinc-700 font-semibold">
+                                        <IoMdSettings className="mr-2" />
+                                        Settings
+                                    </button>
+                                </DialogTrigger>
+                                <DialogContent className="flex flex-col sm:max-w-[425px] sm:max-h-[425px] items-center">
+                                    <DialogHeader className='items-center'>
+                                        <DialogTitle>Settings</DialogTitle>
+                                        <DialogDescription>
+                                            Set up your Pomo Focus
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <Tabs defaultValue="timer" className="w-[400px] h-[400px]">
+                                        <TabsList className='flex w-full justify-between'>
+                                            <TabsTrigger value="timer">
+                                                <div className='flex items-center w-[60px]'>
+                                                    <LuClock2 className='mr-2' />
+                                                    <p>Timer</p>
+                                                </div>
+                                            </TabsTrigger>
+                                            <TabsTrigger value="task">
+                                                <div className='flex items-center w-[60px]'>
+                                                    <BsListTask className='mr-2' />
+                                                    <p>Tasks</p>
+                                                </div>
+                                            </TabsTrigger>
+                                            <TabsTrigger value="sound">
+                                                <div className='flex items-center w-[60px]'>
+                                                    <AiOutlineSound className='mr-2' />
+                                                    <p>Sound</p>
+                                                </div>
+                                            </TabsTrigger>
+                                            <TabsTrigger value="theme">
+                                                <div className='flex items-center w-[60px]'>
+                                                    <GiStarShuriken className='mr-2' />
+                                                    <p>Theme</p>
+                                                </div>
+                                            </TabsTrigger>
+                                        </TabsList>
+                                        <TabsContent value="timer">
+                                            <div className='flex flex-col h-full w-full my-5 space-y-4'>
+                                                <Label className='flex w-[30%]'>Time (minutes)</Label>
+                                                <div className='flex w-full justify-between'>
+                                                    <div className='flex flex-col w-[30%] space-y-1'>
+                                                        <Label className="flex text-black/60 text-sm">Pomodoro</Label>
+                                                        <div className="flex items-center p-1 px-2 bg-gray-100 rounded-md">
+                                                            <span className="flex-grow">12</span>
+                                                            <div className="flex flex-col items-center justify-center">
+                                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex flex-col w-[30%] space-y-1">
+                                                        <Label className="flex text-black/60 text-sm">Short Break</Label>
+                                                        <div className="flex items-center p-1 px-2 bg-gray-100 rounded-md">
+                                                            <span className="flex-grow">12</span>
+                                                            <div className="flex flex-col items-center justify-center">
+                                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div className='flex flex-col w-[30%] space-y-1'>
+                                                        <Label className="flex text-black/60 text-sm">Long Break</Label>
+                                                        <div className="flex items-center p-1 px-2 bg-gray-100 rounded-md">
+                                                            <span className="flex-grow">12</span>
+                                                            <div className="flex flex-col items-center justify-center">
+                                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </TabsContent>
+                                        <TabsContent value="task">Change your task here.</TabsContent>
+                                        <TabsContent value="sound">Change your sound here.</TabsContent>
+                                        <TabsContent value="theme">Change your theme here.</TabsContent>
+                                    </Tabs>
+                                    <DialogFooter className='flex w-full justify-end'>
+                                        <Button type="submit">Save changes</Button>
+                                    </DialogFooter>
+                                </DialogContent>
+                            </Dialog>
                         </div>
                     </div>
                 </div>
@@ -178,16 +276,19 @@ const Timer = () => {
                             <p className="text-8xl font-semibold text-[#5f341f]">{formatTime(time)}</p>
                         </div>
                         <div className='flex w-[50%] h-10 justify-center items-center relative'>
-                            <button className='flex absolute -left-16 hover:bg-white hover:rounded-full p-1'>
+                            {/* <button className='flex absolute -left-16 hover:bg-white hover:rounded-full p-1'>
                                 <FaArrowRotateLeft className='w-5 h-5 text-[#5f341f]' />
-                            </button>
+                            </button> */}
                             <button
                                 onClick={() => setIsActive(!isActive)}
                                 className={`w-full h-full p-1 px-4 rounded-md ${startButtonColor()} text-white text-lg font-semibold outline-none`}>
                                 <p>{isActive ? 'Pause' : 'Start'}</p>
                             </button>
-                            <button className='flex absolute -right-16 hover:bg-white hover:rounded-full p-1'>
-                                <BsFillSkipEndFill className='w-5 h-5 text-[#5f341f] '/>
+                            <button
+                                className={`${isActive ? 'opacity-100' : 'opacity-0'} 
+                                flex absolute -right-16 hover:bg-white hover:rounded-full p-1 transition-opacity duration-300`}
+                            >
+                                <BsFillSkipEndFill className='w-5 h-5 text-[#5f341f] ' />
                             </button>
                         </div>
                     </div>

@@ -1,3 +1,5 @@
+//Import from frameworks
+import { useLocation, useNavigate } from "react-router-dom";
 
 //Import Icons
 import { IoHomeOutline } from "react-icons/io5";
@@ -8,9 +10,8 @@ import { SiGoogleanalytics } from "react-icons/si";
 import { IoMdSettings } from "react-icons/io";
 import { TfiHelpAlt } from "react-icons/tfi";
 
-//Import sample asset
-import user_avatar from '/avatar.png';
-import { useLocation, useNavigate } from "react-router-dom";
+//Import components
+import { UserButton } from "@clerk/clerk-react";
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ const SideBar = () => {
           <IoMdSettings className="w-6 h-6" />
         </div>
         <div className="p-1 hover:border-gray-300 hover:cursor-pointer rounded-full">
-          <img className="w-10 h-10 rounded-full" src={user_avatar} />
+          <UserButton />
         </div>
       </div>
     </aside>

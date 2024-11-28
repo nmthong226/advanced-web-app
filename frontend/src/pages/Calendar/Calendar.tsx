@@ -61,31 +61,7 @@ const Calendar = () => {
                             <p>Today</p>
                         </div>
                     </div>
-                    <div className="flex w-full h-full overflow-y-auto custom-scrollbar">
-                        {/* Timeline Sidebar (1-hour span) */}
-                        <div className="w-[5%] grid grid-rows-[auto_repeat(24,1fr)] gap-[8px] text-center">
-                            {/* Empty placeholder for the first row (day header alignment) */}
-                            <div className="h-20"></div>
-                            {/* Hourly slots */}
-                            {Array.from({ length: 24 }, (_, hour) => (
-                                <div
-                                    key={hour}
-                                    className="flex items-center justify-center text-[11px] font-medium h-20"
-                                >
-                                    {/* Display the hour in 12-hour AM/PM format */}
-                                    {hour === 0
-                                        ? '12 AM'
-                                        : hour < 12
-                                            ? `${hour} AM`
-                                            : hour === 12
-                                                ? '12 PM'
-                                                : `${hour - 12} PM`}
-                                </div>
-                            ))}
-                        </div>
-                        {/* Calendar Grid */}
-                        <CalendarGrid />
-                    </div>
+                    <CalendarGrid />
                 </div>
                 <div className="flex flex-col h-full w-[16%] shadow-[rgba(0,0,15,0.1)_0px_15px_10px_10px] px-2 py-1 space-y-2">
                     <div className="flex w-full p-2 rounded-lg bg-gray-100 relative">
