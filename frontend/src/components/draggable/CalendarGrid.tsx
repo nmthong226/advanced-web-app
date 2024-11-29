@@ -149,10 +149,11 @@ const CalendarGrid = () => {
                                             activity={activity}
                                             onResize={handleResize}
                                             onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                            className={shouldSpanRows ? `row-span-${spanRows} h-full rounded-md shadow-md border-none p-2` : 'h-5 text-[10px]'}
+                                            className={shouldSpanRows ? `row-span-${spanRows} h-full rounded-md shadow-md border-none` : 'h-5 text-[10px]'}
                                             style={{
                                                 gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                             }}
+                                            rowSpan={shouldSpanRows ? spanRows : 1}
                                         />
                                     )
                                 })}

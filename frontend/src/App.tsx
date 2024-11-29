@@ -30,6 +30,7 @@ function App() {
           <Route path='/timer' element={<Timer />} />
           <Route path="/about" element={<About />} />
           <Route path="/signin" element={<SignIn />} />
+          <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<Navigate to={"/home"} />} />
         </Route>
         {/* Public Route */}

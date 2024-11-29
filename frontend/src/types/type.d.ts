@@ -53,6 +53,7 @@ type DefinedEvents = {
 
 type UserEvent = DefinedEvents[];
 
+//Temp
 type User = {
     id: string;
     name: string;

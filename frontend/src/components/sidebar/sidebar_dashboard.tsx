@@ -134,14 +134,26 @@ const SideBarDashboard = () => {
                                 </CollapsibleContent>
                                 <div className="flex items-center justify-between">
                                     <div className="flex space-x-2 items-center">
-                                        <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="p-0">
-                                                <div className="flex items-center space-x-1 px-2">
-                                                    <h4 className="text-[12px] text-indigo-600">
-                                                        {openCategories[eventCategory.name] ? "Show less" : `Show more (${eventCategory.item.length - 4})`}                                                    </h4>
-                                                </div>
-                                            </Button>
-                                        </CollapsibleTrigger>
+                                        {eventCategory.item.length > 4 && (
+                                            <CollapsibleTrigger asChild>
+                                                <Button variant="ghost" size="sm" className="p-0">
+                                                    <div className="flex items-center space-x-1 px-2">
+                                                        <h4 className="text-[12px] text-indigo-600">
+                                                            {openCategories[eventCategory.name]
+                                                                ? "Show less"
+                                                                : `Show more (${eventCategory.item.length - 4})`}
+                                                        </h4>
+                                                    </div>
+                                                </Button>
+                                            </CollapsibleTrigger>
+                                        )}
+                                        {eventCategory.item.length <= 4 && (
+                                            <h4 className="text-[12px] text-gray-500">
+                                                {eventCategory.item.length === 0
+                                                    ? "No items to display"
+                                                    : `All ${eventCategory.item.length} items are shown`}
+                                            </h4>
+                                        )}
                                     </div>
                                 </div>
                             </Collapsible>
