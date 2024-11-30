@@ -1,6 +1,7 @@
 import SideBar from "../components/sidebar/sidebar";
 import { Outlet } from "react-router-dom";
 import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { Toaster } from "../components/ui/sonner"
 
 const Layout = () => {
     return (
@@ -10,6 +11,7 @@ const Layout = () => {
                     <SideBar />
                     <main className="flex-grow">
                         <Outlet />
+                        <Toaster />
                     </main>
                 </div>
             </SignedIn>

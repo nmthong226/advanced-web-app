@@ -28,6 +28,7 @@
     "concurrently": "^9.0.1",
     "howler": "^2.2.4",
     "lucide-react": "^0.447.0",
+    "next-themes": "^0.4.3",
     "npm-run-all": "^4.1.5",
     "react": "^18.3.1",
     "react-dnd": "^16.0.1",
@@ -36,6 +37,7 @@
     "react-icons": "^5.3.0",
     "react-rnd": "^10.4.13",
     "react-router-dom": "^6.26.2",
+    "sonner": "^1.7.0",
     "tailwind-merge": "^2.5.3",
     "tailwindcss-animate": "^1.0.7",
     "uuid": "^11.0.3"

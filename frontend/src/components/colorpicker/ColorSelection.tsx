@@ -7,7 +7,7 @@ interface ColorPickerProps {
 
 const colors = [
   'yellow', 'amber', 'orange', 'rose', 'red', 'purple', 'pink',
-  'lime', 'green', 'emerald', 'cyan', 'sky', 'gray',
+  'lime', 'green', 'emerald', 'cyan', 'sky',
 ];
 
 const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorSelect }) => {
@@ -17,7 +17,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorSelect 
       : 'p-0.5 rounded-md';
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2 justify-between w-[65%]">
       {colors.map((color) => (
         <button
           key={color}

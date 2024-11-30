@@ -17,12 +17,13 @@ import { Input } from '../ui/input';
 import ColorPicker from "../colorpicker/ColorSelection";
 import { BsPlusCircle } from "react-icons/bs";
 
-interface AddEventDialogProps {
+interface EditEventDialogProps {
     eventCategory: { id: string; name: string };
-    onAddEvent: (categoryId: string, title: string, color: string, textColor: string) => void;
+    eventItem: { id: string; title: string; backgroundColor: string; textColor: string }
+    onEditEventItem: (categoryId: string, title: string, color: string, textColor: string) => void;
 }
 
-const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onAddEvent }) => {
+const EditEventItemsDialog: React.FC<EditEventDialogProps> = ({ eventCategory, eventItem, onEditEventItem }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedColor, setSelectedColor] = useState<string>('');
     const [newEventItemTitle, setNewEventItemTitle] = useState<string>('');
@@ -34,7 +35,7 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
             alert("Please fill out all fields!");
             return;
         }
-        onAddEvent(eventCategory.id, newEventItemTitle, newEventItemColor, newEventItemTextColor);
+        onEditEventItem(eventCategory.id, newEventItemTitle, newEventItemColor, newEventItemTextColor);
         setNewEventItemTitle("");
         setSelectedColor("");
         setIsDialogOpen(false);
@@ -105,54 +106,44 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
     };
 
     return (
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-                <div className="flex items-center text-indigo-600 hover:cursor-pointer">
-                    <BsPlusCircle className="mr-1" />
-                    <button className="flex text-sm font-semibold">
-                        Add
-                    </button>
+        <DialogContent className="w-[425px]">
+            <DialogHeader>
+                <DialogTitle>Edit {eventItem.title} In {eventCategory.name}</DialogTitle>
+                <DialogDescription>Create a new event for you to track.</DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4">
+                <div className={`flex w-full px-3 py-2 h-10 items-center font-mono ${eventItem.backgroundColor}`}>
+                    <p>{eventItem.title}</p>
                 </div>
-            </DialogTrigger>
-            <DialogContent className="w-[425px]">
-                <DialogHeader>
-                    <DialogTitle>Add New Event In {eventCategory.name}</DialogTitle>
-                    <DialogDescription>Create a new event for you to track.</DialogDescription>
-                </DialogHeader>
-                <div className="grid gap-4">
-                    <div className={`flex w-full px-3 py-2 h-10 items-center font-mono ${newEventItemColor ? newEventItemColor : "bg-slate-100"}`}>
-                        <p>{newEventItemTitle ? newEventItemTitle : "Preview event"}</p>
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
-                        <Label htmlFor="name" className="text-left">
-                            Name<span className="text-red-500">*</span>
-                        </Label>
-                        <Input
-                            id="name"
-                            placeholder="How you want to call it"
-                            value={newEventItemTitle}
-                            onChange={(e) => setNewEventItemTitle(e.target.value)}
-                            className="col-span-3"
-                        />
-                    </div>
-                    <div className="grid grid-cols-4 items-center gap-2">
-                        <Label htmlFor="color" className="text-left">
-                            Color Badge<span className="text-red-500">*</span>
-                        </Label>
-                        <div className="col-span-3">
-                            <ColorPicker selectedColor={selectedColor} onColorSelect={handleColorSelect} />
-                        </div>
-                    </div>
-                    <span className='text-xs italic text-end'>* required</span>
+                <div className="grid grid-cols-4 items-center gap-4">
+                    <Label htmlFor="name" className="text-left">
+                        Name<span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                        id="name"
+                        placeholder={eventItem.title}
+                        value={newEventItemTitle}
+                        onChange={(e) => setNewEventItemTitle(e.target.value)}
+                        className="col-span-3"
+                    />
                 </div>
-                <DialogFooter>
-                    <Button type="submit" onClick={handleAddEvent}>
-                        Add Event
-                    </Button>
-                </DialogFooter>
-            </DialogContent>
-        </Dialog>
+                <div className="grid grid-cols-4 items-center gap-2">
+                    <Label htmlFor="color" className="text-left">
+                        Color <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="col-span-3">
+                        <ColorPicker selectedColor={selectedColor} onColorSelect={handleColorSelect} />
+                    </div>
+                </div>
+                <span className='text-xs italic text-end'>* required</span>
+            </div>
+            <DialogFooter>
+                <Button type="submit" onClick={handleAddEvent}>
+                    Edit Event
+                </Button>
+            </DialogFooter>
+        </DialogContent>
     );
 };
 
-export default AddEventItemsDialog;
+export default EditEventItemsDialog

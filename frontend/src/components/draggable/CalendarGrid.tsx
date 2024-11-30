@@ -4,6 +4,9 @@ import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
 import { initialCalendarData } from '@/mocks/MockData';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
 
+//Import icons
+import { RxCountdownTimer } from "react-icons/rx";
+
 // Define the type for the draggable item.
 const CalendarGrid = () => {
     // Get current week
@@ -73,7 +76,8 @@ const CalendarGrid = () => {
     return (
         <div className='flex flex-col w-full h-full overflow-hidden'>
             <div className='flex'>
-                <div className='w-[5%]'>
+                <div className='flex w-[5%] items-center justify-center bg-zinc-50'>
+                    <RxCountdownTimer />
                 </div>
                 <div className='w-[95%] grid grid-cols-7 grid-rows-[auto] gap-0.5 mr-1.5'>
                     {/* Days of the week */}

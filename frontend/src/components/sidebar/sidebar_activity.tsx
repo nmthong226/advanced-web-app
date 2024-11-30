@@ -7,18 +7,18 @@ import { MdFolderOpen } from "react-icons/md";
 import { FaChevronLeft } from "react-icons/fa";
 
 //Import components
-import { Button } from "../../components/ui/button"
+import { Button } from "../ui/button"
 import {
     Collapsible,
     CollapsibleContent,
     CollapsibleTrigger,
-} from "../../components/ui/collapsible";
+} from "../ui/collapsible";
 import DraggableItem from '../draggable/DraggableItem';
 import { mockUserEvents } from '@/mocks/MockData';
 import AddEventItemsDialog from '../dialogs/createEventItems';
 import AddEvent from '../dialogs/createEvent';
 
-const SideBarDashboard = () => {
+const SideBarActivity = () => {
     const [events, setEvents] = useState(mockUserEvents); // State for managing events list
 
     // Initialize state for managing open/close for each category
@@ -110,6 +110,7 @@ const SideBarDashboard = () => {
                                         endTime=""
                                         date=""
                                         duration={60}
+                                        category={eventCategory}
                                         backgroundColor={item.backgroundColor}
                                         textColor={item.textColor || ""} // Optional text color
                                     />
@@ -127,6 +128,7 @@ const SideBarDashboard = () => {
                                             endTime=""
                                             date=""
                                             duration={60}
+                                            category={eventCategory}
                                             backgroundColor={item.backgroundColor}
                                             textColor={item.textColor || ""}
                                         />
@@ -171,4 +173,4 @@ const SideBarDashboard = () => {
     )
 }
 
-export default SideBarDashboard
+export default SideBarActivity

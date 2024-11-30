@@ -14,7 +14,7 @@ import { FaFlagCheckered } from "react-icons/fa";
 
 //Import styles
 import "./style.css"
-import SideBarDashboard from "../../components/sidebar/sidebar_dashboard.tsx";
+import SideBarActivity from "../../components/sidebar/sidebar_activity.tsx";
 
 //Import components
 import { Button } from "../../components/ui/button.tsx"
@@ -34,7 +34,7 @@ const Calendar = () => {
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="flex items-start w-full h-full">
-                <SideBarDashboard />
+                <SideBarActivity />
                 <div className="flex flex-col p-1 w-[70%] h-full relative space-y-2">
                     <div className="flex px-8 py-1 justify-start items-center">
                         <div className="flex space-x-8">
