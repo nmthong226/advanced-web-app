@@ -1,6 +1,6 @@
 export const initialCalendarData: CalendarData = [
     {
-        date: '24-11-2024',
+        date: '01-12-2024',
         dayOfWeek: 'Sun',
         schedule:
         {
@@ -32,7 +32,7 @@ export const initialCalendarData: CalendarData = [
         },
     },
     {
-        date: '25-11-2024',
+        date: '02-12-2024',
         dayOfWeek: 'Mon',
         schedule: {
             activies: [],
@@ -40,7 +40,7 @@ export const initialCalendarData: CalendarData = [
         }
     },
     {
-        date: '26-11-2024',
+        date: '03-12-2024',
         dayOfWeek: 'Tue',
         schedule: {
             activies: [],
@@ -48,7 +48,7 @@ export const initialCalendarData: CalendarData = [
         }
     },
     {
-        date: '27-11-2024',
+        date: '04-12-2024',
         dayOfWeek: 'Wed',
         schedule: {
             activies: [],
@@ -56,7 +56,7 @@ export const initialCalendarData: CalendarData = [
         }
     },
     {
-        date: '28-11-2024',
+        date: '05-12-2024',
         dayOfWeek: 'Thu',
         schedule: {
             activies: [],
@@ -64,7 +64,7 @@ export const initialCalendarData: CalendarData = [
         }
     },
     {
-        date: '29-11-2024',
+        date: '06-12-2024',
         dayOfWeek: 'Fri',
         schedule: {
             activies: [],
@@ -72,24 +72,8 @@ export const initialCalendarData: CalendarData = [
         }
     },
     {
-        date: '30-11-2024',
+        date: '07-12-2024',
         dayOfWeek: 'Sar',
-        schedule: {
-            activies: [],
-            tasks: [],
-        }
-    },
-    {
-        date: '25-11-2024',
-        dayOfWeek: 'Mon',
-        schedule: {
-            activies: [],
-            tasks: [],
-        }
-    },
-    {
-        date: '25-11-2024',
-        dayOfWeek: 'Mon',
         schedule: {
             activies: [],
             tasks: [],

@@ -34,6 +34,7 @@ import { IoMdArrowDropdown } from "react-icons/io";
 import { AiTwotoneInfoCircle } from "react-icons/ai";
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
+import { Input } from "../ui/input";
 
 const PomoSettings = () => {
     const [soundAlarm, setSoundAlarm] = useState('bell');
@@ -120,32 +121,20 @@ const PomoSettings = () => {
                                 <div className='flex w-full justify-between'>
                                     <div className='flex flex-col w-[30%] space-y-1'>
                                         <Label className="flex text-black/60 text-sm">Pomodoro</Label>
-                                        <div className="flex h-10 items-center p-1 px-2 bg-gray-100 rounded-md group">
-                                            <span className="flex-grow">12</span>
-                                            <div className="flex-col items-center justify-center group-hover:flex hidden">
-                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                            </div>
+                                        <div className="flex h-10 items-center rounded-md group">
+                                            <Input className='w-full bg-gray-50' type='number' placeholder='25' />
                                         </div>
                                     </div>
                                     <div className="flex flex-col w-[30%] space-y-1">
                                         <Label className="flex text-black/60 text-sm">Short Break</Label>
-                                        <div className="flex h-10 items-center p-1 px-2 bg-gray-100 rounded-md group">
-                                            <span className="flex-grow">12</span>
-                                            <div className="flex-col items-center justify-center group-hover:flex hidden">
-                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                            </div>
+                                        <div className="flex h-10 items-center rounded-md group">
+                                            <Input className='w-full bg-gray-50' type='number' placeholder='5' />
                                         </div>
                                     </div>
                                     <div className='flex flex-col w-[30%] space-y-1'>
                                         <Label className="flex text-black/60 text-sm">Long Break</Label>
-                                        <div className="flex h-10 items-center p-1 px-2 bg-gray-100 rounded-md group">
-                                            <span className="flex-grow">12</span>
-                                            <div className="flex-col items-center justify-center group-hover:flex hidden">
-                                                <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                                <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                            </div>
+                                        <div className="flex h-10 items-center rounded-md group">
+                                            <Input className='w-full bg-gray-50' type='number' placeholder='15' />
                                         </div>
                                     </div>
                                 </div>
@@ -169,12 +158,8 @@ const PomoSettings = () => {
                             <div className='flex w-full items-center mt-4 justify-between'>
                                 <div className='flex w-full items-center group'>
                                     <Label className="flex text-sm">Long Break interval</Label>
-                                    <div className="flex h-10 items-center p-1 px-2 bg-gray-100 rounded-md w-[30%]  ml-4 ">
-                                        <span className="flex-grow">12</span>
-                                        <div className="flex-col items-center justify-center hidden group-hover:flex">
-                                            <IoMdArrowDropup className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                            <IoMdArrowDropdown className="cursor-pointer hover:text-gray-800 hover:bg-gray-400 rounded-sm" />
-                                        </div>
+                                    <div className="flex h-10 items-center rounded-md w-[30%]  ml-4 ">
+                                        <Input className='w-full bg-gray-50' type='number' placeholder='4' />
                                     </div>
                                 </div>
                             </div>

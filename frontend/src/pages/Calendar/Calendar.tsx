@@ -9,14 +9,15 @@ import { MdSort } from "react-icons/md";
 import { FiPlusCircle } from "react-icons/fi";
 import { RiFireFill } from "react-icons/ri";
 import { IoCalendarOutline } from "react-icons/io5";
-import { ChevronsUpDown } from "lucide-react"
+import { CalendarDaysIcon, ChevronsUpDown } from "lucide-react"
 import { FaFlagCheckered } from "react-icons/fa";
+import { BsCollection } from "react-icons/bs";
 
 //Import styles
 import "./style.css"
-import SideBarActivity from "../../components/sidebar/sidebar_activity.tsx";
 
 //Import components
+import SideBarActivity from "../../components/sidebar/sidebar_activity.tsx";
 import { Button } from "../../components/ui/button.tsx"
 import {
     Collapsible,
@@ -25,12 +26,20 @@ import {
 } from "../../components/ui/collapsible.tsx"
 import CalendarGrid from "../../components/draggable/CalendarGrid.tsx";
 
-//Import libs
+//Import libs/packages
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 
 const Calendar = () => {
     const [isOpenTask, setIsOpenTask] = useState(false);
+    const [isCalendarVisible, setIsCalendarVisible] = useState(false);
+    const [startDate, setStartDate] = useState("2024-12-01"); // Default date
+
+    const toggleCalendar = () => {
+        setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
+    };
+
     return (
         <DndProvider backend={HTML5Backend}>
             <div className="flex items-start w-full h-full">
@@ -54,12 +63,45 @@ const Calendar = () => {
                         </div>
                     </div>
                     <hr className="my-2 border-[1px]" />
-                    <div className="flex justify-end space-x-4 mr-4 text-sm items-center">
-                        <button className="flex px-6 py-0.5 border-2 rounded-md font-semibold">Week</button>
-                        <button className="flex px-6 py-0.5 border-2 rounded-md font-semibold">Month</button>
-                        <div className="flex px-6 py-0.5">
-                            <p>Today</p>
-                        </div>
+                    <div className="flex justify-end space-x-4 mr-4 text-sm items-center relative">
+                        <button
+                            className="flex px-2 py-1 border-2 rounded-md items-center"
+                        >
+                            <BsCollection className="w-4 h-4 mr-2" /> {/* Correct size classes */}
+                            <p>
+                                <p>
+                                    Preset 1
+                                </p>
+                            </p>
+                        </button>
+                        <button
+                            className="flex px-2 py-1 border-2 rounded-md items-center"
+                            onClick={toggleCalendar}
+                        >
+                            <CalendarDaysIcon className="w-4 h-4 mr-2" /> {/* Correct size classes */}
+                            <p>
+                                <p>
+                                    {new DayPilot.Date(startDate).toString("dd")} -{" "}
+                                    {new DayPilot.Date(startDate).addDays(6).toString("dd MMM yy")}
+                                </p>
+                            </p>
+                        </button>
+
+                        {/* Conditional rendering of the calendar */}
+                        {isCalendarVisible && (
+                            <div className="absolute z-50 top-10 bg-gray-50 border shadow-md p-2 rounded-md">
+                                <DayPilotNavigator
+                                    selectMode={"Week"}
+                                    showMonths={1}
+                                    skipMonths={1}
+                                    selectionDay={new DayPilot.Date(startDate)}
+                                    onTimeRangeSelected={(args) => {
+                                        setStartDate(new DayPilot.Date(args.day).toString("yyyy-MM-dd"));
+                                        setIsCalendarVisible(false); // Hide calendar after selecting a date
+                                    }}
+                                />
+                            </div>
+                        )}
                     </div>
                     <CalendarGrid />
                 </div>

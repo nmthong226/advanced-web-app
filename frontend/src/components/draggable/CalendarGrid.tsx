@@ -7,6 +7,20 @@ import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
 //Import icons
 import { RxCountdownTimer } from "react-icons/rx";
 
+//Import components
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "../../components/ui/dialog"
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
+import { Label } from '../ui/label';
+
 // Define the type for the draggable item.
 const CalendarGrid = () => {
     // Get current week
@@ -68,17 +82,128 @@ const CalendarGrid = () => {
 
     const interval = 15; // 15-minute intervals
     const slotsPerDay = (60 / interval) * 24; // 96 slots for 15-minute intervals
-
-    console.log("calendar", calendarData);
-
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
+
+    const [value, setValue] = useState("00");
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let inputValue = parseInt(e.target.value || "0", 10);
+
+        // Validate range and pad with leading zero
+        if (inputValue >= 0 && inputValue <= 12) {
+            setValue(inputValue.toString().padStart(2, "0"));
+        }
+    };
 
     return (
         <div className='flex flex-col w-full h-full overflow-hidden'>
             <div className='flex'>
-                <div className='flex w-[5%] items-center justify-center bg-zinc-50'>
-                    <RxCountdownTimer />
-                </div>
+                <Dialog>
+                    <DialogTrigger asChild>
+                        <div className='flex flex-col space-y-3 w-[5%] items-center justify-center bg-zinc-50 group hover:cursor-pointer hover:bg-zinc-100'>
+                            <RxCountdownTimer />
+                            <div className='flex flex-col text-center leading-tight'>
+                                <p className='text-[10px] text-gray-400'>Time</p>
+                                <p className='text-[10px] text-gray-400'>Range</p>
+                            </div>
+                        </div>
+                    </DialogTrigger>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle>Settings Time Range</DialogTitle>
+                            <DialogDescription>
+                                Choose your best fit time range for daily planning.
+                            </DialogDescription>
+                        </DialogHeader>
+                        <div className="flex flex-col space-y-4">
+                            <div className="flex flex-col gap-4">
+                                <Label htmlFor="name" className="text-left">
+                                    Starting Time
+                                </Label>
+                                <div className='flex w-full h-20 space-x-2 justify-between items-center text-3xl'>
+                                    <div className='flex flex-col h-full w-1/3 leading-tight'>
+                                        <Input
+                                            id="hour"
+                                            defaultValue="0"
+                                            type="number"
+                                            min="0"
+                                            max="12"
+                                            onChange={handleChange}
+                                            className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
+                                            autoFocus
+                                        />
+                                        <p className='text-[10px] h-[5%] text-gray-600'>hour</p>
+                                    </div>
+                                    <span className='text-3xl mb-3'>:</span>
+                                    <div className='flex flex-col h-full w-1/3 leading-tight'>
+                                        <Input
+                                            id="minute"
+                                            defaultValue="00"
+                                            type="number"
+                                            min="0"
+                                            max="59"
+                                            className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
+                                            disabled
+                                        />
+                                        <p className='text-[10px] h-[5%] text-gray-600'>minute</p>
+                                    </div>
+                                    <div className='flex flex-col h-full w-1/5'>
+                                        <div className='flex h-1/2 w-full border bg-indigo-100 rounded-t-lg items-center justify-center'>
+                                            <p className='text-zinc-600 text-[12px] font-bold'>AM</p>
+                                        </div>
+                                        <div className='flex h-1/2 w-full border rounded-b-lg items-center justify-center'>
+                                            <p className='text-zinc-600 text-[12px] font-bold'>PM</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <Label htmlFor="username" className="text-left">
+                                    End Time
+                                </Label>
+                                <div className='flex w-full h-20 space-x-2 justify-between items-center text-3xl'>
+                                    <div className='flex flex-col h-full w-1/3 leading-tight'>
+                                        <Input
+                                            id="hour"
+                                            defaultValue="12"
+                                            type="number"
+                                            min="0"
+                                            max="12"
+                                            onChange={handleChange}
+                                            className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
+                                            autoFocus
+                                        />
+                                        <p className='text-[10px] h-[5%] text-gray-600'>hour</p>
+                                    </div>
+                                    <span className='text-3xl mb-3'>:</span>
+                                    <div className='flex flex-col h-full w-1/3 leading-tight'>
+                                        <Input
+                                            id="minute"
+                                            defaultValue="00"
+                                            type="number"
+                                            min="0"
+                                            max="59"
+                                            className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
+                                            disabled
+                                        />
+                                        <p className='text-[10px] h-[5%] text-gray-600'>minute</p>
+                                    </div>
+                                    <div className='flex flex-col h-full w-1/5'>
+                                        <div className='flex h-1/2 w-full border rounded-t-lg items-center justify-center'>
+                                            <p className='text-zinc-600 text-[12px] font-bold'>AM</p>
+                                        </div>
+                                        <div className='flex h-1/2 w-full border bg-indigo-100 rounded-b-lg items-center justify-center'>
+                                            <p className='text-zinc-600 text-[12px] font-bold'>PM</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <DialogFooter>
+                            <Button type="submit">Save changes</Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
                 <div className='w-[95%] grid grid-cols-7 grid-rows-[auto] gap-0.5 mr-1.5'>
                     {/* Days of the week */}
                     {currentWeek.map((date, index) => (
@@ -98,7 +223,7 @@ const CalendarGrid = () => {
                     {Array.from({ length: 24 }, (_, hour) => (
                         <div
                             key={hour}
-                            className="flex items-center justify-center text-[11px] font-medium h-20"
+                            className="flex items-center justify-center text-[11px] h-20"
                         >
                             {/* Display the hour in 12-hour AM/PM format */}
                             {hour === 0
@@ -166,7 +291,7 @@ const CalendarGrid = () => {
                     })}
                 </div>
             </div>
-        </div>
+        </div >
 
     );
 };

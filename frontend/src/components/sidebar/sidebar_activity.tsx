@@ -69,7 +69,7 @@ const SideBarActivity = () => {
 
     return (
         <div className='flex flex-col w-[14%] h-full relative'>
-            <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative overflow-y-hidden">
+            <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative overflow-y-hidden overflow-x-hidden">
                 <AddEvent onAddEvent={handleAddNewCategory} />
                 <hr className="my-2 border-[1px]" />
                 <div className="px-2 overflow-y-auto custom-scrollbar">
