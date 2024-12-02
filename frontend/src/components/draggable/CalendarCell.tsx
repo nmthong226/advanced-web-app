@@ -79,7 +79,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                         height: '100%', // Set initial height based on activity duration
                     }}
                     position={{ x: 1, y: 3 }}
-                    onResizeStop={(ref : any) => {
+                    onResizeStop={(_e, _direction, ref, _delta, _position) => {
                         // Only proceed if the resized activity matches the active one
                         const newHeight = ref.offsetHeight;
                         const newDuration = Math.max(15, Math.floor(newHeight / 20) * 15); // Calculate new duration based on height
