@@ -29,8 +29,6 @@ import { LuClock2 } from "react-icons/lu";
 import { BsListTask } from "react-icons/bs";
 import { AiFillSpotify, AiOutlineSound } from "react-icons/ai";
 import { GiStarShuriken } from "react-icons/gi";
-import { IoMdArrowDropup } from "react-icons/io";
-import { IoMdArrowDropdown } from "react-icons/io";
 import { AiTwotoneInfoCircle } from "react-icons/ai";
 import { Label } from '../ui/label';
 import { Button } from '../ui/button';
@@ -204,10 +202,12 @@ const PomoSettings = () => {
                             <div className="flex flex-col w-full justify-between  space-y-3">
                                 <div className='flex items-center justify-between w-[75%]'>
                                     <Label>Alarm Sound</Label>
-                                    <Select onValueChange={(value) => {
-                                        setSoundAlarm(value);
-                                        playAlarmSound(value); // Call a function to play the sound.
-                                    }}>
+                                    <Select
+                                        value={soundAlarm}
+                                        onValueChange={(value) => {
+                                            setSoundAlarm(value);
+                                            playAlarmSound(value); // Call a function to play the sound.
+                                        }}>
                                         <SelectTrigger className="w-[180px]">
                                             <SelectValue defaultValue={"bell"} placeholder="Bell" />
                                         </SelectTrigger>
@@ -232,7 +232,9 @@ const PomoSettings = () => {
                                 </div>
                                 <div className="flex items-center justify-between w-[75%]">
                                     <Label>Break Sound</Label>
-                                    <Select onValueChange={(value) => {
+                                    <Select 
+                                        value={soundBreak} 
+                                        onValueChange={(value) => {
                                         setSoundBreak(value);
                                         playBreakSound(value);
                                     }}>

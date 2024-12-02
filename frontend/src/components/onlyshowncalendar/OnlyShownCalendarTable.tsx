@@ -11,7 +11,7 @@ const OnlyShownCalendarTable = () => {
     // Get current week
     const currentWeek = getCurrentWeek();
     // Use state to track items dropped in specific hours
-    const [calendarData, setCalendarData] = useState<CalendarData>(initialCalendarData);
+    const [calendarData] = useState<CalendarData>(initialCalendarData);
 
     const interval = 15; // 15-minute intervals
     const slotsPerDay = (60 / interval) * 24; // 96 slots for 15-minute intervals

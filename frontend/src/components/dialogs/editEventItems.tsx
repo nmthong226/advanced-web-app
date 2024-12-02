@@ -4,18 +4,15 @@ import React, { useState } from "react";
 //Import components
 import { Button } from "../../components/ui/button"
 import {
-    Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "../../components/ui/dialog"
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import ColorPicker from "../colorpicker/ColorSelection";
-import { BsPlusCircle } from "react-icons/bs";
 
 interface EditEventDialogProps {
     eventCategory: { id: string; name: string };
@@ -24,7 +21,6 @@ interface EditEventDialogProps {
 }
 
 const EditEventItemsDialog: React.FC<EditEventDialogProps> = ({ eventCategory, eventItem, onEditEventItem }) => {
-    const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [selectedColor, setSelectedColor] = useState<string>('');
     const [newEventItemTitle, setNewEventItemTitle] = useState<string>('');
     const [newEventItemColor, setNewEventItemColor] = useState<string>('');
@@ -38,7 +34,6 @@ const EditEventItemsDialog: React.FC<EditEventDialogProps> = ({ eventCategory, e
         onEditEventItem(eventCategory.id, newEventItemTitle, newEventItemColor, newEventItemTextColor);
         setNewEventItemTitle("");
         setSelectedColor("");
-        setIsDialogOpen(false);
     };
 
     const handleColorSelect = (color: string) => {
