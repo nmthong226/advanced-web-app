@@ -1,16 +1,25 @@
+import SideBar from "../components/sidebar/sidebar";
 import { Outlet } from "react-router-dom";
-// import Header from "@/components/Header";
-// import Footer from "@/components/Footer";
+import { SignedIn, SignedOut, RedirectToSignIn } from "@clerk/clerk-react";
+import { Toaster } from "../components/ui/sonner"
 
 const Layout = () => {
     return (
-        <div className="flex flex-col w-full h-screen">
-            {/* <Header /> */}
-            <main className="flex-grow">
-                <Outlet />
-            </main>
-            {/* <Footer /> */}
-        </div>
+        <>
+            <SignedIn>
+                <div className="flex flex-row w-full h-screen">
+                    <SideBar />
+                    <main className="flex-grow">
+                        <Outlet />
+                        <Toaster />
+                    </main>
+                </div>
+            </SignedIn>
+            {/* Redirect to sign-in page when signed out */}
+            <SignedOut>
+                <RedirectToSignIn />
+            </SignedOut>
+        </>
     );
 };
 
