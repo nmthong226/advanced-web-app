@@ -73,12 +73,12 @@ const PomoSettings = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <button className="flex items-center rounded-md p-1 px-4 bg-white/70 text-zinc-700 font-semibold">
+                <button className="flex items-center bg-white/70 px-4 p-1 rounded-md font-semibold text-zinc-700">
                     <IoMdSettings className="mr-2" />
                     Settings
                 </button>
             </DialogTrigger>
-            <DialogContent className="flex flex-col sm:max-w-[425px] sm:max-h-[425px] items-center">
+            <DialogContent className="flex flex-col items-center sm:max-w-[425px] sm:max-h-[425px]">
                 <DialogHeader className='items-center'>
                     <DialogTitle>Settings</DialogTitle>
                     <DialogDescription>
@@ -86,7 +86,7 @@ const PomoSettings = () => {
                     </DialogDescription>
                 </DialogHeader>
                 <Tabs defaultValue="timer" className="w-[400px] h-[400px]">
-                    <TabsList className='flex w-full justify-between'>
+                    <TabsList className='flex justify-between w-full'>
                         <TabsTrigger value="timer">
                             <div className='flex items-center w-[60px]'>
                                 <LuClock2 className='mr-2' />
@@ -113,31 +113,31 @@ const PomoSettings = () => {
                         </TabsTrigger>
                     </TabsList>
                     <TabsContent value="timer">
-                        <div className='flex flex-col h-full w-full my-5 px-1'>
-                            <div className='flex w-full flex-col space-y-2'>
+                        <div className='flex flex-col my-5 px-1 w-full h-full'>
+                            <div className='flex flex-col space-y-2 w-full'>
                                 <Label className='flex'>Time (minutes)</Label>
-                                <div className='flex w-full justify-between'>
-                                    <div className='flex flex-col w-[30%] space-y-1'>
+                                <div className='flex justify-between w-full'>
+                                    <div className='flex flex-col space-y-1 w-[30%]'>
                                         <Label className="flex text-black/60 text-sm">Pomodoro</Label>
-                                        <div className="flex h-10 items-center rounded-md group">
-                                            <Input className='w-full bg-gray-50' type='number' placeholder='25' />
+                                        <div className="flex items-center rounded-md h-10 group">
+                                            <Input className='bg-gray-50 w-full' type='number' placeholder='25' />
                                         </div>
                                     </div>
-                                    <div className="flex flex-col w-[30%] space-y-1">
+                                    <div className="flex flex-col space-y-1 w-[30%]">
                                         <Label className="flex text-black/60 text-sm">Short Break</Label>
-                                        <div className="flex h-10 items-center rounded-md group">
-                                            <Input className='w-full bg-gray-50' type='number' placeholder='5' />
+                                        <div className="flex items-center rounded-md h-10 group">
+                                            <Input className='bg-gray-50 w-full' type='number' placeholder='5' />
                                         </div>
                                     </div>
-                                    <div className='flex flex-col w-[30%] space-y-1'>
+                                    <div className='flex flex-col space-y-1 w-[30%]'>
                                         <Label className="flex text-black/60 text-sm">Long Break</Label>
-                                        <div className="flex h-10 items-center rounded-md group">
-                                            <Input className='w-full bg-gray-50' type='number' placeholder='15' />
+                                        <div className="flex items-center rounded-md h-10 group">
+                                            <Input className='bg-gray-50 w-full' type='number' placeholder='15' />
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <div className='flex w-full items-center mt-6 justify-between'>
+                            <div className='flex justify-between items-center mt-6 w-full'>
                                 <div className='flex items-center space-x-2 w-[50%]'>
                                     <Label className='flex'>Auto Start Pomodoro</Label>
                                     <Switch
@@ -153,37 +153,37 @@ const PomoSettings = () => {
                                     />
                                 </div>
                             </div>
-                            <div className='flex w-full items-center mt-4 justify-between'>
-                                <div className='flex w-full items-center group'>
+                            <div className='flex justify-between items-center mt-4 w-full'>
+                                <div className='flex items-center w-full group'>
                                     <Label className="flex text-sm">Long Break interval</Label>
-                                    <div className="flex h-10 items-center rounded-md w-[30%]  ml-4 ">
-                                        <Input className='w-full bg-gray-50' type='number' placeholder='4' />
+                                    <div className="flex items-center ml-4 rounded-md w-[30%] h-10">
+                                        <Input className='bg-gray-50 w-full' type='number' placeholder='4' />
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </TabsContent>
                     <TabsContent value="task">
-                        <div className='flex flex-col h-full w-full my-5 px-4'>
-                            <div className='flex w-full flex-col space-y-3'>
-                                <div className='flex items-center justify-between w-[47%]'>
+                        <div className='flex flex-col my-5 px-4 w-full h-full'>
+                            <div className='flex flex-col space-y-3 w-full'>
+                                <div className='flex justify-between items-center w-[47%]'>
                                     <Label className='flex'>Auto Check Tasks</Label>
                                     <Switch
                                         checked={true}
                                         onCheckedChange={() => { }}
                                     />
                                 </div>
-                                <div className='flex items-center justify-between w-[47%]'>
+                                <div className='flex justify-between items-center w-[47%]'>
                                     <Label className='flex'>Auto Switch Tasks</Label>
                                     <Switch
                                         checked={true}
                                         onCheckedChange={() => { }}
                                     />
                                 </div>
-                                <div className='flex flex-col items-start w-full h-[120px] bg-gray-100 rounded-md relative p-1 space-y-1'>
+                                <div className='relative flex flex-col items-start space-y-1 bg-gray-100 p-1 rounded-md w-full h-[120px]'>
                                     <div className='flex items-center'>
                                         <AiTwotoneInfoCircle className='mr-2' />
-                                        <span className='text-sm font-semibold text-zinc-700'>Info</span>
+                                        <span className='font-semibold text-sm text-zinc-700'>Info</span>
                                     </div>
                                     <div className='flex items-start space-x-2'>
                                         <GiStarShuriken />
@@ -198,9 +198,9 @@ const PomoSettings = () => {
                         </div>
                     </TabsContent>
                     <TabsContent value="sound">
-                        <div className='flex flex-col h-full w-full my-3 px-4'>
-                            <div className="flex flex-col w-full justify-between  space-y-3">
-                                <div className='flex items-center justify-between w-[75%]'>
+                        <div className='flex flex-col my-3 px-4 w-full h-full'>
+                            <div className="flex flex-col justify-between space-y-3 w-full">
+                                <div className='flex justify-between items-center w-[75%]'>
                                     <Label>Alarm Sound</Label>
                                     <Select
                                         value={soundAlarm}
@@ -230,7 +230,7 @@ const PomoSettings = () => {
                                         </SelectContent>
                                     </Select>
                                 </div>
-                                <div className="flex items-center justify-between w-[75%]">
+                                <div className="flex justify-between items-center w-[75%]">
                                     <Label>Break Sound</Label>
                                     <Select 
                                         value={soundBreak} 
@@ -252,11 +252,11 @@ const PomoSettings = () => {
                                 <Label>Spotify</Label>
                                 <div className="flex flex-col w-full">
                                     <div className="flex justify-between">
-                                        <button className="flex p-1 bg-zinc-800 text-white rounded-md w-56 text-sm items-center justify-center">
+                                        <button className="flex justify-center items-center bg-zinc-800 p-1 rounded-md w-56 text-sm text-white">
                                             <AiFillSpotify className="mr-2 text-green-500" />
                                             Connect your spotify account
                                         </button>
-                                        <button className="flex p-1 bg-zinc-800 text-white rounded-md w-28 text-sm items-center justify-center disabled:bg-zinc-500" disabled>
+                                        <button className="flex justify-center items-center bg-zinc-800 disabled:bg-zinc-500 p-1 rounded-md w-28 text-sm text-white" disabled>
                                             <AiFillSpotify className="mr-2 text-green-500" />
                                             Manage list
                                         </button>
@@ -273,32 +273,32 @@ const PomoSettings = () => {
                         </div>
                     </TabsContent>
                     <TabsContent value="theme">
-                        <div className='flex flex-col h-full w-full my-5 px-5'>
-                            <div className='flex w-full flex-col space-y-2'>
+                        <div className='flex flex-col my-5 px-5 w-full h-full'>
+                            <div className='flex flex-col space-y-2 w-full'>
                                 <Label className='flex'>Color Theme</Label>
-                                <div className='flex w-full justify-between'>
-                                    <div className='flex flex-col w-[30%] space-y-2 justify-center items-start'>
+                                <div className='flex justify-between w-full'>
+                                    <div className='flex flex-col justify-center items-start space-y-2 w-[30%]'>
                                         <Label className="flex text-black/60 text-sm">Pomodoro</Label>
                                         <div className="flex space-x-2">
-                                            <div className="w-5 h-5 rounded-full bg-orange-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-red-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-purple-600/60"></div>
+                                            <div className="bg-orange-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-red-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-purple-600/60 rounded-full w-5 h-5"></div>
                                         </div>
                                     </div>
-                                    <div className='flex flex-col w-[30%] space-y-2 justify-center items-center'>
+                                    <div className='flex flex-col justify-center items-center space-y-2 w-[30%]'>
                                         <Label className="flex text-black/60 text-sm">Short break</Label>
                                         <div className="flex space-x-2">
-                                            <div className="w-5 h-5 rounded-full bg-teal-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-green-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-emerald-600/60"></div>
+                                            <div className="bg-teal-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-green-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-emerald-600/60 rounded-full w-5 h-5"></div>
                                         </div>
                                     </div>
-                                    <div className='flex flex-col w-[30%] space-y-2 justify-center items-end'>
+                                    <div className='flex flex-col justify-center items-end space-y-2 w-[30%]'>
                                         <Label className="flex text-black/60 text-sm">Long break</Label>
                                         <div className="flex space-x-2">
-                                            <div className="w-5 h-5 rounded-full bg-blue-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-sky-600/60"></div>
-                                            <div className="w-5 h-5 rounded-full bg-cyan-600/60"></div>
+                                            <div className="bg-blue-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-sky-600/60 rounded-full w-5 h-5"></div>
+                                            <div className="bg-cyan-600/60 rounded-full w-5 h-5"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -306,7 +306,7 @@ const PomoSettings = () => {
                         </div>
                     </TabsContent>
                 </Tabs>
-                <DialogFooter className='flex w-full justify-end'>
+                <DialogFooter className='flex justify-end w-full'>
                     <Button type="submit">Save changes</Button>
                 </DialogFooter>
             </DialogContent>
