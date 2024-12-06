@@ -6,6 +6,7 @@ import Canlendar from './pages/Calendar/Calendar.tsx'
 import Layout from '@/layouts/PublicLayout.tsx'
 import Timer from './pages/Timer/Timer.tsx'
 import SignIn from "./pages/Auth/SignIn/index.tsx";
+import TaskList from './pages/Task/TaskList.tsx';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         >
           <Route path="/home" element={<Home />} />
           <Route path='/calendar' element={<Canlendar />} />
+          <Route path='/task' element={<TaskList />} />
           <Route path='/timer' element={<Timer />} />
           <Route path="/about" element={<About />} />
           <Route path="/signin" element={<SignIn />} />

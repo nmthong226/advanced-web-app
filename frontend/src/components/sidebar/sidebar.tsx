@@ -27,30 +27,31 @@ const SideBar = () => {
   };
 
   return (
-    <aside className="flex flex-col w-14 h-full border-r-[1px] items-center py-2 justify-between ">
+    <aside className="flex flex-col justify-between items-center py-2 border-r-[1px] w-14 h-full">
       <div className="flex flex-col">
-        <div className="flex w-8 h-8 mx-1">
+        <div className="flex mx-1 w-8 h-8">
           <img width="48" height="48" src="https://img.icons8.com/parakeet/48/machine-learning.png" alt="machine-learning" />
         </div>
-        <div className="flex flex-col my-6 space-y-2">
+        <div className="flex flex-col space-y-2 my-6">
           <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/home') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
             onClick={() => navigateTo('/home')}
           >
             <IoHomeOutline className={`${isActiveTab('/home') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
-            <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Dashboard
             </span>
           </div>
           <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/calendar') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
             onClick={() => navigateTo('/calendar')}>
             <IoCalendarOutline className={`${isActiveTab('/calendar') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
-            <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Calendar
             </span>
           </div>
-          <div className="relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer">
-            <BsListTask className="text-zinc-800 w-6 h-6" />
-            <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
+          <div className={`relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md hover:cursor-pointer group ${isActiveTab('/task') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
+            onClick={() => navigateTo('/task')}>
+            <BsListTask className={`${isActiveTab('/task') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Tasks
             </span>
           </div>
@@ -58,26 +59,26 @@ const SideBar = () => {
             onClick={() => navigateTo('/timer')}
           >
             <TfiTimer className={`${isActiveTab('/timer') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
-            <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Timer
             </span>
           </div>
-          <div className="relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer">
-            <SiGoogleanalytics className="text-zinc-800 w-6 h-6" />
-            <span className="absolute left-[52px] top-1/2 transform -translate-y-1/2 opacity-0 group-hover:opacity-100 bg-gray-700 text-white text-xs rounded-md px-2 py-1 transition-opacity duration-200 pointer-events-none z-50">
+          <div className="relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md hover:cursor-pointer group">
+            <SiGoogleanalytics className="w-6 h-6 text-zinc-800" />
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Analytics
             </span>
           </div>
         </div>
       </div>
-      <div className="flex flex-col items-center space-y-2 rounded-3xl bg-gray-200">
-        <div className="p-2 rounded-md hover:border-gray-300 hover:cursor-pointer">
+      <div className="flex flex-col items-center space-y-2 bg-gray-200 rounded-3xl">
+        <div className="hover:border-gray-300 p-2 rounded-md hover:cursor-pointer">
           <TfiHelpAlt className="w-6 h-6" />
         </div>
-        <div className="p-2 rounded-md hover:border-gray-300 hover:cursor-pointer">
+        <div className="hover:border-gray-300 p-2 rounded-md hover:cursor-pointer">
           <IoMdSettings className="w-6 h-6" />
         </div>
-        <div className="p-1 hover:border-gray-300 hover:cursor-pointer rounded-full">
+        <div className="hover:border-gray-300 p-1 rounded-full hover:cursor-pointer">
           <UserButton />
         </div>
       </div>

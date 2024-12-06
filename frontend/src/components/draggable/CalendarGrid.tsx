@@ -84,17 +84,6 @@ const CalendarGrid = () => {
     const slotsPerDay = (60 / interval) * 24; // 96 slots for 15-minute intervals
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
 
-    const [value, setValue] = useState("00");
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        let inputValue = parseInt(e.target.value || "0", 10);
-
-        // Validate range and pad with leading zero
-        if (inputValue >= 0 && inputValue <= 12) {
-            setValue(inputValue.toString().padStart(2, "0"));
-        }
-    };
-
     return (
         <div className='flex flex-col w-full h-full overflow-hidden'>
             <div className='flex'>
@@ -128,7 +117,6 @@ const CalendarGrid = () => {
                                             type="number"
                                             min="0"
                                             max="12"
-                                            onChange={handleChange}
                                             className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
                                             autoFocus
                                         />
@@ -169,7 +157,6 @@ const CalendarGrid = () => {
                                             type="number"
                                             min="0"
                                             max="12"
-                                            onChange={handleChange}
                                             className="h-[95%] w-full rounded-md items-center justify-center md:text-3xl text-center"
                                             autoFocus
                                         />
