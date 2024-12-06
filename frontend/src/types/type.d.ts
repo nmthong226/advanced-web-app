@@ -25,7 +25,7 @@ type Task = {
 };
 
 type Schedule = {
-    activies: Activity[];
+    activities: Activity[];
     tasks: Task[];
 };
 

@@ -15,6 +15,7 @@ export default {
 		'row-span-13', 'row-span-14', 'row-span-15',
 		'row-span-16', 'row-span-17', 'row-span-18',
 		'row-span-19', 'row-span-20', 'row-span-21',
+		'row-span-22', 'row-span-23', 'row-span-24',
 		/^row-span-\d{1,2}$/, // Safelist all row-span classes up to two digits (e.g., row-span-12, row-span-13, etc.)
 	],
 	theme: {
@@ -74,7 +75,7 @@ export default {
 				}
 			},
 			gridRow: {
-				...Array.from({ length: 20 }, (_, i) => i + 1).reduce(
+				...Array.from({ length: 24 }, (_, i) => i + 1).reduce(
 					(acc, num) => ({ ...acc, [`span-${num}`]: `span ${num} / span ${num}` }),
 					{}
 				),

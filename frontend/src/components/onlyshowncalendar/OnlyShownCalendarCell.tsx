@@ -34,14 +34,14 @@ const OnlyShownCalendarCell: React.FC<CalendarCellProps> = ({
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>
                                 <span className='mx-1'> - </span>
-                                <p className="text-[10px] font-bold text-zinc-600 truncate">{activity.title}</p>
+                                <p className="font-bold text-[10px] text-zinc-600 truncate">{activity.title}</p>
                             </div>
                         ) : (
-                            <div className='flex flex-col p-2'>
+                            <div className='flex flex-col p-2 w-full h-full'>
                                 <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>
-                                <p className="text-sm font-bold text-zinc-600">{activity.title}</p>
+                                <p className="line-clamp-2 font-semibold text-sm text-zinc-600">{activity.title}</p>
                             </div>
                         )
                     }

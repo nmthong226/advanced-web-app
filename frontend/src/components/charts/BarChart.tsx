@@ -1,4 +1,4 @@
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../../components/ui/chart"
+import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../ui/chart"
 import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
 
 const chartConfig = {
@@ -24,7 +24,7 @@ const Chart = () => {
         { month: "Sat", desktop: 214, mobile: 140 },
     ]
     return (
-        <ChartContainer config={chartConfig} className="h-[160px] w-full">
+        <ChartContainer config={chartConfig} className="w-full h-[160px]">
             <BarChart accessibilityLayer data={chartData}>
                 <CartesianGrid vertical={false} />
                 <XAxis
