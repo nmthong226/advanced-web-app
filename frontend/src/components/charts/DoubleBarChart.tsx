@@ -1,5 +1,5 @@
 //Import frameworks
-import React, { useState } from "react";
+import { useState } from "react";
 
 //Import components
 import {
@@ -7,14 +7,10 @@ import {
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
-} from "../../components/ui/tooltip"
-
-//Import icons
-import { CalendarDaysIcon } from "lucide-react";
-import { BsActivity } from "react-icons/bs";
-import { AiFillInfoCircle } from "react-icons/ai";
+} from "../../components/ui/tooltip";
 
 //Import libs/packages
+import { Bar } from "react-chartjs-2";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -23,132 +19,89 @@ import {
     Title,
     Tooltip,
     Legend,
-    TooltipItem,
 } from "chart.js";
 import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
-import { Bar } from "react-chartjs-2";
-ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-// Mock Weekly Data
+//Import icons
+import { AiFillInfoCircle } from "react-icons/ai";
+import { CalendarDaysIcon } from "lucide-react";
+import { LuCalendarClock } from "react-icons/lu";
+
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 const mockWeeklyData = [
     {
         week: "2024-12-01 to 2024-12-07",
-        statistics: {
-            tasksCompleted: 5,
-            hoursSpent: 40,
-            categories: {
-                Study: 20,
-                Work: 10,
-                Exercise: 5,
-                Leisure: 5,
-            },
-        },
+        timeSpent: [5, 3, 6, 4, 7, 2, 8],
+        estimatedTime: [6, 4, 5, 5, 6, 3, 7],
     },
     {
         week: "2024-12-08 to 2024-12-14",
-        statistics: {
-            tasksCompleted: 6,
-            hoursSpent: 42,
-            categories: {
-                Study: 18,
-                Work: 12,
-                Exercise: 6,
-                Leisure: 6,
-            },
-        },
+        timeSpent: [4, 5, 7, 3, 6, 2, 8],
+        estimatedTime: [5, 5, 6, 4, 7, 3, 8],
     },
     {
         week: "2024-12-15 to 2024-12-21",
-        statistics: {
-            tasksCompleted: 7,
-            hoursSpent: 38,
-            categories: {
-                Study: 22,
-                Work: 8,
-                Exercise: 4,
-                Leisure: 4,
-            },
-        },
-    },
-    {
-        week: "2024-12-22 to 2024-12-28",
-        statistics: {
-            tasksCompleted: 4,
-            hoursSpent: 36,
-            categories: {
-                Study: 16,
-                Work: 12,
-                Exercise: 4,
-                Leisure: 4,
-            },
-        },
+        timeSpent: [6, 4, 7, 5, 8, 3, 9],
+        estimatedTime: [7, 5, 8, 6, 8, 4, 9],
     },
 ];
 
-const WeeklyStatisticsChart: React.FC = () => {
+const DoubleBarChart = () => {
+    const [startDate, setStartDate] = useState("2024-12-01");
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-    const [startDate, setStartDate] = useState("2024-12-01"); // Default start date
 
     // Find the data for the currently selected week
     const currentWeekData = mockWeeklyData.find((week) => {
         const weekStart = new DayPilot.Date(startDate).toString("yyyy-MM-dd");
         const weekEnd = new DayPilot.Date(startDate).addDays(6).toString("yyyy-MM-dd");
         return week.week === `${weekStart} to ${weekEnd}`;
-    });
+    }) || {
+        timeSpent: Array(7).fill(0),
+        estimatedTime: Array(7).fill(0),
+    };
 
-    const categories = ["Study", "Work", "Exercise", "Leisure"];
-    const chartColors = ["#405281", "#A8B7C0", "#CADFEA", "#D3A9A9"];
-
-    // Prepare data for the chart
     const data = {
-        labels: categories,
+        labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Days of the week
         datasets: [
             {
-                label: `Hours Spent (${new DayPilot.Date(startDate).toString("dd MMM yy")} - ${new DayPilot.Date(
-                    startDate
-                )
-                    .addDays(6)
-                    .toString("dd MMM yy")})`,
-                data: categories.map(
-                    (category) =>
-                        currentWeekData?.statistics.categories[category as keyof typeof currentWeekData.statistics.categories] || 0
-                ),
-                backgroundColor: chartColors,
+                label: "Time Spent (hrs)",
+                data: currentWeekData.timeSpent, // Dynamic time spent data
+                backgroundColor: "#7370FB", // Color for time spent bars
+                borderWidth: 1,
+                borderRadius: 5,
+            },
+            {
+                label: "Estimated Time (hrs)",
+                data: currentWeekData.estimatedTime, // Dynamic estimated time data
+                backgroundColor: "#A1B4FF", // Color for estimated time bars
                 borderWidth: 1,
                 borderRadius: 5,
             },
         ],
     };
 
-    // Chart options
     const options = {
         responsive: true,
         plugins: {
             legend: {
                 position: "bottom" as const,
-                display: false,
-            },
-            tooltip: {
-                callbacks: {
-                    label: (context: TooltipItem<"bar">) => {
-                        const hours = context.raw as number;
-                        return `${context.label}: ${hours} hours`;
+                labels: {
+                    font: {
+                        size: 10,
+                        family: "Arial, sans-serif",
                     },
+                    padding: 20,
+                    boxWidth: 10,
+                    boxHeight: 10,
+                    usePointStyle: true,
                 },
             },
         },
         scales: {
             x: {
-                title: {
-                    display: true,
-                    text: "Categories",
-                },
+                stacked: false,
             },
             y: {
-                title: {
-                    display: true,
-                    text: "Hours Spent",
-                },
                 beginAtZero: true,
             },
         },
@@ -156,11 +109,10 @@ const WeeklyStatisticsChart: React.FC = () => {
 
     return (
         <div className="flex flex-col justify-center items-center space-y-2 w-full h-full">
-            {/* Week Selector with Calendar */}
             <div className="flex justify-between items-center w-full h-[10%]">
                 <div className="flex items-center font-semibold text-sm">
-                    <BsActivity className="mr-2" />
-                    <p className="mr-0.5">Weekly Activity Time</p>
+                    <LuCalendarClock className="mr-2" />
+                    <p className="mr-0.5">Time Spent vs Estimated Time</p>
                     <TooltipProvider>
                         <TooltipShadcn>
                             <TooltipTrigger asChild>
@@ -194,7 +146,7 @@ const WeeklyStatisticsChart: React.FC = () => {
                                 selectionDay={new DayPilot.Date(startDate)}
                                 onTimeRangeSelected={(args) => {
                                     setStartDate(new DayPilot.Date(args.day).toString("yyyy-MM-dd"));
-                                    setIsCalendarVisible(false); // Hide calendar after selection
+                                    setIsCalendarVisible(false);
                                 }}
                             />
                         </div>
@@ -208,7 +160,7 @@ const WeeklyStatisticsChart: React.FC = () => {
             </div>
             {/* Bar Chart */}
             <div className="flex justify-center items-center border rounded-xl w-full h-[90%]">
-                <div className="flex justify-center items-center w-[90%] h-full">
+                <div className="flex justify-center items-center w-[80%] h-full">
                     <Bar data={data} options={options} />
                 </div>
             </div>
@@ -216,4 +168,4 @@ const WeeklyStatisticsChart: React.FC = () => {
     );
 };
 
-export default WeeklyStatisticsChart;
+export default DoubleBarChart;

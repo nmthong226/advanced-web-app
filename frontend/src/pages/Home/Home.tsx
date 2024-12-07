@@ -37,6 +37,7 @@ const Home = () => {
   const toggleCalendar = () => {
     setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
   };
+
   // Function to update the current time
   const updateTime = () => {
     const now = dayjs(); // Use dayjs for better formatting
@@ -228,7 +229,7 @@ const Home = () => {
         <div className="flex flex-col justify-between bg-white shadow-md p-1 rounded-lg w-full h-[30%]">
           <div className="flex justify-between items-center">
             <p className="m-2 font-semibold text-sm">Productivity Insights</p>
-            <Select value="task">
+            <Select value="pomo">
               <SelectTrigger className="m-2 w-[100px]">
                 <SelectValue placeholder="Theme" />
               </SelectTrigger>

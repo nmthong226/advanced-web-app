@@ -1,20 +1,7 @@
-//Import frameworks
 import React, { useState } from "react";
+import { Bar } from "react-chartjs-2";
 
-//Import components
-import {
-    Tooltip as TooltipShadcn,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "../../components/ui/tooltip"
-
-//Import icons
-import { CalendarDaysIcon } from "lucide-react";
-import { BsActivity } from "react-icons/bs";
-import { AiFillInfoCircle } from "react-icons/ai";
-
-//Import libs/packages
+import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 import {
     Chart as ChartJS,
     CategoryScale,
@@ -23,10 +10,9 @@ import {
     Title,
     Tooltip,
     Legend,
-    TooltipItem,
 } from "chart.js";
-import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
-import { Bar } from "react-chartjs-2";
+import { BsActivity } from "react-icons/bs";
+import { CalendarDaysIcon } from "lucide-react";
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 // Mock Weekly Data
@@ -37,10 +23,10 @@ const mockWeeklyData = [
             tasksCompleted: 5,
             hoursSpent: 40,
             categories: {
-                Study: 20,
-                Work: 10,
-                Exercise: 5,
-                Leisure: 5,
+                Economics: 18,
+                Math: 10,
+                Science: 8,
+                Art: 4,
             },
         },
     },
@@ -50,42 +36,24 @@ const mockWeeklyData = [
             tasksCompleted: 6,
             hoursSpent: 42,
             categories: {
-                Study: 18,
-                Work: 12,
-                Exercise: 6,
-                Leisure: 6,
-            },
-        },
-    },
-    {
-        week: "2024-12-15 to 2024-12-21",
-        statistics: {
-            tasksCompleted: 7,
-            hoursSpent: 38,
-            categories: {
-                Study: 22,
-                Work: 8,
-                Exercise: 4,
-                Leisure: 4,
-            },
-        },
-    },
-    {
-        week: "2024-12-22 to 2024-12-28",
-        statistics: {
-            tasksCompleted: 4,
-            hoursSpent: 36,
-            categories: {
-                Study: 16,
-                Work: 12,
-                Exercise: 4,
-                Leisure: 4,
+                Economics: 16,
+                Math: 12,
+                Science: 9,
+                Art: 5,
             },
         },
     },
 ];
 
-const WeeklyStatisticsChart: React.FC = () => {
+// Define the type for the category object
+type Categories = {
+    Economics: number;
+    Math: number;
+    Science: number;
+    Art: number;
+};
+
+const WeeklyCategoryPercentageChart: React.FC = () => {
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
     const [startDate, setStartDate] = useState("2024-12-01"); // Default start date
 
@@ -96,83 +64,80 @@ const WeeklyStatisticsChart: React.FC = () => {
         return week.week === `${weekStart} to ${weekEnd}`;
     });
 
-    const categories = ["Study", "Work", "Exercise", "Leisure"];
-    const chartColors = ["#405281", "#A8B7C0", "#CADFEA", "#D3A9A9"];
+    // Extract categories and ensure safe indexing
+    const categories = Object.keys(
+        currentWeekData?.statistics.categories || {}
+    ) as Array<keyof Categories>;
 
-    // Prepare data for the chart
+    const totalHours = currentWeekData?.statistics.hoursSpent || 1;
+
+    const percentages = categories.map(
+        (category) =>
+            ((currentWeekData?.statistics.categories[category] || 0) / totalHours) *
+            100
+    );
+
+    const maxPercentage = Math.max(...percentages); // Find the largest percentage
+
+    // Chart data and options
     const data = {
         labels: categories,
         datasets: [
             {
-                label: `Hours Spent (${new DayPilot.Date(startDate).toString("dd MMM yy")} - ${new DayPilot.Date(
-                    startDate
-                )
-                    .addDays(6)
-                    .toString("dd MMM yy")})`,
-                data: categories.map(
-                    (category) =>
-                        currentWeekData?.statistics.categories[category as keyof typeof currentWeekData.statistics.categories] || 0
-                ),
-                backgroundColor: chartColors,
+                data: percentages,
+                backgroundColor: [
+                    "#01528A",
+                    "#0096D3",
+                    "#21E499",
+                    "#C7BFAA",
+                ],
+                borderColor: "rgba(0, 0, 0, 0.1)",
                 borderWidth: 1,
-                borderRadius: 5,
+                borderRadius: 3,
             },
         ],
     };
 
-    // Chart options
     const options = {
+        indexAxis: "y" as const, // Horizontal bar chart
         responsive: true,
         plugins: {
             legend: {
-                position: "bottom" as const,
+                position: "top" as const,
                 display: false,
             },
             tooltip: {
                 callbacks: {
-                    label: (context: TooltipItem<"bar">) => {
-                        const hours = context.raw as number;
-                        return `${context.label}: ${hours} hours`;
-                    },
+                    label: (context: any) =>
+                        `${context.label}: ${context.raw.toFixed(2)}%`,
                 },
             },
         },
         scales: {
             x: {
-                title: {
-                    display: true,
-                    text: "Categories",
-                },
-            },
-            y: {
-                title: {
-                    display: true,
-                    text: "Hours Spent",
-                },
+                min: 0,
+                max: maxPercentage + 5, // Set max to the largest percentage + a buffer
                 beginAtZero: true,
+                ticks: {
+                    callback: function (value: any, index: any, ticks: any) {
+                        // Only append '%' on the last tick
+                        if (index === ticks.length - 1) {
+                            return value.toFixed(0) + '%'; // Add '%' to the last value only
+                        }
+                        return value.toFixed(0); // Normal ticks without '%'
+                    },
+                },
             },
         },
     };
 
     return (
         <div className="flex flex-col justify-center items-center space-y-2 w-full h-full">
-            {/* Week Selector with Calendar */}
+            {/* Week Selector */}
             <div className="flex justify-between items-center w-full h-[10%]">
                 <div className="flex items-center font-semibold text-sm">
                     <BsActivity className="mr-2" />
-                    <p className="mr-0.5">Weekly Activity Time</p>
-                    <TooltipProvider>
-                        <TooltipShadcn>
-                            <TooltipTrigger asChild>
-                                <div className="flex items-center hover:cursor-pointer">
-                                    <AiFillInfoCircle className="text-gray-500/40 size-4" />
-                                </div>
-                            </TooltipTrigger>
-                            <TooltipContent className="bg-white shadow-xl border text-muted-foreground text-zinc-700">
-                                <p>Track your task's status</p>
-                            </TooltipContent>
-                        </TooltipShadcn>
-                    </TooltipProvider>
+                    <p>Activity Statistics</p>
                 </div>
                 <div className="relative flex space-x-1 text-center">
                     <button
@@ -186,7 +151,7 @@ const WeeklyStatisticsChart: React.FC = () => {
                         </p>
                     </button>
                     {isCalendarVisible && (
-                        <div className="top-10 left-1/2 z-50 absolute bg-white shadow-md p-2 border rounded-md transform -translate-x-1/2">
+                        <div className="top-10 left-0 z-50 absolute bg-white shadow-md p-2 border rounded-md transform -translate-x-1/2">
                             <DayPilotNavigator
                                 selectMode="Week"
                                 showMonths={1}
@@ -206,7 +171,8 @@ const WeeklyStatisticsChart: React.FC = () => {
                     </button>
                 </div>
             </div>
-            {/* Bar Chart */}
+
+            {/* Horizontal Bar Chart */}
             <div className="flex justify-center items-center border rounded-xl w-full h-[90%]">
                 <div className="flex justify-center items-center w-[90%] h-full">
                     <Bar data={data} options={options} />
@@ -216,4 +182,4 @@ const WeeklyStatisticsChart: React.FC = () => {
     );
 };
 
-export default WeeklyStatisticsChart;
+export default WeeklyCategoryPercentageChart;

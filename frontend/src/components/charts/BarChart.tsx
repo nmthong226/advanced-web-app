@@ -1,46 +1,67 @@
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent, ChartLegend, ChartLegendContent } from "../ui/chart"
-import { Bar, BarChart, CartesianGrid, XAxis } from "recharts"
+import { Bar } from "react-chartjs-2";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend } from "chart.js";
 
-const chartConfig = {
-    desktop: {
-        label: "Desktop",
-        color: "#2563eb",
-    },
-    mobile: {
-        label: "Mobile",
-        color: "#60a5fa",
-    },
-} satisfies ChartConfig
+// Register required Chart.js components
+ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
+const PomodoroChart = () => {
+    const data = {
+        labels: ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"], // Days of the week
+        datasets: [
+            {
+                label: "Pomodoros Used",
+                data: [8, 5, 7, 6, 4, 9, 10], // Number of Pomodoros per day
+                backgroundColor: "rgba(244, 63, 94, 0.6)", // Red-rose color with transparency
+                borderColor: "rgba(244, 63, 94, 1)", // Red-rose border color
+                borderWidth: 1, // Border thickness
+                borderRadius: 5, // Rounded corners
+            },
+        ],
+    };
 
-const Chart = () => {
-    const chartData = [
-        { month: "Sun", desktop: 214, mobile: 140 },
-        { month: "Mon", desktop: 186, mobile: 80 },
-        { month: "Tue", desktop: 305, mobile: 200 },
-        { month: "Wed", desktop: 237, mobile: 120 },
-        { month: "Thu", desktop: 73, mobile: 190 },
-        { month: "Fri", desktop: 209, mobile: 130 },
-        { month: "Sat", desktop: 214, mobile: 140 },
-    ]
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false, // Allow for better scaling for custom height/width
+        plugins: {
+            legend: {
+                display: false,
+                position: "bottom" as const,
+                labels: {
+                    fontSize: 12,
+                    usePointStyle: true,
+                },
+            },
+            tooltip: {
+                callbacks: {
+                    label: function (context: any) {
+                        return `${context.raw} Pomodoros`; // Customize tooltip label
+                    },
+                },
+            },
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: "Pomo used per day",
+                },
+                ticks: {
+                    font: {
+                        size: 12,
+                    },
+                },
+                grid: {
+                    display: false, // Hide vertical grid lines
+                },
+            },
+        },
+    };
+
     return (
-        <ChartContainer config={chartConfig} className="w-full h-[160px]">
-            <BarChart accessibilityLayer data={chartData}>
-                <CartesianGrid vertical={false} />
-                <XAxis
-                    dataKey="month"
-                    tickLine={false}
-                    tickMargin={10}
-                    axisLine={false}
-                    tickFormatter={(value) => value.slice(0, 3)}
-                />
-                <ChartTooltip content={<ChartTooltipContent />} />
-                <ChartLegend content={<ChartLegendContent />} />
-                <Bar dataKey="desktop" fill="var(--color-desktop)" radius={4} />
-                <Bar dataKey="mobile" fill="var(--color-mobile)" radius={4} />
-            </BarChart>
-        </ChartContainer>
-    )
-}
+        <div className="w-full h-[200px]">
+            <Bar data={data} options={options} />
+        </div>
+    );
+};
 
-export default Chart
+export default PomodoroChart;
