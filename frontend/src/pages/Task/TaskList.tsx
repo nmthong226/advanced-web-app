@@ -13,7 +13,6 @@ import {
   FaExclamationCircle,
 } from 'react-icons/fa';
 import SideBarActivity from '../../components/sidebar/sidebar_activity.tsx';
-import { Button } from '../../components/ui/button.tsx';
 
 const TaskList = () => {
   const [isOpenTask, setIsOpenTask] = useState(false);
