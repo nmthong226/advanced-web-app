@@ -27,7 +27,7 @@ const SideBar = () => {
   };
 
   return (
-    <aside className="flex flex-col justify-between items-center py-2 border-r-[1px] w-14 h-full">
+    <aside className="flex flex-col justify-between items-center p-2 border-r-[1px] w-14 h-full">
       <div className="flex flex-col">
         <div className="flex mx-1 w-8 h-8">
           <img width="48" height="48" src="https://img.icons8.com/parakeet/48/machine-learning.png" alt="machine-learning" />
@@ -63,8 +63,9 @@ const SideBar = () => {
               Timer
             </span>
           </div>
-          <div className="relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md hover:cursor-pointer group">
-            <SiGoogleanalytics className="w-6 h-6 text-zinc-800" />
+          <div className={`relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md group hover:cursor-pointer ${isActiveTab('/analytics') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
+          onClick={() => navigateTo('/analytics')}>
+            <SiGoogleanalytics className={`${isActiveTab('/analytics') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
             <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Analytics
             </span>
@@ -82,7 +83,7 @@ const SideBar = () => {
           <UserButton />
         </div>
       </div>
-    </aside>
+    </aside >
   )
 }
 

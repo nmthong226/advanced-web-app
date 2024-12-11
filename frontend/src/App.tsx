@@ -7,6 +7,7 @@ import Layout from '@/layouts/PublicLayout.tsx'
 import Timer from './pages/Timer/Timer.tsx'
 import SignIn from "./pages/Auth/SignIn/index.tsx";
 import TaskList from './pages/Task/TaskList.tsx';
+import Analytics from './pages/Analytics/Analytics.tsx';
 
 function App() {
   return (
@@ -31,6 +32,7 @@ function App() {
           <Route path='/task' element={<TaskList />} />
           <Route path='/timer' element={<Timer />} />
           <Route path="/about" element={<About />} />
+          <Route path="/analytics" element={<Analytics />} />
           <Route path="/signin" element={<SignIn />} />
           <Route path="/" element={<Navigate to="/home" replace />} />
           <Route path="*" element={<Navigate to={"/home"} />} />

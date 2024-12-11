@@ -3,7 +3,7 @@ export const initialCalendarData: CalendarData = [
         date: '24-11-2024',
         dayOfWeek: 'Sun',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-1',
                     title: 'Your course here',
@@ -34,7 +34,7 @@ export const initialCalendarData: CalendarData = [
         date: '25-11-2024',
         dayOfWeek: 'Mon',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-2',
                     title: 'Learn NestJS - Basics',
@@ -69,7 +69,7 @@ export const initialCalendarData: CalendarData = [
         date: '26-11-2024',
         dayOfWeek: 'Tue',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-4',
                     title: 'Learn NestJS - Dependency Injection',
@@ -104,7 +104,7 @@ export const initialCalendarData: CalendarData = [
         date: '27-11-2024',
         dayOfWeek: 'Wed',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-6',
                     title: 'Learn NestJS - Middleware',
@@ -148,7 +148,7 @@ export const initialCalendarData: CalendarData = [
         date: '28-11-2024',
         dayOfWeek: 'Thu',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-8',
                     title: 'Learn NestJS - Services',
@@ -183,7 +183,7 @@ export const initialCalendarData: CalendarData = [
         date: '29-11-2024',
         dayOfWeek: 'Fri',
         schedule: {
-            activies: [
+            activities: [
                 {
                     id: 'activity-10',
                     title: 'Learn NestJS - Testing',

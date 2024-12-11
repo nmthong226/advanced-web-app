@@ -7,7 +7,7 @@ import dayjs from 'dayjs';
 
 //Import components
 import OnlyShownCalendarTable from "../../components/onlyshowncalendar/OnlyShownCalendarTable";
-import Chart from "../../components/chart/Chart";
+import Chart from "../../components/charts/BarChart";
 import {
   Select,
   SelectContent,
@@ -37,6 +37,7 @@ const Home = () => {
   const toggleCalendar = () => {
     setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
   };
+
   // Function to update the current time
   const updateTime = () => {
     const now = dayjs(); // Use dayjs for better formatting
@@ -78,17 +79,25 @@ const Home = () => {
           </div>
         </div>
         <div className="flex flex-col bg-white shadow-md p-1 rounded-lg w-full h-[15%]">
-          <div className="flex flex-col w-full">
+          <div className="flex flex-col justify-start w-full">
             <div className="flex justify-between items-center border-b">
               <p className="m-2 font-semibold text-sm">Your Upcoming</p>
               <div className="flex space-x-1 text-[12px]">
-                <button className="px-1.5 border rounded-sm">Activity</button>
-                <button className="px-1.5 border rounded-sm">Deadline</button>
+                <button className="px-1.5 border rounded-sm w-14">Activity</button>
+                <button className="px-1.5 border rounded-sm w-14">Task</button>
               </div>
             </div>
-            <div>
-
+            <div className="flex justify-between items-center space-x-0.5 border-purple-500 bg-purple-100 mt-1 p-1 border-l-4 w-full h-10">
+              <p className="m-2 w-[25%] font-mono font-semibold text-left text-sm text-zinc-600 truncate">Stand up</p>
+              <p className="ml-2 w-[17%] font-mono text-left text-sm text-zinc-600 truncate">9-10 AM</p>
+              <p className="ml-2 w-[15%] font-mono text-sm text-zinc-600 truncate">21 Dec</p>
+              <p className="ml-2 w-[20%] font-mono text-sm text-zinc-600 truncate">Courses</p>
+              <p className="m-2 w-[20%] font-mono text-sm text-zinc-600">⌛10 min</p>
+              <button className="w-[3%]">
+                <IoMdMore />
+              </button>
             </div>
+            <div className="mt-1 font-mono text-[12px] text-center hover:underline italic hover:cursor-pointer">and 2 more...</div>
           </div>
         </div>
         <div className="flex flex-col justify-between bg-white shadow-md rounded-lg w-full h-[40%]">
@@ -220,7 +229,7 @@ const Home = () => {
         <div className="flex flex-col justify-between bg-white shadow-md p-1 rounded-lg w-full h-[30%]">
           <div className="flex justify-between items-center">
             <p className="m-2 font-semibold text-sm">Productivity Insights</p>
-            <Select value="task">
+            <Select value="pomo">
               <SelectTrigger className="m-2 w-[100px]">
                 <SelectValue placeholder="Theme" />
               </SelectTrigger>

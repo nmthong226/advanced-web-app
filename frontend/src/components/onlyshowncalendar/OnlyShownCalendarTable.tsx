@@ -20,26 +20,26 @@ const OnlyShownCalendarTable = () => {
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
 
     return (
-        <div className='flex flex-col w-full h-full overflow-hidden relative group'>
+        <div className='relative flex flex-col w-full h-full overflow-hidden group'>
             <div className='flex'>
-                <div className='flex flex-col space-y-3 w-[5%] items-center justify-center bg-zinc-50 group hover:cursor-pointer hover:bg-zinc-100'>
+                <div className='flex flex-col justify-center items-center space-y-3 bg-zinc-50 hover:bg-zinc-100 w-[5%] hover:cursor-pointer group'>
                     <RxCountdownTimer />
                 </div>
-                <div className='w-[95%] grid grid-cols-7 grid-rows-[auto] gap-0.5 mr-1.5'>
+                <div className='gap-0.5 grid grid-cols-7 grid-rows-[auto] mr-1.5 w-[95%]'>
                     {/* Days of the week */}
                     {currentWeek.map((date, index) => (
-                        <div key={index} className="flex flex-col justify-between h-20 items-center bg-indigo-50 font-bold text-center text-zinc-500">
-                            <div className="flex h-14 flex-col px-2 leading-tight justify-center items-center text-center">
+                        <div key={index} className="flex flex-col justify-between items-center bg-indigo-50 h-20 font-bold text-center text-zinc-500">
+                            <div className="flex flex-col justify-center items-center px-2 h-14 text-center leading-tight">
                                 <p className="text-[12px]">{date.dayOfWeek}</p>
                                 <p>{date.dayOfMonth}</p>
                             </div>
-                            <div className="flex h-6 bg-indigo-200 w-full"></div>
+                            <div className="flex bg-indigo-200 w-full h-6"></div>
                         </div>
                     ))}
                 </div>
             </div>
-            <div className='flex w-full h-full overflow-y-auto custom-scrollbar'>
-                <div className="w-[5%] h-full grid grid-rows-[auto_repeat(19,1fr)] gap-[8px] text-center">
+            <div className='flex custom-scrollbar w-full h-full overflow-y-auto'>
+                <div className="gap-[8px] grid grid-rows-[auto_repeat(19,1fr)] w-[5%] h-full text-center">
                     {/* Hourly slots (6 AM to 12 PM, then 1 PM to 12 PM) */}
                     {Array.from({ length: 19 }, (_, index) => {
                         const hour = index < 7 ? 6 + index : index - 6; // Generate 6 AM to 12 PM and 1 PM to 12 PM
@@ -47,7 +47,7 @@ const OnlyShownCalendarTable = () => {
                         return (
                             <div
                                 key={index}
-                                className="flex items-center justify-center text-[11px] h-20"
+                                className="flex justify-center items-center h-20 text-[11px]"
                             >
                                 {/* Display the hour in 12-hour AM/PM format */}
                                 {hour === 0 ? '12 AM' : hour} {period}
@@ -55,7 +55,7 @@ const OnlyShownCalendarTable = () => {
                         );
                     })}
                 </div>
-                <div className="w-[95%] h-full grid grid-cols-7 grid-rows-[repeat(24,1fr)] gap-0.5 grid-auto-flow-dense">
+                <div className="gap-0.5 grid grid-cols-7 grid-rows-[repeat(24,1fr)] grid-auto-flow-dense w-[95%] h-full">
                     {Array.from({ length: slotsPerDay }, (_, index) => {
                         const formattedTime = formatTime(startHour * (60 / interval) + index, interval);
                         return (
@@ -65,7 +65,7 @@ const OnlyShownCalendarTable = () => {
                                         return null;
                                     }
 
-                                    const activity = calendarData[day]?.schedule?.activies
+                                    const activity = calendarData[day]?.schedule?.activities
                                         .find(activity => activity.startTime === formattedTime);
 
                                     const shouldSpanRows = activity && activity.duration > 0;
