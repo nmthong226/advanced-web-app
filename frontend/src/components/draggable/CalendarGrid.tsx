@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import CalendarCell from "./CalendarCell";
 import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
 import { initialCalendarData } from '@/mocks/MockData';
@@ -22,11 +22,24 @@ import { Input } from '../ui/input';
 import { Label } from '../ui/label';
 
 // Define the type for the draggable item.
-const CalendarGrid = () => {
+const CalendarGrid = ({ date }: { date: string }) => {
     // Get current week
-    const currentWeek = getCurrentWeek();
-    // Use state to track items dropped in specific hours
-    const [calendarData, setCalendarData] = useState<CalendarData>(initialCalendarData);
+    const currentWeek = getCurrentWeek(date);
+    // Calculate the current week based on the date prop
+    const [calendarData, setCalendarData] = useState<CalendarData>([]);
+
+    useEffect(() => {
+        // Calculate the current week whenever `date` changes
+        const currentWeek = getCurrentWeek(date);
+        const currentWeekDates = currentWeek.map((day) => day.fullDate);
+
+        // Filter the initial calendar data to include only the current week
+        const filteredData = initialCalendarData.filter((data) =>
+            currentWeekDates.includes(data.date)
+        );
+
+        setCalendarData(filteredData);
+    }, [date]); // Dependency array ensures this runs whenever `date` changes
 
     const handleDrop = (item: Activity, time: string, date: string) => {
         console.log(`Item dropped at ${time} on ${date}:`, item);
@@ -204,7 +217,7 @@ const CalendarGrid = () => {
                     ))}
                 </div>
             </div>
-            <div className='flex custom-scrollbar w-full h-full overflow-y-auto'>
+            <div className='flex custom-scrollbar w-full h-full overflow-x-hidden overflow-y-auto'>
                 <div className="gap-[8px] grid grid-rows-[auto_repeat(24,1fr)] w-[5%] h-full text-center">
                     {/* Hourly slots */}
                     {Array.from({ length: 24 }, (_, hour) => (
@@ -223,7 +236,7 @@ const CalendarGrid = () => {
                         </div>
                     ))}
                 </div>
-                <div className="gap-0.5 grid grid-cols-7 grid-rows-[repeat(96,min(0,1fr))] grid-auto-flow-dense w-[95%] h-full">
+                <div className="gap-0.5 grid grid-cols-7 grid-rows-[repeat(96,20px)] grid-flow-row-dense w-[95%] h-full">
                     {Array.from({ length: slotsPerDay }, (_, index) => {
                         const formattedTime = formatTime(index, interval);
                         return (
@@ -257,6 +270,7 @@ const CalendarGrid = () => {
                                     // Manually calculate the grid row start and end
                                     const gridRowStart = index + 1;
                                     const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
+
                                     return (
                                         <CalendarCell
                                             key={`${day}-${index}`}
@@ -265,7 +279,7 @@ const CalendarGrid = () => {
                                             activity={activity}
                                             onResize={handleResize}
                                             onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                            className={shouldSpanRows ? `row-span-${spanRows} h-full rounded-md shadow-md border-none` : 'h-5 text-[10px]'}
+                                            className={shouldSpanRows ? `row-span-${spanRows} col-span-1 h-full rounded-md shadow-md border-none` : 'col-span-1 row-span-1 h-5 text-[10px]'}
                                             style={{
                                                 gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                             }}

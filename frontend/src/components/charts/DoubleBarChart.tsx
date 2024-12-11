@@ -61,7 +61,7 @@ const DoubleBarChart = () => {
     };
 
     const data = {
-        labels: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"], // Days of the week
+        labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"], // Days of the week
         datasets: [
             {
                 label: "Time Spent (hrs)",

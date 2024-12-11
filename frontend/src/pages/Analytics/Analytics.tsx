@@ -91,7 +91,7 @@ const Analytics = () => {
                         </div>
                     </div>
                     <div className="flex flex-col justify-center items-center border rounded-md w-full h-[70%]">
-                        <span className="m-2 font-semibold text-sm">Focus Hours</span>
+                        <span className="m-2 font-semibold text-sm">Pomofocus chart</span>
                         <div className="flex justify-center items-center w-[80%] h-[100%]">
                             <Chart />
                         </div>
@@ -206,7 +206,7 @@ const Analytics = () => {
                     </div>
                 </div>
             </div>
-            <div className="flex flex-col space-y-2 w-[45%] h-full">
+            <div className="flex flex-col space-y-2 w-[40%] h-full">
                 <div className="flex bg-white p-2 rounded-md w-full h-[50%]">
                     {/* - Schedule: display the number of hour spent per category, per weeks, per month */}
                     <WeeklyCategoryChart />
@@ -216,12 +216,12 @@ const Analytics = () => {
                     <TimeVsTaskCompletionChart />
                 </div>
             </div>
-            <div className="flex flex-col space-y-2 w-[25%] h-full">
-                <div className="flex bg-white p-2 rounded-md w-full h-[30%]">
+            <div className="flex flex-col space-y-2 w-[30%] h-full">
+                <div className="flex bg-white p-2 rounded-md w-full h-[40%]">
                     {/* - showing the top categories */}
                     <WeeklyCategoryPercentageChart />
                 </div>
-                <div className="flex bg-white rounded-md w-full h-[70%]">
+                <div className="flex bg-white rounded-md w-full h-[60%]">
                     {/* - showing the top categories */}
                     <AIFeedback />
                 </div>

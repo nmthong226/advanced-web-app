@@ -66,7 +66,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
     return (
         <DropdownMenu>
             <div className='flex items-center group'>
-                <MdDragIndicator className="invisible group-hover:visible" />
+                <MdDragIndicator className="group-hover:visible invisible" />
                 <div
                     ref={drag}
                     className={cn(`rounded-md border px-3 py-2 font-mono truncate text-sm w-full relative ${isDragging ? 'opacity-50' : 'opacity-100'}`, backgroundColor)}
@@ -75,13 +75,13 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
                     }}
                 >
                     <p className='w-full truncate'>{title}</p>
-                    <DropdownMenuTrigger className="absolute right-0 top-1/2">
-                        <IoIosMore className="absolute right-2 top-1/2 transform -translate-y-1/2 hidden group-hover:flex group-hover:cursor-pointer" />
+                    <DropdownMenuTrigger className="top-1/2 right-0 absolute">
+                        <IoIosMore className="group-hover:flex top-1/2 right-2 absolute hidden transform -translate-y-1/2 group-hover:cursor-pointer" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className=''>
                         {/* Edit Action */}
                         <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                            <div className="flex space-x-2 items-center text-[12px]">
+                            <div className="flex items-center space-x-2 text-[12px]">
                                 <GoPencil className="mr-2 size-3" />
                                 Edit
                             </div>
@@ -89,7 +89,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
 
                         {/* Delete Action */}
                         <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
-                            <div className="flex space-x-2 items-center text-[12px]">
+                            <div className="flex items-center space-x-2 text-[12px]">
                                 <GoTrash className="mr-2 size-3" />
                                 Delete
                             </div>
@@ -102,7 +102,7 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
                     </Dialog>
                     {/* Delete Dialog */}
                     <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                        <DialogContent className='w-[200px] left-[10%] p-2 justify-center'>
+                        <DialogContent className='left-[10%] justify-center p-2 w-[200px]'>
                             <DialogHeader>
                                 <DialogTitle className='text-md'>Delete Confirm</DialogTitle>
                                 <DialogDescription>
@@ -111,10 +111,11 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
                                     </p>
                                 </DialogDescription>
                             </DialogHeader>
-                            <div className='flex space-x-2 items-center'>
+                            <div className='flex items-center space-x-2'>
                                 <Button
                                     variant="secondary"
                                     onClick={() => setIsDeleteDialogOpen(false)}
+                                    className='hover:bg-gray-50 border'
                                 >
                                     Cancel
                                 </Button>

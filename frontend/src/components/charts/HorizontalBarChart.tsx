@@ -132,9 +132,9 @@ const WeeklyCategoryPercentageChart: React.FC = () => {
     };
 
     return (
-        <div className="flex flex-col justify-center items-center space-y-2 w-full h-full">
+        <div className="flex flex-col justify-center items-center space-y-3 w-full h-full">
             {/* Week Selector */}
-            <div className="flex justify-between items-center w-full h-[10%]">
+            <div className="flex justify-between items-center mt-1 w-full h-[10%]">
                 <div className="flex items-center font-semibold text-sm">
                     <BsActivity className="mr-2" />
                     <p>Activity Statistics</p>

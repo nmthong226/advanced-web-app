@@ -11,8 +11,7 @@ const PomodoroChart = () => {
             {
                 label: "Pomodoros Used",
                 data: [8, 5, 7, 6, 4, 9, 10], // Number of Pomodoros per day
-                backgroundColor: "rgba(244, 63, 94, 0.6)", // Red-rose color with transparency
-                borderColor: "rgba(244, 63, 94, 1)", // Red-rose border color
+                backgroundColor: "#3F80EB", // Red-rose color with transparency
                 borderWidth: 1, // Border thickness
                 borderRadius: 5, // Rounded corners
             },

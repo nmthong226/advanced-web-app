@@ -39,14 +39,14 @@ export const getCurrentDateInfo = () => {
   };
 };
 
-export const getCurrentWeek = () => {
-  const today = new Date();
+export const getCurrentWeek = (dateProp?: string) => {
+  const baseDate = dateProp ? new Date(dateProp) : new Date(); // Use the provided date or default to today
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   // Calculate the difference to find the previous Sunday
-  const dayOffset = today.getDay(); // `getDay()` returns 0 (Sunday) to 6 (Saturday)
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - dayOffset); // Go back to the previous Sunday
+  const dayOffset = baseDate.getDay(); // `getDay()` returns 0 (Sunday) to 6 (Saturday)
+  const startOfWeek = new Date(baseDate);
+  startOfWeek.setDate(baseDate.getDate() - dayOffset); // Go back to the previous Sunday
 
   const currentWeekDate = [];
 
@@ -131,7 +131,7 @@ export const formatTimeRange = (startTime: string, endTime: string): string => {
     const [hour, minuteWithPeriod] = time.split(':'); // Split hour and minute part
     const formattedHour = hour.startsWith('0') ? hour.substring(1) : hour; // Remove leading zero from hour
     const [minute, period] = minuteWithPeriod.split(' '); // Extract minutes and AM/PM period
-    
+
     // If minutes are 00, return just the hour with period; otherwise, return hour:minute with period
     if (removePeriod) {
       return minute === '00' ? `${formattedHour}` : `${formattedHour}:${minute}`;
@@ -157,8 +157,8 @@ export const formatTimeRange = (startTime: string, endTime: string): string => {
 export const transformBgColorToTextColor = (bgColor: string): string => {
   // Example: 'bg-red-50' -> 'text-red-500'
   return bgColor.replace(/bg-(\w+)-(\d+)/, (_, colorName, shade) => {
-      // Replace the 'bg' with 'text' and change the shade from '50' to '500'
-      const newShade = Math.min(parseInt(shade, 10) * 10, 500); // Adjusting the shade to '500'
-      return `text-${colorName}-${newShade}`;
+    // Replace the 'bg' with 'text' and change the shade from '50' to '500'
+    const newShade = Math.min(parseInt(shade, 10) * 10, 500); // Adjusting the shade to '500'
+    return `text-${colorName}-${newShade}`;
   });
 };

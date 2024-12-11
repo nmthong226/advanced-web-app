@@ -745,6 +745,160 @@ export const initialCalendarData: CalendarData = [
             ],
         },
     },
+    {
+        date: '08-12-2024',
+        dayOfWeek: 'Sun',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-40',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '09-12-2024',
+        dayOfWeek: 'Mon',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-41',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '10-12-2024',
+        dayOfWeek: 'Tue',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-42',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '11-12-2024',
+        dayOfWeek: 'Wed',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-43',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '12-12-2024',
+        dayOfWeek: 'Thu',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-44',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '13-12-2024',
+        dayOfWeek: 'Fri',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-45',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
+    {
+        date: '14-12-2024',
+        dayOfWeek: 'Sat',
+        schedule: {
+            activities: [
+                {
+                    id: 'activity-46',
+                    title: 'Morning Routine',
+                    description: 'Reviewing the latest economic trends and news articles.',
+                    type: 'activity',
+                    startTime: '6:00 AM',
+                    endTime: '8:00 AM',
+                    style: {
+                        backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
+                        textColor: 'text-green-600',
+                    },
+                    duration: 120,
+                },
+            ],
+            tasks: [],
+        },
+    },
 ];
 
 export const mockUserEvents: UserEvent = [
