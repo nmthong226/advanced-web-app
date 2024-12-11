@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilotNavigator, DayPilot } from '@daypilot/daypilot-lite-react';
-import { MdFilterAlt, MdMoreVert } from 'react-icons/md';
+import { MdMoreVert } from 'react-icons/md';
 import { IoSearchSharp } from 'react-icons/io5';
 import { CalendarDaysIcon } from 'lucide-react';
 import {
@@ -18,7 +18,7 @@ const TaskList = () => {
   const [isOpenTask, setIsOpenTask] = useState(false);
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const [startDate, setStartDate] = useState('2024-12-01');
-  const [groupBy, setGroupBy] = useState('');
+
   const [searchTerm, setSearchTerm] = useState('');
   const [showColumns, setShowColumns] = useState(true);
   const [activeTab, setActiveTab] = useState('All'); // Track active tab
@@ -108,7 +108,7 @@ const TaskList = () => {
   };
 
   const toggleCalendar = () => setIsCalendarVisible(!isCalendarVisible);
-  const handleGroupChange = (group: string) => setGroupBy(group);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) =>
     setSearchTerm(e.target.value);
   const toggleColumnsVisibility = () => setShowColumns(!showColumns);
@@ -138,14 +138,6 @@ const TaskList = () => {
           </div>
           <hr className="my-2 border-[1px]" />
           <div className="flex justify-end space-x-4 mr-4 text-sm items-center relative">
-            <button
-              onClick={() => handleGroupChange('category')}
-              className="flex px-2 py-1 border-2 rounded-md items-center"
-            >
-              <MdFilterAlt className="w-4 h-4 mr-2" />
-              Group By
-            </button>
-
             <div className="relative">
               <input
                 type="text"
