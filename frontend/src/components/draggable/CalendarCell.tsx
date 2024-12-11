@@ -64,8 +64,8 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
         }),
     });
 
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-
     return (
         <div
             ref={drop}
@@ -121,7 +121,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                             </div>
                         )
                     }
-                    <Dialog>
+                    <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
                         <DialogTrigger asChild>
                             <div className='group-hover:flex top-0 right-0 absolute justify-center items-center border-[1px] border-zinc-300 hidden bg-white rounded-full w-6 h-6 hover:cursor-pointer'>
                                 <GoPencil />
@@ -161,7 +161,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                             </DialogFooter>
                         </DialogContent>
                     </Dialog>
-                    <Dialog>
+                    <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
                         <DialogTrigger asChild>
                             <div className={`${rowSpan < 3 ? "hidden" : "group-hover:flex hidden"}  absolute bottom-0 right-0 w-6 h-6 bg-white items-center justify-center border-zinc-300 border-[1px] rounded-full hover:cursor-pointer`}>
                                 <GoTrash />
