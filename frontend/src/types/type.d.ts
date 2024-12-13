@@ -6,6 +6,7 @@ type Style = {
 
 type Activity = {
     id: string;
+    userId: string;
     title: string;
     description: string;
     type: 'activity';
@@ -13,57 +14,64 @@ type Activity = {
     endTime: string;
     style: Style;
     duration: number;
+    relatedItems?: string[];
 };
 
 type Task = {
     id: string;
+    userId: string;
     title: string;
     description: string;
-    type: 'task'; // Differentiates from activity
-    dueTime: string; // e.g., '03:00 PM'
-    status: 'pending' | 'in-progress' | 'completed';
+    type: 'task';
+    status?: 'pending' | 'in-progress' | 'completed';
+    category: string;
+    style: Style;
+    startTime?: string;
+    endTime?: string;
+    dueTime: string;
+    estimatedTime: number;
 };
 
-type Schedule = {
-    activities: Activity[];
-    tasks: Task[];
-};
-
-type DaySchedule = {
+//This goes for tasks scheduling
+type TaskSchedule = {
     date: string; // e.g., '2024-11-20'
     dayOfWeek: string; // e.g., 'Wed'
-    schedule: Schedule;
+    tasks: Task[]; 
 };
 
-// Main calendar data type
-type CalendarData = DaySchedule[];
+//This goes for timetable
+type ActivitySchedule = {
+    date: string; // e.g., '2024-11-20'
+    dayOfWeek: string; // e.g., 'Wed'
+    activities: Activity[]; 
+}
 
-type ItemEvent = {
+type EventItem = {
     id: string;
     title: string;
     backgroundColor: string;
     textColor: string;
 };
 
-type DefinedEvents = {
+type EventCategory = {
     id: string;
     name: string;
-    item: ItemEvent[];
+    item: EventItem[];
 };
 
-type UserEvent = DefinedEvents[];
-
-//Temp
 type User = {
     id: string;
     name: string;
     email: string;
     avatar?: string;
-    calendar: CalendarData;
-    events: UserEvent;
+    taskSchedule: TaskSchedule[];
+    tasks: Task[];
+    eventCategories: EventCategory[];
+    activitySchedule: ActivitySchedule[];
     settings?: {
         theme: 'light' | 'dark';
         notifications: boolean;
         language: string;
     };
+    // activities: Activity[]; expand later for activity management
 };

@@ -6,12 +6,14 @@ import { IoHomeOutline } from "react-icons/io5";
 import { IoCalendarOutline } from "react-icons/io5";
 import { BsListTask } from "react-icons/bs";
 import { TfiTimer } from "react-icons/tfi";
-import { SiGoogleanalytics } from "react-icons/si";
-import { IoMdSettings } from "react-icons/io";
 import { TfiHelpAlt } from "react-icons/tfi";
+import { BsCalendarCheck } from "react-icons/bs";
+import { FaRegChartBar } from "react-icons/fa";
+import { HiOutlineCog6Tooth } from "react-icons/hi2";
 
 //Import components
 import { UserButton } from "@clerk/clerk-react";
+import Settings from "../settings/Settings";
 
 const SideBar = () => {
   const navigate = useNavigate();
@@ -32,7 +34,7 @@ const SideBar = () => {
         <div className="flex mx-1 w-8 h-8">
           <img width="48" height="48" src="https://img.icons8.com/parakeet/48/machine-learning.png" alt="machine-learning" />
         </div>
-        <div className="flex flex-col space-y-2 my-6">
+        <div className="flex flex-col items-center space-y-2 my-6 w-full">
           <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/home') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
             onClick={() => navigateTo('/home')}
           >
@@ -43,9 +45,9 @@ const SideBar = () => {
           </div>
           <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/calendar') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
             onClick={() => navigateTo('/calendar')}>
-            <IoCalendarOutline className={`${isActiveTab('/calendar') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
-            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
-              Calendar
+            <BsCalendarCheck  className={`${isActiveTab('/calendar') ? 'text-white' : 'text-zinc-800'} w-5 h-5`} />
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md w-[90px] text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
+              Task Calendar
             </span>
           </div>
           <div className={`relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md hover:cursor-pointer group ${isActiveTab('/task') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
@@ -53,6 +55,13 @@ const SideBar = () => {
             <BsListTask className={`${isActiveTab('/task') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
             <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Tasks
+            </span>
+          </div>
+          <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/timetable') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
+            onClick={() => navigateTo('/timetable')}>
+            <IoCalendarOutline  className={`${isActiveTab('/timetable') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
+            <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
+              Timetable
             </span>
           </div>
           <div className={`relative group p-2 bg-gradient-to-r border-[1px] border-white rounded-md hover:border-gray-300 hover:cursor-pointer ${isActiveTab('/timer') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
@@ -64,8 +73,8 @@ const SideBar = () => {
             </span>
           </div>
           <div className={`relative border-[1px] border-white hover:border-gray-300 bg-gradient-to-r p-2 rounded-md group hover:cursor-pointer ${isActiveTab('/analytics') ? 'bg-gradient-to-r from-indigo-500 to-cyan-400' : ''}`}
-          onClick={() => navigateTo('/analytics')}>
-            <SiGoogleanalytics className={`${isActiveTab('/analytics') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
+            onClick={() => navigateTo('/analytics')}>
+            <FaRegChartBar className={`${isActiveTab('/analytics') ? 'text-white' : 'text-zinc-800'} w-6 h-6`} />
             <span className="top-1/2 left-[52px] z-50 absolute bg-gray-700 opacity-0 group-hover:opacity-100 px-2 py-1 rounded-md text-white text-xs transform transition-opacity -translate-y-1/2 duration-200 pointer-events-none">
               Analytics
             </span>
@@ -74,10 +83,10 @@ const SideBar = () => {
       </div>
       <div className="flex flex-col items-center space-y-2 bg-gray-200 rounded-3xl">
         <div className="hover:border-gray-300 p-2 rounded-md hover:cursor-pointer">
-          <TfiHelpAlt className="w-6 h-6" />
+          <TfiHelpAlt className="w-5 h-5" />
         </div>
         <div className="hover:border-gray-300 p-2 rounded-md hover:cursor-pointer">
-          <IoMdSettings className="w-6 h-6" />
+          <HiOutlineCog6Tooth className="w-6 h-6"/>
         </div>
         <div className="hover:border-gray-300 p-1 rounded-full hover:cursor-pointer">
           <UserButton />

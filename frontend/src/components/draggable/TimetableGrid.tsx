@@ -1,8 +1,12 @@
+//Import frameworks
 import { useEffect, useState } from 'react';
-import CalendarCell from "./CalendarCell";
-import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
-import { initialTaskData } from '@/mocks/MockData';
+
+//Import mockdata
+import { initialActivityData } from '@/mocks/MockData';
+
+//Import libs/packages
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
+import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
 
 //Import icons
 import { RxCountdownTimer } from "react-icons/rx";
@@ -20,28 +24,30 @@ import {
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import TimetableCell from './TimetableCell';
 
 // Define the type for the draggable item.
-const CalendarGrid = ({ date }: { date: string }) => {
+const TimeTableGrid = ({ date }: { date: string }) => {
     // Get current week
     const currentWeek = getCurrentWeek(date);
     // Calculate the current week based on the date prop
-    const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
-
+    const [calendarData, setCalendarData] = useState<ActivitySchedule[]>([]);
+    console.log(calendarData);
     useEffect(() => {
         // Calculate the current week whenever `date` changes
         const currentWeek = getCurrentWeek(date);
         const currentWeekDates = currentWeek.map((day) => day.fullDate);
 
         // Filter the initial calendar data to include only the current week
-        const filteredData = initialTaskData.filter((data) =>
+        const filteredData = initialActivityData.filter((data) =>
             currentWeekDates.includes(data.date)
         );
 
         setCalendarData(filteredData);
     }, [date]); // Dependency array ensures this runs whenever `date` changes
 
-    const handleDrop = (item: Task, time: string, date: string) => {
+    const handleDrop = (item: Activity, time: string, date: string) => {
+        console.log(`Item dropped at ${time} on ${date}:`, item);
         setCalendarData((prevData) => {
             const updatedData = prevData.map((day) => {
                 if (day.date === date) {
@@ -49,14 +55,13 @@ const CalendarGrid = ({ date }: { date: string }) => {
                         ...item,
                         id: item.id || uuidv4(), // Use provided ID or generate a new one
                         startTime: time,
-                        endTime: addMinutesToTime(time, 60),
-                        estimatedTime: 15,
+                        endTime: addMinutesToTime(time, 60), // Example end time (can be adjusted)
                         date: date,
                     };
-                    const updatedTasks = [...day.tasks, newItem];
+                    const updatedActivities = [...day.activities, newItem];
                     return {
                         ...day,
-                        tasks: updatedTasks, // Update the activities within the day
+                        activities: updatedActivities, // Update the activities within the day
                     };
                 }
                 return day; // If the date doesn't match, return the day unchanged
@@ -70,19 +75,19 @@ const CalendarGrid = ({ date }: { date: string }) => {
         setCalendarData((prevData) =>
             prevData.map((day) => {
                 if (day.date === date) {
-                    const updatedTasks = day.tasks.map((task) => {
-                        if (task.id === id) { // Match by id
+                    const updatedActivities = day.activities.map((act) => {
+                        if (act.id === id) { // Match by id
                             return {
-                                ...task,
+                                ...act,
                                 duration: newDuration,
-                                endTime: addMinutesToTime((task.startTime || ''), newDuration), // Update the end time
+                                endTime: addMinutesToTime(act.startTime, newDuration), // Update the end time
                             };
                         }
-                        return task;
+                        return act;
                     });
                     return {
                         ...day,
-                        tasks: updatedTasks, // Update the activities within the day
+                        activities: updatedActivities, // Update the activities within the day
                     };
                 }
                 return day;
@@ -95,8 +100,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
     const endHour = 24; // End at 12 PM
     const slotsPerDay = (endHour + 1 - startHour) * (60 / interval); // Number of slots between 6 AM and 12 PM
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
-
-    console.log(currentWeek);
     return (
         <div className='flex flex-col bg-white w-full h-full overflow-hidden'>
             <div className='flex'>
@@ -210,8 +213,8 @@ const CalendarGrid = ({ date }: { date: string }) => {
                         const today = new Date();
                         const isToday = date.dayOfMonth === today.getDate();
                         return (
-                            <div key={index} className="flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500">
-                                <div className={`flex ${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-100 via-indigo-200 to-indigo-100 rounded-xl' : ''} flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}>
+                            <div key={index} className="flex flex-col justify-center items-center bg-indigo-50 rounded-md h-16 font-bold text-center text-zinc-500">
+                                <div className={`flex ${isToday ? 'text-blue-700 bg-gradient-to-br from-indigo-100 via-indigo-200 to-indigo-100 rounded-xl' : ''} flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}>
                                     <p className="text-[12px]">{date.dayOfWeek}</p>
                                     <p>{date.dayOfMonth}</p>
                                 </div>
@@ -249,14 +252,15 @@ const CalendarGrid = ({ date }: { date: string }) => {
                                     }
 
                                     // Find the activity that starts at the current formattedTime
-                                    const task = calendarData[day]?.tasks
-                                        .find(task => task.dueTime === formattedTime);
-                                    const shouldSpanRows = task && task.estimatedTime > 0;
+                                    const activity = calendarData[day]?.activities
+                                        .find(activity => activity.startTime === formattedTime);
+
+                                    const shouldSpanRows = activity && activity.duration > 0;
 
                                     // Dynamically calculate the row span based on activity duration
                                     let spanRows = 1; // Default to 1 row
                                     if (shouldSpanRows) {
-                                        spanRows = Math.ceil(task.estimatedTime / interval); // Calculate based on duration and interval
+                                        spanRows = Math.ceil(activity.duration / interval); // Calculate based on duration and interval
                                     }
 
                                     // Mark subsequent rows as occupied if this cell spans rows
@@ -271,16 +275,15 @@ const CalendarGrid = ({ date }: { date: string }) => {
                                     // Manually calculate the grid row start and end
                                     const gridRowStart = index + 1;
                                     const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
-
                                     return (
-                                        <CalendarCell
+                                        <TimetableCell
                                             key={`${day}-${index}`}
                                             time={formattedTime}
                                             date={currentWeek[day].fullDate}
-                                            task={task}
+                                            activity={activity}
                                             onResize={handleResize}
-                                            onDrop={(item: Task) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                            className={shouldSpanRows ? `row-span-${spanRows} col-span-1 w-[96%] h-full shadow-md border-0` : 'col-span-1 row-span-1 h-5 text-[10px]'}
+                                            onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
+                                            className={shouldSpanRows ? `row-span-${spanRows} col-span-1 w-[96%] h-full rounded-md shadow-md border-none` : 'col-span-1 row-span-1 h-5 text-[10px]'}
                                             style={{
                                                 gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                             }}
@@ -298,4 +301,4 @@ const CalendarGrid = ({ date }: { date: string }) => {
     );
 };
 
-export default CalendarGrid;
+export default TimeTableGrid;

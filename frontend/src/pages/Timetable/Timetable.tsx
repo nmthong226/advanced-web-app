@@ -8,8 +8,8 @@ import { BsCollection } from 'react-icons/bs';
 import './style.css';
 
 //Import components
-import SideBarTask from '../../components/sidebar/sidebar_task.tsx';
-import CalendarGrid from '../../components/draggable/CalendarGrid.tsx';
+import SideBarActivity from '../../components/sidebar/sidebar_activity.tsx';
+import TimeTableGrid from '../../components/draggable/TimeTableGrid.tsx';
 
 //Import libs/packages
 import { DndProvider } from 'react-dnd';
@@ -17,7 +17,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
 import { CalendarDaysIcon } from 'lucide-react';
 
-const Calendar = () => {
+const TimeTable = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
   const [startDate, setStartDate] = useState('2024-12-08'); // Default date
 
@@ -28,14 +28,14 @@ const Calendar = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className='flex items-center space-x-2 bg-indigo-50 p-2 w-full h-full'>
-        <SideBarTask />
+        <SideBarActivity />
         <div className='relative flex flex-col justify-center space-y-2 bg-white p-1 border rounded-lg w-[84%] h-full'>
           <div className='flex justify-start items-center px-2 py-1'>
             <div className='flex space-x-4'>
               <button className='px-2 font-semibold text-indigo-500 text-lg'>
-                Task Calendar
+                Timetable
                 <span className='ml-2 font-normal text-gray-500'>|</span>
-                <span className='ml-2 font-normal text-[12px] text-gray-500'>This section manages your tasks on track.</span>
+                <span className='ml-2 font-normal text-[12px] text-gray-500'>This section manages your daily activity calendar.</span>
               </button>
             </div>
           </div>
@@ -50,7 +50,6 @@ const Calendar = () => {
                 <span className="text-base">💡</span>
                 <span className="font-medium">AI Insights</span>
               </button>
-
               {/* Summary Text */}
               <div className="flex items-center text-[12px] text-gray-500">
                 <p>Overall: <span className="font-medium text-gray-600">...</span></p>
@@ -101,11 +100,11 @@ const Calendar = () => {
               )}
             </div>
           </div>
-          <CalendarGrid date={startDate}/>
+          <TimeTableGrid date={startDate}/>
         </div>
       </div>
     </DndProvider>
   );
 };
 
-export default Calendar;
+export default TimeTable;

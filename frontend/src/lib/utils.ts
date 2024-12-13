@@ -126,6 +126,7 @@ export const getTimeSlotIndex = (formattedTime: string): number => {
 
 // Utility function to format time range
 export const formatTimeRange = (startTime: string, endTime: string): string => {
+  if (startTime == '' || endTime == '') return '';
   // Helper function to format time with AM/PM
   const formatTime = (time: string, removePeriod: boolean): string => {
     const [hour, minuteWithPeriod] = time.split(':'); // Split hour and minute part

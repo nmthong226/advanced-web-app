@@ -12,7 +12,7 @@ type CalendarCellProps = {
     rowSpan: number;
 };
 
-const OnlyShownCalendarCell: React.FC<CalendarCellProps> = ({
+const OnlyShownTimeTableCell: React.FC<CalendarCellProps> = ({
     activity,
     className,
     rowSpan
@@ -41,7 +41,7 @@ const OnlyShownCalendarCell: React.FC<CalendarCellProps> = ({
                                 <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>
-                                <p className="line-clamp-2 font-semibold text-sm text-zinc-600">{activity.title}</p>
+                                <p className="line-clamp-2 font-semibold text-[12px] text-zinc-600">{activity.title}</p>
                             </div>
                         )
                     }
@@ -51,4 +51,4 @@ const OnlyShownCalendarCell: React.FC<CalendarCellProps> = ({
     );
 };
 
-export default OnlyShownCalendarCell;
+export default OnlyShownTimeTableCell;

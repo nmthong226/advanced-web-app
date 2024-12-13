@@ -4,7 +4,6 @@ import { useState } from 'react'
 //Import icons
 import { ChevronsUpDown } from "lucide-react"
 import { MdFolderOpen } from "react-icons/md";
-import { FaChevronLeft } from "react-icons/fa";
 
 //Import components
 import { Button } from "../ui/button"
@@ -13,7 +12,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../ui/collapsible";
-import DraggableItem from '../draggable/DraggableItem';
+import DraggableActivity from '../draggable/DraggableActivity';
 import { mockUserEvents } from '@/mocks/MockData';
 import AddEventItemsDialog from '../dialogs/createEventItems';
 import AddEvent from '../dialogs/createEvent';
@@ -68,39 +67,39 @@ const SideBarActivity = () => {
     };
 
     return (
-        <div className='flex flex-col w-[14%] h-full relative'>
-            <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative overflow-y-hidden overflow-x-hidden">
+        <div className='relative flex flex-col bg-white border rounded-lg w-[16%] h-full'>
+            <div className="relative flex flex-col border-indigo-100 px-2 py-2 border-r-[1px] w-full h-full overflow-x-hidden overflow-y-hidden">
                 <AddEvent onAddEvent={handleAddNewCategory} />
-                <hr className="my-2 border-[1px]" />
-                <div className="px-2 overflow-y-auto custom-scrollbar">
+                <hr className="border-[1px] my-2" />
+                <div className="custom-scrollbar overflow-y-auto">
                     {events.map((eventCategory, index) => (
                         <>
                             <Collapsible
                                 key={eventCategory.id}
                                 open={openCategories[eventCategory.name] || false}
                                 onOpenChange={() => toggleCategory(eventCategory.name)} // Toggle the category's open state
-                                className="w-full space-y-2"
+                                className="space-y-2 w-full"
                             >
-                                <div className="flex items-center justify-between">
-                                    <div className="flex space-x-2 items-center">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center">
                                         <CollapsibleTrigger asChild>
-                                            <Button variant="ghost" size="sm" className="p-0">
-                                                <ChevronsUpDown className="h-4 w-4" />
+                                            <Button variant="ghost" size="sm" className="m-0 p-0">
+                                                <ChevronsUpDown className="w-4 h-4" />
                                                 <span className="sr-only">Toggle</span>
                                             </Button>
                                         </CollapsibleTrigger>
-                                        <div className="flex items-center space-x-1">
+                                        <div className="flex items-center space-x-2">
                                             <MdFolderOpen />
-                                            <h4 className="text-sm font-semibold">
+                                            <h4 className="font-semibold text-sm">
                                                 {eventCategory.name}
                                             </h4>
                                         </div>
                                     </div>
                                     <AddEventItemsDialog eventCategory={eventCategory} onAddEvent={handleAddEvenItem} />
                                 </div>
-                                {/* Render DraggableItems for each item in the category */}
+                                {/* Render DraggableActivity for each item in the category */}
                                 {eventCategory.item.slice(0, 4).map((item) => (
-                                    <DraggableItem
+                                    <DraggableActivity
                                         key={item.id}
                                         id={item.id}
                                         title={item.title}
@@ -118,7 +117,7 @@ const SideBarActivity = () => {
                                 {/* Collapsible Content */}
                                 <CollapsibleContent className="space-y-2">
                                     {eventCategory.item.slice(4).map((item) => (
-                                        <DraggableItem
+                                        <DraggableActivity
                                             key={item.id}
                                             id={item.id}
                                             title={item.title}
@@ -134,8 +133,8 @@ const SideBarActivity = () => {
                                         />
                                     ))}
                                 </CollapsibleContent>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex space-x-2 items-center">
+                                <div className="flex justify-between items-center">
+                                    <div className="flex items-center space-x-2">
                                         {eventCategory.item.length > 4 && (
                                             <CollapsibleTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="p-0">
@@ -165,9 +164,6 @@ const SideBarActivity = () => {
                         </>
                     ))}
                 </div>
-            </div>
-            <div className='absolute p-2 bg-indigo-200 rounded-md -right-4 top-2 hover:cursor-pointer'>
-                <FaChevronLeft />
             </div>
         </div>
     )
