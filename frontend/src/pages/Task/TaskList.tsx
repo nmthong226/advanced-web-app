@@ -49,11 +49,6 @@ const Tasks = () => {
     });
   }, [currentRow, setOpen]);
 
-  const handleClose = useCallback(() => {
-    setOpen(null);
-    setCurrentRow(null);
-  }, [setOpen]);
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex items-start w-full h-full">
@@ -65,10 +60,7 @@ const Tasks = () => {
           >
             {/* ===== Top Heading ===== */}
             <div className="mb-2 flex items-center justify-between space-y-2 flex-wrap gap-x-4">
-              <div>
-                <h2 className="text-2xl font-bold tracking-tight">Tasks</h2>
-                <p>Here&apos;s a list of your tasks for this month!</p>
-              </div>
+              <div></div>
               <div className="flex gap-2">
                 <Button
                   variant="outline"

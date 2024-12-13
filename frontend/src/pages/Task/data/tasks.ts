@@ -6,6 +6,9 @@ export const tasks = [
     status: 'in progress',
     label: 'documentation',
     priority: 'medium',
+    description: 'This task involves optimizing the SSD compression method.',
+    startDate: '2024-01-01',
+    endDate: '2024-02-01',
   },
   {
     id: 'TASK-7878',
@@ -14,6 +17,9 @@ export const tasks = [
     status: 'backlog',
     label: 'documentation',
     priority: 'medium',
+    description: 'Work on indexing the EXE feed with multi-byte pixel support.',
+    startDate: '2024-02-01',
+    endDate: '2024-02-10',
   },
   {
     id: 'TASK-7839',
@@ -21,6 +27,9 @@ export const tasks = [
     status: 'todo',
     label: 'bug',
     priority: 'high',
+    description: 'Fix the issue with the neural TCP card communication.',
+    startDate: '2024-01-15',
+    endDate: '2024-01-20',
   },
   {
     id: 'TASK-5562',
@@ -29,6 +38,9 @@ export const tasks = [
     status: 'backlog',
     label: 'feature',
     priority: 'medium',
+    description: 'Resolve issues with the SAS interface to ensure proper PNG bandwidth backup.',
+    startDate: '2024-02-05',
+    endDate: '2024-02-15',
   },
   {
     id: 'TASK-8686',
@@ -37,6 +49,9 @@ export const tasks = [
     status: 'canceled',
     label: 'feature',
     priority: 'medium',
+    description: 'Attempted parsing of SSL protocols for API integration, but canceled due to incompatibility.',
+    startDate: '2024-01-01',
+    endDate: '2024-01-10',
   },
   {
     id: 'TASK-1280',
@@ -45,6 +60,9 @@ export const tasks = [
     status: 'done',
     label: 'bug',
     priority: 'high',
+    description: 'Resolved bug related to digital TLS panel and haptic system transmission.',
+    startDate: '2024-01-10',
+    endDate: '2024-01-12',
   },
   {
     id: 'TASK-7262',
@@ -53,6 +71,9 @@ export const tasks = [
     status: 'done',
     label: 'feature',
     priority: 'high',
+    description: 'Fix UTF8 application down by parsing neural bandwidth for firewall support.',
+    startDate: '2024-01-05',
+    endDate: '2024-01-08',
   },
   {
     id: 'TASK-1138',
@@ -61,6 +82,9 @@ export const tasks = [
     status: 'in progress',
     label: 'feature',
     priority: 'medium',
+    description: 'Currently quantifying 1080p SMTP bandwidth for driver development.',
+    startDate: '2024-01-20',
+    endDate: '2024-02-01',
   },
   {
     id: 'TASK-7184',
@@ -68,6 +92,9 @@ export const tasks = [
     status: 'todo',
     label: 'feature',
     priority: 'low',
+    description: 'Back-end programming for THX pixel required.',
+    startDate: '2024-02-10',
+    endDate: '2024-02-15',
   },
   {
     id: 'TASK-5160',
@@ -76,6 +103,9 @@ export const tasks = [
     status: 'in progress',
     label: 'documentation',
     priority: 'high',
+    description: 'Working on the back-end JSON protocol navigation and data handling.',
+    startDate: '2024-01-18',
+    endDate: '2024-02-05',
   },
   {
     id: 'TASK-5618',
@@ -84,6 +114,9 @@ export const tasks = [
     status: 'done',
     label: 'documentation',
     priority: 'medium',
+    description: 'Documented the process of indexing online SSL applications for integration.',
+    startDate: '2024-01-12',
+    endDate: '2024-01-14',
   },
   {
     id: 'TASK-6699',
@@ -92,8 +125,8 @@ export const tasks = [
     status: 'backlog',
     label: 'documentation',
     priority: 'medium',
+    description: 'The task involves transmitting the wireless JBOD capacitor to support SSD feed.',
+    startDate: '2024-02-10',
+    endDate: '2024-02-20',
   },
- 
- 
-  
 ]
