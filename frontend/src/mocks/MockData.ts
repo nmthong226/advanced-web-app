@@ -7,7 +7,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-1',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
@@ -21,7 +20,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-2',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '10:00 AM',
                 endTime: '12:00 AM',
                 style: {
@@ -41,7 +39,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-3',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
@@ -66,16 +63,15 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-4',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
                     backgroundColor: 'bg-red-100 border-l-[5px] border-l-red-600',
                     textColor: 'text-red-600',
-                }, 
+                },
                 duration: 180,
                 userId: 'user-1',
-        }]
+            }]
     },
     {
         date: '12-12-2024',
@@ -85,7 +81,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-5',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
@@ -105,7 +100,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-6',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
@@ -125,7 +119,6 @@ export const initialActivityData: ActivitySchedule[] = [
                 id: 'activity-7',
                 title: 'Your course here',
                 description: 'your description here',
-                type: 'activity',
                 startTime: '7:00 AM',
                 endTime: '10:00 AM',
                 style: {
@@ -144,6 +137,60 @@ export const initialActivityData: ActivitySchedule[] = [
     }
 ];
 
+export const userTask: Task[] = [
+    {
+        id: 'task-1',
+        userId: 'user-1',
+        title: 'Homework HW3',
+        description: 'your description here',
+        dueTime: '2024-12-13T08:00:00.000Z',
+        startTime: '',
+        endTime: '',
+        estimatedTime: 0,
+        status: 'pending',
+        priority: 'high',
+        style: {
+            backgroundColor: 'bg-gradient-to-b from-white to-blue-100',
+            textColor: 'text-blue-600',
+        },
+        category: 'Web Development',
+    },
+    {
+        id: 'task-2',
+        title: 'Homework here',
+        description: 'your description here',
+        dueTime: '2024-12-12T10:00:00.000Z',
+        startTime: '',
+        endTime: '',
+        priority: 'medium',
+        status: 'in-progress',
+        userId: 'user-1',
+        estimatedTime: 0,
+        style: {
+            backgroundColor: 'bg-gradient-to-b from-white to-green-100',
+            textColor: 'text-green-600',
+        },
+        category: 'Intro2SE',
+    },
+    {
+        id: 'task-3',
+        title: 'Homework here',
+        description: 'your description here',
+        dueTime: '2024-12-11T09:00:00.000Z',
+        startTime: '',
+        endTime: '',
+        priority: 'low',
+        status: 'completed',
+        userId: 'user-1',
+        estimatedTime: 0,
+        style: {
+            backgroundColor: 'bg-gradient-to-b from-white to-red-100',
+            textColor: 'text-red-600',
+        },
+        category: 'Game Dev',
+    }
+]
+
 export const initialTaskData: TaskSchedule[] = [
     {
         date: '08-12-2024',
@@ -151,15 +198,15 @@ export const initialTaskData: TaskSchedule[] = [
         tasks: [
             {
                 id: 'task-1',
-                title: 'Homework here',
-                description: 'your description here',
-                type: 'task',
-                dueTime: '8:00 AM',
-                startTime: '8:00 AM',
-                endTime: '23:00 PM',
-                status: 'pending',
                 userId: 'user-1',
-                estimatedTime: 15,
+                title: 'Homework HW3',
+                description: 'your description here',
+                dueTime: '8:00 AM',
+                startTime: '',
+                endTime: '8:00 AM',
+                estimatedTime: 0,
+                status: 'pending',
+                priority: 'high',
                 style: {
                     backgroundColor: 'bg-blue-100 border-l-[5px] border-l-blue-600',
                     textColor: 'text-blue-600',
@@ -170,13 +217,13 @@ export const initialTaskData: TaskSchedule[] = [
                 id: 'task-2',
                 title: 'Homework here',
                 description: 'your description here',
-                type: 'task',
                 dueTime: '10:00 AM',
-                startTime: '10:00 AM',
-                endTime: '10:00 AM',
+                startTime: '',
+                endTime: '9:00 AM',
+                priority: 'medium',
                 status: 'in-progress',
                 userId: 'user-1',
-                estimatedTime: 15,
+                estimatedTime: 0,
                 style: {
                     backgroundColor: 'bg-red-100 border-l-[5px] border-l-red-600',
                     textColor: 'text-red-600',
@@ -203,11 +250,13 @@ export const initialTaskData: TaskSchedule[] = [
                 id: 'task-3',
                 title: 'Homework here',
                 description: 'your description here',
-                type: 'task',
                 dueTime: '9:00 AM',
+                startTime: '',
+                endTime: '8:00 AM',
+                priority: 'low',
                 status: 'completed',
                 userId: 'user-1',
-                estimatedTime: 15,
+                estimatedTime: 0,
                 style: {
                     backgroundColor: 'bg-green-100 border-l-[5px] border-l-green-600',
                     textColor: 'text-green-600',
@@ -219,7 +268,7 @@ export const initialTaskData: TaskSchedule[] = [
     {
         date: '12-12-2024',
         dayOfWeek: 'Thu',
-        tasks: [],        
+        tasks: [],
     },
     {
         date: '13-12-2024',

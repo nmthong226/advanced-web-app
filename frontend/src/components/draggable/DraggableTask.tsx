@@ -1,26 +1,16 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useDrag } from 'react-dnd';
-import { IoIosMore } from "react-icons/io";
-import { GoPencil } from "react-icons/go";
-import { GoTrash } from "react-icons/go";
+
+//Import icons
+import { GoArrowUp } from "react-icons/go";
+import { GoArrowRight } from "react-icons/go";
+import { GoArrowDown } from "react-icons/go";
 
 import {
     DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogHeader,
-    DialogTitle,
-} from "../ui/dialog";
-import NotifyDeletion from '../toast/notifyDeletion';
-import { Button } from '../ui/button';
 // import EditEventItemsDialog from '../dialogs/editEventItems';
-import { cn } from '@/lib/utils';
+import { cn, generateStylesFromParent } from '@/lib/utils';
 
 type DraggableTaskProps = {
     id: string;
@@ -28,108 +18,87 @@ type DraggableTaskProps = {
     description: string;
     startTime: string;
     endTime: string;
+    dueTime: string;
+    estimatedTime: number;
     backgroundColor: string;
     textColor: string;
     activity: string;
     status: string;
+    priority: string;
 };
 
-const DraggableTask: React.FC<DraggableTaskProps> = ({ title, status, backgroundColor, textColor, description, startTime, endTime, activity }) => {
-    const [{ isDragging }, drag] = useDrag(() => ({
-        type: 'ITEM',
-        item: {
-            title,
-            description,
-            startTime,
-            endTime,
-            status,
-            style: {
-                backgroundColor,
-                textColor,
+const DraggableTask: React.FC<DraggableTaskProps> =
+    ({ title,
+        status,
+        priority,
+        backgroundColor,
+        textColor,
+        description,
+        startTime,
+        endTime,
+        activity,
+        estimatedTime,
+        dueTime }) => {
+
+        const [{ isDragging }, drag] = useDrag(() => ({
+            type: 'ITEM',
+            item: {
+                title,
+                description,
+                startTime,
+                endTime,
+                status,
+                priority,
+                estimatedTime,
+                dueTime,
+                style: {
+                    backgroundColor: generateStylesFromParent(backgroundColor),
+                    textColor,
+                },
             },
-        },
-        collect: (monitor) => ({
-            isDragging: !!monitor.isDragging(),
-        }),
-    }));
-    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-    const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+            collect: (monitor) => ({
+                isDragging: !!monitor.isDragging(),
+            }),
+        }));
 
-    return (
-        <DropdownMenu>
-            <div className={cn('relative flex flex-col space-y-1 bg-purple-100 px-2 py-3 border border-l-[5px] border-l-purple-600 rounded-md font-mono text-sm truncate hover:cursor-grab', backgroundColor)} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
-                {/* Task Header */}
-                <div className='flex text-[11px] truncate'>
-                    <p className='font-bold truncate'>{activity}</p>
-                    <p>|</p>
-                    <p className='truncate'>{description}</p>
+        function formatDueTime(isoDate: string): string {
+            const date = new Date(isoDate);
+            const day = date.getDate();
+            const month = date.toLocaleString('default', { month: 'short' }); // Short month name like Dec
+            const hours = date.getHours();
+            const minutes = date.getMinutes();
+            const period = hours >= 12 ? 'PM' : 'AM';
+            const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
+            return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${period}, ${month} ${day}`;
+        }
+
+        return (
+            <DropdownMenu>
+                <div className={cn('relative flex flex-col px-2 py-2 border rounded-md text-sm truncate hover:cursor-grab shadow-md', backgroundColor)} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                    {/* Task Header */}
+                    <div className='flex text-[11px] truncate'>
+                        <p className={cn(`flex items-center font-semibold truncate`, textColor)}>
+                            {activity}
+                        </p>
+                        <p className='mx-1'>|</p>
+                        {priority === 'high' && <p className='flex items-center truncate'><GoArrowUp className='mr-1' /> High</p>}
+                        {priority === 'medium' && <p className='flex items-center truncate'><GoArrowRight className='mr-1' /> Medium</p>}
+                        {priority === 'low' && <p className='flex items-center truncate'><GoArrowDown className='mr-1' /> Low</p>}
+                    </div>
+                    {/* Task Title */}
+                    <p className='font-semibold text-base truncate'>{title}</p>
+                    {/* Task Times */}
+                    <div className='flex flex-col text-[11px] leading-tight'>
+                        <p>
+                            Due to: <span className='ml-1'>{formatDueTime(dueTime)}</span>
+                        </p>
+                        <p>
+                            Status: <span className='ml-2 text-pretty capitalize'>{status}</span>
+                        </p>
+                    </div>
                 </div>
-
-                {/* Task Title */}
-                <p className='font-bold text-lg truncate'>{title}</p>
-
-                {/* Task Times */}
-                <div className='flex flex-col text-[11px] leading-tight'>
-                    <p>
-                        Start: <span className='ml-1 font-bold'>{startTime}</span>
-                    </p>
-                    <p>
-                        End: <span className='ml-4 font-bold'>{endTime}</span>
-                    </p>
-                </div>
-
-                {/* Dropdown Menu Trigger */}
-                <DropdownMenuTrigger className="top-1/2 right-0 absolute">
-                    <IoIosMore className="group-hover:flex top-1/2 right-2 absolute hidden transform -translate-y-1/2 group-hover:cursor-pointer" />
-                </DropdownMenuTrigger>
-
-                {/* Dropdown Menu Content */}
-                <DropdownMenuContent className=''>
-                    <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
-                        <div className="flex items-center space-x-2 text-[12px]">
-                            <GoPencil className="mr-2 size-3" />
-                            Edit
-                        </div>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setIsDeleteDialogOpen(true)}>
-                        <div className="flex items-center space-x-2 text-[12px]">
-                            <GoTrash className="mr-2 size-3" />
-                            Delete
-                        </div>
-                    </DropdownMenuItem>
-                </DropdownMenuContent>
-
-                {/* Edit Dialog */}
-                <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-                    {/* <EditEventItemsDialog eventCategory={category} eventItem={{ id: '', title, backgroundColor, textColor }} onEditEventItem={() => { }} /> */}
-                </Dialog>
-
-                {/* Delete Dialog */}
-                <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-                    <DialogContent className='left-[10%] justify-center p-2 w-[200px]'>
-                        <DialogHeader>
-                            <DialogTitle className='text-md'>Delete Confirm</DialogTitle>
-                            <DialogDescription>
-                                <p className='flex flex-wrap text-sm'>
-                                    Delete {title} item?
-                                </p>
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className='flex items-center space-x-2'>
-                            <Button
-                                variant="secondary"
-                                onClick={() => setIsDeleteDialogOpen(false)}
-                                className='hover:bg-gray-50 border'
-                            >
-                                Cancel
-                            </Button>
-                            <NotifyDeletion setIsDeleteDialogOpen={setIsDeleteDialogOpen} />
-                        </div>
-                    </DialogContent>
-                </Dialog>
-            </div>
-        </DropdownMenu>
-    );
-};
+            </DropdownMenu>
+        );
+    };
 
 export default DraggableTask;

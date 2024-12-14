@@ -6,7 +6,7 @@ import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 import dayjs from 'dayjs';
 
 //Import components
-import OnlyShownCalendarTable from "../../components/onlyshowncalendar/OnlyShownTimeTable";
+import OnlyShownTimeTable from "../../components/onlyshownschedule/OnlyShownTimeTable";
 import Chart from "../../components/charts/BarChart";
 import {
   Select,
@@ -16,6 +16,7 @@ import {
   SelectValue,
 } from "../../components/ui/select"
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
+import OnlyShownTaskSchedule from "../../components/onlyshownschedule/OnlyShownTaskSchedule";
 
 //Import icons
 import { BsCollection } from "react-icons/bs";
@@ -28,8 +29,7 @@ import { IoMdMore } from "react-icons/io";
 import { IoMdSettings } from "react-icons/io";
 
 //Import contexts
-import { useSettings } from "@/contexts/SettingsContext";
-import OnlyShownTaskSchedule from "@/components/onlyshowncalendar/OnlyShownTaskSchedule";
+import { useSettings } from "../../contexts/SettingsContext";
 
 const Home = () => {
   const [currentTime, setCurrentTime] = useState<string>("");
@@ -332,17 +332,17 @@ const Home = () => {
           </div>
         </div>
         <hr className="w-full" />
-        <OnlyShownCalendarTable
+        <OnlyShownTimeTable
           ref={table1Ref}
           className="top-12 left-0 absolute h-[92%]"
           onScroll={() => syncScroll(table2Ref, table1Ref)}
         />
-        <OnlyShownTaskSchedule
+        {/* <OnlyShownTaskSchedule
           ref={table2Ref}
           className="top-12 left-0 absolute h-[92%]"
           tableClassName="opacity-0"
           onScroll={() => syncScroll(table1Ref, table2Ref)}
-        />
+        /> */}
       </div>
       {/* <button className="right-6 bottom-4 z-[100] absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 p-[2px] rounded-full w-10 h-10">
         <div className="flex justify-center items-center bg-white rounded-full w-full h-full">

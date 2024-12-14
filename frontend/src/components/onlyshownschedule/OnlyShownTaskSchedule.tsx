@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
-import OnlyShownCalendarCell from "./OnlyShownTimeTableCell";
 import { cn, formatTime, getCurrentWeek } from '@/lib/utils';
-import { initialActivityData } from '@/mocks/MockData';
+import { initialTaskData } from '@/mocks/MockData';
 
 //Import icons
 import { CiClock1 } from "react-icons/ci";
+import OnlyShownTaskCell from './OnlyShownTaskCell';
 
 type Props = {
     className: string,
@@ -12,11 +12,11 @@ type Props = {
 }
 
 // Define the type for the draggable item.
-const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) => {
+const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) => {
     // Get current week
     const currentWeek = getCurrentWeek();
     // Use state to track items dropped in specific hours
-    const [calendarData] = useState<ActivitySchedule[]>(initialActivityData);
+    const [calendarData] = useState<TaskSchedule[]>(initialTaskData);
 
     const interval = 15; // 15-minute intervals
     const startHour = 6; // Start from 6 AM
@@ -35,17 +35,18 @@ const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) 
         const currentHour = now.getHours();
         const currentMinutes = now.getMinutes();
 
+        // Check if the time is outside the timetable range
+        if (currentHour < startHour && currentHour >= 0) {
+            setIsIndicatorVisible(false); // Hide the indicator between 12 AM and 6 AM
+            return;
+        }
+
         // Format the time to HH:MM AM/PM
         const formattedHour = currentHour % 12 || 12; // Convert 24-hour to 12-hour format
         const period = currentHour < 12 ? 'AM' : 'PM';
         const formattedMinutes = currentMinutes.toString().padStart(2, '0');
         setFormattedTime(`${formattedHour}:${formattedMinutes} ${period}`);
 
-        // Check if the time is outside the timetable range
-        if (currentHour < startHour && currentHour >= 0) {
-            setIsIndicatorVisible(false); // Hide the indicator between 12 AM and 6 AM
-            return;
-        }
 
         // Show the indicator otherwise
         setIsIndicatorVisible(true);
@@ -112,11 +113,11 @@ const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) 
                         const currentHour = now.getHours();
 
                         // Match 24-hour current hour to the 12-hour slot system
-                        const isCurrentHour =
-                            (currentHour >= 6 && currentHour <= 11 && hour === currentHour) || // 6 AM to 11 AM
-                            (currentHour === 12 && period === 'PM' && hour === 12) || // 12 PM
-                            (currentHour > 12 && hour === currentHour - 12 && period === 'PM') || // 1 PM to 12 PM
-                            (currentHour === 0 && hour === 12 && period === 'AM'); // Midnight (12 AM)
+                        const isCurrentHour = (() => {
+                            const isAM = currentHour < 12;
+                            const twelveHourFormat = currentHour % 12 || 12; // 12-hour format
+                            return hour === twelveHourFormat && period === (isAM ? 'AM' : 'PM');
+                        })();
 
                         return (
                             <div
@@ -139,14 +140,14 @@ const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) 
                                         return null;
                                     }
 
-                                    const activity = calendarData[day]?.activities
-                                        .find(activity => activity.startTime === formattedTime);
+                                    const task = calendarData[day]?.tasks
+                                        .find(task => task.startTime === formattedTime);
 
-                                    const shouldSpanRows = activity && activity.duration > 0;
+                                    const shouldSpanRows = task && task.estimatedTime > 0;
 
                                     let spanRows = 1;
                                     if (shouldSpanRows) {
-                                        spanRows = Math.ceil(activity.duration / interval);
+                                        spanRows = Math.ceil(task.estimatedTime / interval);
                                     }
 
                                     if (shouldSpanRows) {
@@ -161,11 +162,11 @@ const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) 
                                     const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
 
                                     return (
-                                        <OnlyShownCalendarCell
+                                        <OnlyShownTaskCell
                                             key={`${day}-${index}`}
                                             time={formattedTime}
                                             date={currentWeek[day].fullDate}
-                                            activity={activity}
+                                            task={task}
                                             className={
                                                 shouldSpanRows
                                                     ? `row-span-${spanRows} w-[96%] h-full rounded-md shadow-md border-none`
@@ -188,4 +189,4 @@ const OnlyShownCalendarTable: React.FC<Props> = ({ className, tableClassName }) 
     );
 };
 
-export default OnlyShownCalendarTable;
+export default OnlyShownTaskSchedule;

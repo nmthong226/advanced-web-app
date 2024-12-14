@@ -1,11 +1,10 @@
-import { useEffect, useRef, useState } from 'react';
+import { forwardRef, useEffect, useRef, useState } from 'react';
 import OnlyShownCalendarCell from "./OnlyShownTimeTableCell";
 import { cn, formatTime, getCurrentWeek } from '@/lib/utils';
-import { initialActivityData, initialTaskData } from '@/mocks/MockData';
+import { initialActivityData } from '@/mocks/MockData';
 
 //Import icons
 import { CiClock1 } from "react-icons/ci";
-import OnlyShownTaskCell from './OnlyShownTaskCell';
 
 type Props = {
     className: string,
@@ -13,11 +12,11 @@ type Props = {
 }
 
 // Define the type for the draggable item.
-const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) => {
+const OnlyShownTimeTable = forwardRef<HTMLDivElement, Props>(({ className, tableClassName }, ref) => {
     // Get current week
     const currentWeek = getCurrentWeek();
     // Use state to track items dropped in specific hours
-    const [calendarData] = useState<TaskSchedule[]>(initialTaskData);
+    const [calendarData] = useState<ActivitySchedule[]>(initialActivityData);
 
     const interval = 15; // 15-minute intervals
     const startHour = 6; // Start from 6 AM
@@ -68,9 +67,11 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
         return () => clearInterval(intervalId);
     }, []);
 
-    // Inside the return statement of OnlyShownCalendarTable component
+    // Inside the return statement of OnlyShownTimeTable component
     return (
-        <div className={cn(`relative flex flex-col w-full h-full overflow-hidden group`, className)}>
+        <div
+            ref={ref}
+            className={cn(`relative flex flex-col w-full h-full overflow-hidden group`, className)}>
             <div className='flex'>
                 <div
                     className='flex flex-col justify-center items-center space-y-3 bg-zinc-50 hover:bg-zinc-100 w-[5%] hover:cursor-pointer group'
@@ -98,14 +99,16 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
             <div className='relative flex custom-scrollbar w-full h-full overflow-y-auto' ref={timetableRef}>
                 {isIndicatorVisible && (
                     <div className="z-50 absolute flex items-center w-full" style={{ top: `${indicatorPosition}px` }}>
-                        <div className='flex justify-center items-center w-[55px]'>
-                            <p className='font-semibold text-[10px] text-red-700'>{formattedTime}</p>
+                        <div className='flex justify-center items-center bg-gradient-to-r from-red-600 to-amber-400 border border-red-indigo-300 border-b rounded-md w-[55px]'>
+                            <p className='font-semibold text-[10px] text-white'>{formattedTime}</p>
                         </div>
-                        <hr className="bg-gradient-to-r from-red-600 to-amber-400 border-red-indigo-300 border-b rounded-md w-full h-[4px]" />
+                        <hr
+                            className="border-0 border-t-2 border-red-600 border-dotted w-full h-[4px]"
+                            style={{ borderSpacing: '10px' }}
+                        />
                     </div>
                 )}
                 <div className="gap-[8px] grid grid-rows-[auto_repeat(19,1fr)] w-[5%] h-full text-center">
-                    {/* Hourly slots (6 AM to 12 PM, then 1 PM to 12 PM) */}
                     {Array.from({ length: 19 }, (_, index) => {
                         const hour = index < 7 ? 6 + index : index - 6; // Generate 6 AM to 12 PM and 1 PM to 12 PM
                         const period = index < 7 ? 'AM' : 'PM'; // Determine AM or PM
@@ -113,18 +116,18 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
                         const currentHour = now.getHours();
 
                         // Match 24-hour current hour to the 12-hour slot system
-                        const isCurrentHour =
-                            (currentHour >= 6 && currentHour <= 11 && hour === currentHour) || // 6 AM to 11 AM
-                            (currentHour === 12 && period === 'PM' && hour === 12) || // 12 PM
-                            (currentHour > 12 && hour === currentHour - 12 && period === 'PM') || // 1 PM to 12 PM
-                            (currentHour === 0 && hour === 12 && period === 'AM'); // Midnight (12 AM)
+                        const isCurrentHour = (() => {
+                            const isAM = currentHour < 12;
+                            const twelveHourFormat = currentHour % 12 || 12; // 12-hour format
+                            return hour === twelveHourFormat && period === (isAM ? 'AM' : 'PM');
+                        })();
 
                         return (
                             <div
                                 key={index}
-                                className={`flex justify-center items-center h-20 text-[11px] ${(isIndicatorVisible && isCurrentHour) ? 'invisible' : 'visible'}`}
+                                className={`flex justify-center items-center h-20 text-[11px] ${isIndicatorVisible && isCurrentHour ? 'invisible' : 'visible'
+                                    }`}
                             >
-                                {/* Display the hour in 12-hour AM/PM format */}
                                 {hour === 0 ? '12 AM' : hour} {period}
                             </div>
                         );
@@ -140,14 +143,14 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
                                         return null;
                                     }
 
-                                    const task = calendarData[day]?.tasks
-                                        .find(task => task.startTime === formattedTime);
+                                    const activity = calendarData[day]?.activities
+                                        .find(activity => activity.startTime === formattedTime);
 
-                                    const shouldSpanRows = task && task.estimatedTime > 0;
+                                    const shouldSpanRows = activity && activity.duration > 0;
 
                                     let spanRows = 1;
                                     if (shouldSpanRows) {
-                                        spanRows = Math.ceil(task.estimatedTime / interval);
+                                        spanRows = Math.ceil(activity.duration / interval);
                                     }
 
                                     if (shouldSpanRows) {
@@ -162,11 +165,11 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
                                     const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
 
                                     return (
-                                        <OnlyShownTaskCell
+                                        <OnlyShownCalendarCell
                                             key={`${day}-${index}`}
                                             time={formattedTime}
                                             date={currentWeek[day].fullDate}
-                                            task={task}
+                                            activity={activity}
                                             className={
                                                 shouldSpanRows
                                                     ? `row-span-${spanRows} w-[96%] h-full rounded-md shadow-md border-none`
@@ -185,8 +188,7 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
                 </div>
             </div>
         </div >
-
     );
-};
+});
 
-export default OnlyShownTaskSchedule;
+export default OnlyShownTimeTable;

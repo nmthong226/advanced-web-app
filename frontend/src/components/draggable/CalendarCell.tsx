@@ -14,7 +14,16 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "../../components/ui/dialog"
+} from "../../components/ui/dialog";
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+} from "../../components/ui/select"
 //Import icons
 import { GoPencil } from "react-icons/go";
 import { Button } from '../ui/button';
@@ -26,6 +35,8 @@ import { LuSave } from "react-icons/lu";
 import { FaCheck } from "react-icons/fa6";
 import { FcCancel } from "react-icons/fc";
 import { RiProgress5Line } from "react-icons/ri";
+import { MdOutlineRestartAlt } from "react-icons/md";
+import { FaHourglassStart } from "react-icons/fa6";
 
 type CalendarCellProps = {
     time: string;
@@ -47,19 +58,52 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
     onResize,
     rowSpan
 }) => {
+
+    // Helper function to convert 12-hour time (e.g., "8:00 AM") to 24-hour format (e.g., "08:00")
+    const convertTo24HourFormat = (time: string): string => {
+        const [hour, minute, period] = time.match(/(\d{1,2}):(\d{2}) (AM|PM)/)!.slice(1);
+        let hours = parseInt(hour, 10);
+        if (period === 'PM' && hours !== 12) hours += 12;
+        if (period === 'AM' && hours === 12) hours = 0;
+        return `${hours.toString().padStart(2, '0')}:${minute}`;
+    };
+
+    const compareDueTime = (dueTime: string, date: string, time: string): boolean => {
+        // Parse the ISO due time into a Date object
+        const dueDate = new Date(dueTime);
+
+        // Parse the provided date and time into a Date object
+        const [day, month, year] = date.split('-').map(Number); // Split DD-MM-YYYY format
+        const time24 = convertTo24HourFormat(time); // Convert 12-hour time to 24-hour format
+        const [hours, minutes] = time24.split(':').map(Number);
+
+        // Combine into a single Date object
+        const currentDateTime = new Date(year, month - 1, day, hours, minutes);
+
+        // Compare the two dates
+        return currentDateTime.getTime() > dueDate.getTime(); // Returns true if currentDateTime is after dueDate
+    };
+
+
     const [{ isOver }, drop] = useDrop<Task, void, { isOver: boolean }>({
         accept: 'ITEM',
         drop: (item) => {
-            // Ensure the dropped item matches the current task
             if (item.id === task?.id) {
-                const updatedEndTime = addMinutesToTime(time, 60);
+                const updatedEndTime = addMinutesToTime(time, 0); // Updated end time
+
+                // Compare dueTime with the provided date and time
+                const isExpired = compareDueTime(item.dueTime, date, updatedEndTime);
+
+                // Update the task details
                 const updatedItem = {
                     ...item,
                     startTime: time,
                     endTime: updatedEndTime,
-                    dueTime: time,
                     date: date,
+                    status: isExpired ? 'expired' : item.status, // Mark as expired if true
                 };
+
+                // Handle the updated task
                 onDrop(updatedItem, time, date);
             }
         },
@@ -70,6 +114,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
 
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+
     return (
         <div
             ref={drop}
@@ -125,7 +170,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                     <>
                                         <div className='flex justify-center items-center bg-amber-400 w-5 h-full'>
                                             <div className='flex justify-center items-center bg-white rounded-full w-4 h-4'>
-                                                <RiProgress5Line className='text-amber-700' />
+                                                <MdOutlineRestartAlt className='text-amber-700' />
                                             </div>
                                         </div>
                                         <span className='mx-1 text-[10px]'>-</span>
@@ -134,11 +179,21 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                 )}
                                 {task.status === 'pending' && (
                                     <>
-                                        <div className='flex justify-center items-center bg-red-400 w-5 h-full'>
+                                        <div className='flex justify-center items-center bg-blue-400 w-5 h-full'>
                                             <div className='flex justify-center items-center bg-white rounded-full w-4 h-4'>
+                                                <FaHourglassStart className='w-3 h-3 text-blue-700' />
+                                            </div>
+                                        </div>
+                                        <span className='mx-1 text-[10px]'>-</span>
+                                        <p className="text-[10px] text-zinc-600 truncate">{task.title}</p>
+                                    </>
+                                )}
+                                {task.status === 'expired' && (
+                                    <>
+                                        <div className='flex justify-center items-center bg-red-400 w-5 h-5'>
+                                            <div className='bg-white rounded-full w-4 h-4'>
                                                 <FcCancel />
                                             </div>
-
                                         </div>
                                         <span className='mx-1 text-[10px]'>-</span>
                                         <p className="text-[10px] text-zinc-600 truncate">{task.title}</p>
@@ -163,6 +218,17 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                         </div>
                                     )}
                                     {task.status === 'pending' && (
+                                        <>
+                                            <div className='flex justify-center items-center bg-gray-400 w-5 h-5'>
+                                                <div className='bg-white rounded-full w-4 h-4'>
+                                                    <FaHourglassStart />
+                                                </div>
+                                            </div>
+                                            <span className='mx-1 text-[10px]'>-</span>
+                                            <p className="text-[10px] text-zinc-600 truncate">{task.title}</p>
+                                        </>
+                                    )}
+                                    {task.status === 'expired' && (
                                         <>
                                             <div className='flex justify-center items-center bg-red-400 w-5 h-5'>
                                                 <div className='bg-white rounded-full w-4 h-4'>
@@ -189,9 +255,9 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                         </DialogTrigger>
                         <DialogContent className="sm:max-w-[425px]">
                             <DialogHeader>
-                                <DialogTitle className='font-semibold text-sm'>Edit {task?.title} at {formatTimeRange((task?.startTime || ''), (task?.endTime || ''))}, {date}</DialogTitle>
+                                <DialogTitle className='font-semibold text-sm'>Task: {task?.title} in {date}</DialogTitle>
                                 <DialogDescription>
-                                    Edit this event in your calendar.
+                                    Check for this task in your calendar.
                                 </DialogDescription>
                             </DialogHeader>
                             <div className="gap-4 grid py-4">
@@ -208,11 +274,11 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                 </div>
                                 <div className="items-center gap-4 grid grid-cols-4">
                                     <Label htmlFor="username" className="font-semibold text-[12px] text-left">
-                                        Time Range
+                                        Due Time
                                     </Label>
                                     <Input
                                         id="time"
-                                        value={formatTimeRange((task?.startTime || ''), (task?.endTime || ''))}
+                                        value={task.dueTime + ", " + date}
                                         className="col-span-3"
                                         disabled
                                     />
@@ -223,7 +289,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                     </Label>
                                     <Input
                                         id="duration"
-                                        value={task?.estimatedTime + ' minutes'}
+                                        value={task?.estimatedTime === 0 ? 'None' : task.estimatedTime + ' minutes'}
                                         className="col-span-3"
                                         disabled
                                     />
@@ -232,15 +298,22 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                                 <div className="items-center gap-4 grid grid-cols-4">
                                     <Label htmlFor="username" className="font-semibold text-[12px] text-left">
                                         <div className='flex flex-col'>
-                                            <p>Description</p>
-                                            <p className='font-normal text-[10px] text-gray-600'>(120 max)</p>
+                                            <p>Status</p>
                                         </div>
                                     </Label>
-                                    <Input
-                                        id="username"
-                                        placeholder="optional"
-                                        className="col-span-3"
-                                    />
+                                    <Select value={task.status}>
+                                        <SelectTrigger className="col-span-3 capitalize">
+                                            <SelectValue placeholder={task.status}/>
+                                        </SelectTrigger>
+                                        <SelectContent className='col-span-3 capitalize'>
+                                            <SelectGroup>
+                                                <SelectItem value="pending">Pending</SelectItem>
+                                                <SelectItem value="in-progress">In-progress</SelectItem>
+                                                <SelectItem value="completed">Completed</SelectItem>
+                                                <SelectItem value="expired">Expired</SelectItem>
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
                                 </div>
                             </div>
                             <DialogFooter>

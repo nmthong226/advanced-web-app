@@ -20,6 +20,16 @@ import {
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Label } from '../ui/label';
+import {
+    Sheet,
+    SheetClose,
+    SheetContent,
+    SheetDescription,
+    SheetFooter,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from "../../components/ui/sheet"
 
 // Define the type for the draggable item.
 const CalendarGrid = ({ date }: { date: string }) => {
@@ -42,6 +52,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
     }, [date]); // Dependency array ensures this runs whenever `date` changes
 
     const handleDrop = (item: Task, time: string, date: string) => {
+        console.log(`Item dropped at ${time} on ${date}:`, item);
         setCalendarData((prevData) => {
             const updatedData = prevData.map((day) => {
                 if (day.date === date) {
@@ -49,7 +60,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
                         ...item,
                         id: item.id || uuidv4(), // Use provided ID or generate a new one
                         startTime: time,
-                        endTime: addMinutesToTime(time, 60),
+                        endTime: addMinutesToTime(time, 0),
                         estimatedTime: 15,
                         date: date,
                     };
@@ -95,8 +106,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
     const endHour = 24; // End at 12 PM
     const slotsPerDay = (endHour + 1 - startHour) * (60 / interval); // Number of slots between 6 AM and 12 PM
     const occupiedSlots = Array(7).fill(null).map(() => new Array(slotsPerDay).fill(false));
-
-    console.log(currentWeek);
     return (
         <div className='flex flex-col bg-white w-full h-full overflow-hidden'>
             <div className='flex'>
@@ -210,8 +219,8 @@ const CalendarGrid = ({ date }: { date: string }) => {
                         const today = new Date();
                         const isToday = date.dayOfMonth === today.getDate();
                         return (
-                            <div key={index} className="flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500">
-                                <div className={`flex ${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-100 via-indigo-200 to-indigo-100 rounded-xl' : ''} flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}>
+                            <div key={index} className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : ''}  flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500`}>
+                                <div className={`${isToday ? 'text-white' : ''} flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}>
                                     <p className="text-[12px]">{date.dayOfWeek}</p>
                                     <p>{date.dayOfMonth}</p>
                                 </div>
@@ -250,7 +259,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
 
                                     // Find the activity that starts at the current formattedTime
                                     const task = calendarData[day]?.tasks
-                                        .find(task => task.dueTime === formattedTime);
+                                        .find(task => task.endTime === formattedTime);
                                     const shouldSpanRows = task && task.estimatedTime > 0;
 
                                     // Dynamically calculate the row span based on activity duration
@@ -280,7 +289,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
                                             task={task}
                                             onResize={handleResize}
                                             onDrop={(item: Task) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                            className={shouldSpanRows ? `row-span-${spanRows} col-span-1 w-[96%] h-full shadow-md border-0` : 'col-span-1 row-span-1 h-5 text-[10px]'}
+                                            className={task ? `row-span-${spanRows} col-span-1 w-[96%] h-full shadow-md border-0` : 'col-span-1 row-span-1 h-5 text-[10px]'}
                                             style={{
                                                 gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                             }}

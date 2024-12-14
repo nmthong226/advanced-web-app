@@ -9,7 +9,6 @@ type Activity = {
     userId: string;
     title: string;
     description: string;
-    type: 'activity';
     startTime: string;
     endTime: string;
     style: Style;
@@ -22,8 +21,8 @@ type Task = {
     userId: string;
     title: string;
     description: string;
-    type: 'task';
-    status?: 'pending' | 'in-progress' | 'completed';
+    status?: 'pending' | 'in-progress' | 'completed' | 'expired';
+    priority: 'high' | 'medium' | 'low';
     category: string;
     style: Style;
     startTime?: string;
