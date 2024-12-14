@@ -166,78 +166,78 @@ const Home = () => {
                 </div>
                 <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">🔥Game HW3</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">🔥Game HW3</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="bg-slate-400 mr-0.5 rounded-full w-3 h-3" />
                       <p>To-do</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Game Development</p>
-                    <p className="w-[16%] text-[12px] text-left truncate">23:55, Dec 3</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">23:55, Dec 3</p>
                     <p className="w-[6%] text-[12px] text-left">2h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
                     </button>
                   </div>
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">⚡Seminar Presentation</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">⚡Seminar Presentation</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="border-[1px] border-slate-300 bg-zinc-50 mr-0.5 rounded-full w-3 h-3" />
                       <p>Completed</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Advanced Web Application Development</p>
-                    <p className="w-[17%] text-[12px] text-left truncate">14:30, Dec 14</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">14:30, Dec 14</p>
                     <p className="w-[6%] text-[12px] text-left truncate">3h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
                     </button>
                   </div>
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">🌀Data HW3: Analyze</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">🌀Data HW3: Analyze</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="bg-slate-300 mr-0.5 rounded-full w-3 h-3" />
                       <p>Pending</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Intro2DS</p>
-                    <p className="w-[17%] text-[12px] text-left truncate">22:00, Dec 12</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">22:00, Dec 12</p>
                     <p className="w-[6%] text-[12px] text-left truncate">3h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
                     </button>
                   </div>
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">🔥Data Examination</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">🔥Data Examination</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="bg-slate-300 mr-0.5 rounded-full w-3 h-3" />
                       <p>Pending</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Intro2DS</p>
-                    <p className="w-[17%] text-[12px] text-left truncate">23:55, Dec 23</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">23:55, Dec 23</p>
                     <p className="w-[6%] text-[12px] text-left truncate">3h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
                     </button>
                   </div>
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">🌀Feed the cat</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">🌀Feed the cat</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="border-[1px] border-slate-300 bg-zinc-50 mr-0.5 rounded-full w-3 h-3" />
                       <p>Completed</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Chores</p>
-                    <p className="w-[17%] text-[12px] text-left truncate">23:00, Dec 12</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">23:00, Dec 12</p>
                     <p className="w-[6%] text-[12px] text-left truncate">3h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
                     </button>
                   </div>
                   <div className="flex justify-between items-center space-x-2 p-1 border rounded-md w-full h-10">
-                    <p className="w-[25%] text-[12px] text-left truncate">⚡Buy junk food</p>
+                    <p className="w-[23%] text-[12px] text-left truncate">⚡Buy junk food</p>
                     <div className="flex items-center w-[18%] text-[12px] text-left truncate">
                       <div className="bg-slate-400 mr-0.5 rounded-full w-3 h-3" />
                       <p>To-do</p>
                     </div>
                     <p className="w-[16%] text-[12px] text-left truncate">Chores</p>
-                    <p className="w-[17%] text-[12px] text-left truncate">23:00, Dec 26</p>
+                    <p className="w-[18%] text-[12px] text-left truncate">23:00, Dec 26</p>
                     <p className="w-[6%] text-[12px] text-left truncate">1.5h</p>
                     <button className="w-[3%]">
                       <IoMdMore />
@@ -335,7 +335,7 @@ const Home = () => {
         <OnlyShownTimeTable
           ref={table1Ref}
           className="top-12 left-0 absolute h-[92%]"
-          onScroll={() => syncScroll(table2Ref, table1Ref)}
+          tableClassName=""
         />
         {/* <OnlyShownTaskSchedule
           ref={table2Ref}

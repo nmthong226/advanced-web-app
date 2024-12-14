@@ -74,7 +74,7 @@ const DraggableTask: React.FC<DraggableTaskProps> =
 
         return (
             <DropdownMenu>
-                <div className={cn('relative flex flex-col px-2 py-2 border rounded-md text-sm truncate hover:cursor-grab shadow-md', backgroundColor)} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                <div className={cn('relative flex flex-col px-2 py-2 space-y-1 border rounded-md text-sm truncate hover:cursor-grab shadow-md', backgroundColor)} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
                     {/* Task Header */}
                     <div className='flex text-[11px] truncate'>
                         <p className={cn(`flex items-center font-semibold truncate`, textColor)}>
@@ -86,9 +86,9 @@ const DraggableTask: React.FC<DraggableTaskProps> =
                         {priority === 'low' && <p className='flex items-center truncate'><GoArrowDown className='mr-1' /> Low</p>}
                     </div>
                     {/* Task Title */}
-                    <p className='font-semibold text-base truncate'>{title}</p>
+                    <p className='font-[500] text-base truncate'>{title}</p>
                     {/* Task Times */}
-                    <div className='flex flex-col text-[11px] leading-tight'>
+                    <div className='flex flex-col text-[11px] leading-snug'>
                         <p>
                             Due to: <span className='ml-1'>{formatDueTime(dueTime)}</span>
                         </p>

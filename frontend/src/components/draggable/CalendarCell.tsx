@@ -20,7 +20,6 @@ import {
     SelectContent,
     SelectGroup,
     SelectItem,
-    SelectLabel,
     SelectTrigger,
     SelectValue,
 } from "../../components/ui/select"
@@ -119,7 +118,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
         <div
             ref={drop}
             className={cn(
-                `relative flex h-full bg-gray-50 ${isOver ? 'bg-indigo-100' : 'bg-gray-50 p-1'}`,
+                `relative flex h-full bg-gray-50 ${isOver ? 'bg-indigo-100' : 'bg-zinc-100 p-1'}`,
                 task?.style.backgroundColor,
                 className
             )}

@@ -21,13 +21,13 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageInput, setMessageInp
     <div className="bottom-2 left-1/2 absolute flex flex-row w-full transform -translate-x-1/2">
       <div className="bottom-0 left-1/2 absolute flex w-[90%] transform -translate-x-1/2">
         <div className="flex flex-col justify-center items-center w-full">
-          <div className="relative flex flex-row items-center bg-white mb-[2%] border rounded-[32px] w-full">
+          <div className="relative flex flex-row items-center bg-gray-50 mb-[2%] border rounded-[32px] w-full">
             <div className="flex flex-col w-full">
-              <div className="relative flex flex-row">
+              <div className="relative flex flex-row bg-gray-50 rounded-[32px]">
                 <textarea
                   ref={textareaRef}
                   rows={1}
-                  className="custom-scrollbar p-4 rounded-[32px] focus:ring-0 w-[87%] max-h-[250px] overflow-y-auto focus:outline-none resize-none"
+                  className="bg-gray-50 custom-scrollbar p-4 rounded-[32px] focus:ring-0 w-[87%] max-h-[250px] overflow-y-auto focus:outline-none resize-none"
                   placeholder="Input your message"
                   value={messageInput}
                   onChange={(e) => {
