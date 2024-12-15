@@ -118,8 +118,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
         <div
             ref={drop}
             className={cn(
-                `relative flex h-full bg-gray-50 ${isOver ? 'bg-indigo-100' : 'bg-zinc-100 p-1'}`,
-                task?.style.backgroundColor,
+                `relative flex h-full w-full bg-gray-50 ${isOver ? 'bg-indigo-100' : ''}`,
                 className
             )}
         >
@@ -149,11 +148,11 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                         topLeft: false,
                     }}
                     disableDragging={true} // Disable dragging to prevent moving the activity around
-                    className={`${task?.style.backgroundColor} ${className} border-l-0 z-10 group`}
+                    className={`z-10 group`}
                 >
                     {rowSpan === 1 ?
                         (
-                            <div className='flex flex-row items-center h-full font-semibold'>
+                            <div className={`flex flex-row items-center h-full w-[96%] rounded-r-md shadow-md font-semibold ${task.style.backgroundColor}`}>
                                 {task.status === 'completed' && (
                                     <>
                                         <div className='flex justify-center items-center bg-emerald-400 w-5 h-full'>

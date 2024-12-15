@@ -45,7 +45,7 @@ const ChatAI = () => {
                     <span className="font-medium">AI Insights</span>
                 </button>
             </SheetTrigger>
-            <SheetContent className="flex flex-col bg-white sm:max-w-[450px] md:max-w-[500px] h-full">
+            <SheetContent className="flex flex-col bg-gradient-to-t from-indigo-50 to-white rounded-l-[26px] sm:max-w-[450px] md:max-w-[500px] h-full">
                 <SheetHeader className='flex leading-tight'>
                     <SheetTitle>💡 AI Insights</SheetTitle>
                     <SheetDescription className='text-xs'>
@@ -59,25 +59,25 @@ const ChatAI = () => {
                     <div className="space-y-4">
                         {/* AI Message */}
                         <div className="flex items-start">
-                            <div className="bg-gray-100 shadow-sm p-2 rounded-lg max-w-[80%] text-gray-900 text-sm">
+                            <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
                                 <p>Hello! I'm here to assist you in optimizing your schedule. How can I help?</p>
                             </div>
                         </div>
                         {/* User Message */}
                         <div className="flex justify-end items-end">
-                            <div className="bg-blue-600 shadow-sm p-2 rounded-lg max-w-[80%] text-sm text-white">
+                            <div className="bg-blue-600 shadow-md p-2 rounded-2xl max-w-[80%] text-sm text-white">
                                 <p>Can you suggest how to prioritize my tasks for today?</p>
                             </div>
                         </div>
                         {/* AI Message */}
                         <div className="flex items-start">
-                            <div className="bg-gray-100 shadow-sm p-2 rounded-lg max-w-[80%] text-gray-900 text-sm">
+                            <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
                                 <p>Sure! I recommend focusing on the high-priority tasks first, like "Homework HW3." Would you like me to rearrange your schedule?</p>
                             </div>
                         </div>
                         {chatHistory.map((chat, index) => (
                             <div key={index} className={`flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'} ${chat.type === 'user' ? 'items-end' : 'items-start'}`}>
-                                <div className={`bg-${chat.type === 'user' ? 'blue-600' : 'gray-100'} shadow-sm p-2 rounded-lg max-w-[80%] text-${chat.type === 'user' ? 'white' : 'gray-900'} text-sm`}>
+                                <div className={`${chat.type === 'user' ? 'bg-blue-600' : 'bg-white'} shadow-md p-2 rounded-2xl max-w-[80%] text-${chat.type === 'user' ? 'white' : 'gray-900'} text-sm`}>
                                     <p>{chat.message}</p>
                                 </div>
                             </div>

@@ -27,7 +27,7 @@ const SideBar = () => {
   const isActiveTab = (tabPath: string) => {
     return location.pathname === tabPath;
   };
-
+  
   return (
     <aside className="flex flex-col justify-between items-center p-2 border-r-[1px] w-14 h-full">
       <div className="flex flex-col">
@@ -86,7 +86,7 @@ const SideBar = () => {
           <TfiHelpAlt className="w-5 h-5" />
         </div>
         <div className="hover:border-gray-300 p-2 rounded-md hover:cursor-pointer">
-          <HiOutlineCog6Tooth className="w-6 h-6"/>
+          <Settings />
         </div>
         <div className="hover:border-gray-300 p-1 rounded-full hover:cursor-pointer">
           <UserButton />

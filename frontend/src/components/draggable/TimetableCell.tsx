@@ -70,8 +70,7 @@ const TimetableCell: React.FC<CalendarCellProps> = ({
         <div
             ref={drop}
             className={cn(
-                `relative flex h-full bg-gray-50 ${isOver ? 'bg-indigo-100' : 'bg-gray-50 p-1'}`,
-                activity?.style.backgroundColor,
+                `relative flex h-full bg-gray-50 ${isOver ? 'bg-indigo-100' : ''}`,
                 className
             )}
         >
@@ -101,11 +100,11 @@ const TimetableCell: React.FC<CalendarCellProps> = ({
                         topLeft: false,
                     }}
                     disableDragging={true} // Disable dragging to prevent moving the activity around
-                    className={`${activity?.style.backgroundColor} ${className} border-l-0 z-10 group`}
+                    className={`z-10 group`}
                 >
                     {rowSpan === 1 ?
                         (
-                            <div className='flex flex-row justify-center items-center'>
+                            <div className={`flex flex-row justify-center items-center ${activity.style.backgroundColor} w-[96%] h-full`}>
                                 <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>
@@ -113,7 +112,7 @@ const TimetableCell: React.FC<CalendarCellProps> = ({
                                 <p className="font-semibold text-[10px] text-zinc-600 truncate">{activity.title}</p>
                             </div>
                         ) : (
-                            <div className='flex flex-col p-2'>
+                            <div className={`flex flex-col p-2 ${activity.style.backgroundColor} rounded-md shadow-md w-[96%] h-full`}>
                                 <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>

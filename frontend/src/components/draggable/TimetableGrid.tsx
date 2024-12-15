@@ -224,7 +224,7 @@ const TimeTableGrid = ({ date }: { date: string }) => {
                 </div>
             </div>
             <div className='flex custom-scrollbar w-full h-full overflow-x-hidden overflow-y-auto'>
-                <div className="gap-[8px] grid grid-rows-[auto_repeat(24,1fr)] w-[5%] h-full text-center">
+                <div className="grid grid-rows-[auto_repeat(24,1fr)] w-[5%] h-full text-center">
                     {/* Hourly slots (6 AM to 12 PM, then 1 PM to 12 PM) */}
                     {Array.from({ length: 19 }, (_, index) => {
                         const hour = index < 7 ? 6 + index : index - 6; // Generate 6 AM to 12 PM and 1 PM to 12 PM
@@ -240,7 +240,7 @@ const TimeTableGrid = ({ date }: { date: string }) => {
                         );
                     })}
                 </div>
-                <div className="gap-0.5 grid grid-cols-7 grid-rows-[repeat(96,20px)] grid-flow-row-dense w-[95%] h-full">
+                <div className="grid grid-cols-7 grid-rows-[repeat(96,20px)] grid-flow-row-dense w-[95%] h-full">
                     {Array.from({ length: slotsPerDay }, (_, index) => {
                         // const formattedTime = formatTime(index, interval);
                         const formattedTime = formatTime(startHour * (60 / interval) + index, interval);
@@ -275,6 +275,10 @@ const TimeTableGrid = ({ date }: { date: string }) => {
                                     // Manually calculate the grid row start and end
                                     const gridRowStart = index + 1;
                                     const gridRowEnd = shouldSpanRows ? gridRowStart + spanRows : gridRowStart + 1;
+                                    
+                                    // Apply border to every 4th row
+                                    const isBorderRow = (index + 1) % 4 === 0;
+
                                     return (
                                         <TimetableCell
                                             key={`${day}-${index}`}
@@ -283,7 +287,7 @@ const TimeTableGrid = ({ date }: { date: string }) => {
                                             activity={activity}
                                             onResize={handleResize}
                                             onDrop={(item: Activity) => handleDrop(item, formattedTime, currentWeek[day].fullDate)}
-                                            className={shouldSpanRows ? `row-span-${spanRows} col-span-1 w-[96%] h-full rounded-md shadow-md border-none` : 'col-span-1 row-span-1 h-5 text-[10px]'}
+                                            className={`${activity ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r` : 'col-span-1 row-span-1 h-5 text-[10px] border-r'} ${isBorderRow ? 'border-b border-gray-300' : ''}`}
                                             style={{
                                                 gridRow: `${gridRowStart} / ${gridRowEnd}`,
                                             }}

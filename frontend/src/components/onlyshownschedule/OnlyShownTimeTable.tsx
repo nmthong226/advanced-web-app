@@ -99,11 +99,11 @@ const OnlyShownTimeTable = forwardRef<HTMLDivElement, Props>(({ className, table
             <div className='relative flex custom-scrollbar w-full h-full overflow-y-auto' ref={timetableRef}>
                 {isIndicatorVisible && (
                     <div className="z-50 absolute flex items-center w-full" style={{ top: `${indicatorPosition}px` }}>
-                        <div className='flex justify-center items-center bg-gradient-to-r from-red-600 to-amber-400 border border-red-indigo-300 border-b rounded-md w-[55px]'>
+                        <div className='flex justify-center items-center bg-gradient-to-r from-blue-600 to-cyan-400 border border-red-indigo-300 border-b rounded-md w-[55px]'>
                             <p className='font-semibold text-[10px] text-white'>{formattedTime}</p>
                         </div>
                         <hr
-                            className="border-0 border-t-2 border-red-600 border-dotted w-full h-[4px]"
+                            className="border-0 border-t-2 border-blue-600 border-dotted w-full h-[4px]"
                             style={{ borderSpacing: '10px' }}
                         />
                     </div>

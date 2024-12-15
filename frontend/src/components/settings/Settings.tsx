@@ -8,9 +8,9 @@ import {
 } from "../../components/ui/dialog";
 
 // Import icons
-import { IoMdSettings } from 'react-icons/io';
 import { MdViewQuilt } from "react-icons/md";
 import { GrLanguage } from "react-icons/gr";
+import { HiOutlineCog6Tooth } from 'react-icons/hi2';
 
 //Import context
 import { useSettings } from '@/contexts/SettingsContext';
@@ -27,7 +27,7 @@ const Settings = () => {
         <Dialog>
             <DialogTrigger asChild>
                 <div>
-                    <IoMdSettings className="w-6 h-6" />
+                    <HiOutlineCog6Tooth className="w-6 h-6" />
                 </div>
             </DialogTrigger>
             <DialogContent className="flex gap-0 bg-[#F7F7F7] p-0 sm:rounded-xl max-w-[880px] h-[700px]" overlayBgColor="bg-black/70">
