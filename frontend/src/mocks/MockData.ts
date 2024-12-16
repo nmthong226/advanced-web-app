@@ -195,56 +195,25 @@ export const initialTaskData: TaskSchedule[] = [
     {
         date: '08-12-2024',
         dayOfWeek: 'Sun',
-        tasks: [
-            {
-                id: 'task-1',
-                userId: 'user-1',
-                title: 'Homework HW3',
-                description: 'your description here',
-                dueTime: '8:00 AM',
-                startTime: '',
-                endTime: '8:00 AM',
-                estimatedTime: 0,
-                status: 'pending',
-                priority: 'high',
-                style: {
-                    backgroundColor: 'bg-blue-100 border-l-[5px] border-l-blue-600',
-                    textColor: 'text-blue-600',
-                },
-                category: 'none',
-            },
-            {
-                id: 'task-2',
-                title: 'Homework here',
-                description: 'your description here',
-                dueTime: '10:00 AM',
-                startTime: '',
-                endTime: '9:00 AM',
-                priority: 'medium',
-                status: 'in-progress',
-                userId: 'user-1',
-                estimatedTime: 0,
-                style: {
-                    backgroundColor: 'bg-red-100 border-l-[5px] border-l-red-600',
-                    textColor: 'text-red-600',
-                },
-                category: 'none',
-            }
-        ]
+        userId: 'user-1',
+        tasks: [],
     },
     {
         date: '09-12-2024',
         dayOfWeek: 'Mon',
+        userId: 'user-1',
         tasks: [],
     },
     {
         date: '10-12-2024',
         dayOfWeek: 'Tue',
+        userId: 'user-1',
         tasks: [],
     },
     {
         date: '11-12-2024',
         dayOfWeek: 'Wed',
+        userId: 'user-1',
         tasks: [
             {
                 id: 'task-3',
@@ -268,16 +237,19 @@ export const initialTaskData: TaskSchedule[] = [
     {
         date: '12-12-2024',
         dayOfWeek: 'Thu',
+        userId: 'user-1',
         tasks: [],
     },
     {
         date: '13-12-2024',
         dayOfWeek: 'Fri',
+        userId: 'user-1',
         tasks: [],
     },
     {
         date: '14-12-2024',
         dayOfWeek: 'Sat',
+        userId: 'user-1',
         tasks: [],
     },
 ];

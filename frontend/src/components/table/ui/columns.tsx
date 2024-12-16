@@ -113,6 +113,55 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
+    accessorKey: 'startDate',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Start Date" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[120px]">{row.getValue('startDate') || 'N/A'}</div>
+    ),
+    filterFn: (row, columnId, filterValue) => {
+      const rowDate = new Date(row.getValue(columnId));
+      const fromDate = new Date(filterValue?.fromDate);
+      const toDate = new Date(filterValue?.toDate);
+
+      // Debug logs for filtering logic
+      console.log('Row Date:', rowDate);
+      console.log('Filter From Date:', fromDate);
+      console.log('Filter To Date:', toDate);
+
+      if (!rowDate || isNaN(rowDate.getTime())) return false; // Skip invalid dates
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return true; // If no valid filter, include all
+
+      return rowDate >= fromDate && rowDate <= toDate;
+    },
+  },
+  {
+    accessorKey: 'endDate',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="End Date" />
+    ),
+    cell: ({ row }) => (
+      <div className="w-[120px]">{row.getValue('endDate') || 'N/A'}</div>
+    ),
+    filterFn: (row, columnId, filterValue) => {
+      const rowDate = new Date(row.getValue(columnId));
+      const fromDate = new Date(filterValue?.fromDate);
+      const toDate = new Date(filterValue?.toDate);
+
+      // Debug logs for filtering logic
+      console.log('Row Date:', rowDate);
+      console.log('Filter From Date:', fromDate);
+      console.log('Filter To Date:', toDate);
+
+      if (!rowDate || isNaN(rowDate.getTime())) return false; // Skip invalid dates
+      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return true; // If no valid filter, include all
+
+      return rowDate >= fromDate && rowDate <= toDate;
+    },
+  },
+
+  {
     id: 'actions',
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },

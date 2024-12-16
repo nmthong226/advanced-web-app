@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
+import axios from 'axios';
 import { Task } from '../data/schema';
+import { useTaskContext } from '@/contexts/TasksContext';
 
 export type TasksDialogType = 'create' | 'update' | 'delete' | 'import';
 
@@ -8,30 +10,45 @@ interface TasksContextType {
   setOpen: (str: TasksDialogType | null) => void;
   currentRow: Task | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<Task | null>>;
+  handleOpen: (type: TasksDialogType) => void;
 }
 
 const TasksContext = React.createContext<TasksContextType | null>(null);
 
 interface Props {
   children: React.ReactNode;
-  value: TasksContextType;
 }
 
-export default function TasksContextProvider({ children, value }: Props) {
+export default function TasksContextProvider({ children }: Props) {
+  const [open, setOpen] = useState<TasksDialogType | null>(null);
+  const [currentRow, setCurrentRow] = useState<Task | null>(null);
+
+  const handleOpen = useCallback((type: TasksDialogType) => {
+    setOpen(type);
+  }, []);
+  
   return (
-    <TasksContext.Provider value={value}>{children}</TasksContext.Provider>
+    <TasksContext.Provider
+      value={{
+        open,
+        setOpen,
+        currentRow,
+        setCurrentRow,
+        handleOpen,
+      }}
+    >
+      {children}
+    </TasksContext.Provider>
   );
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
+// Custom hook để sử dụng TasksContext
 export const useTasksContext = () => {
-  const tasksContext = React.useContext(TasksContext);
-
-  if (!tasksContext) {
+  const context = useContext(TasksContext);
+  if (!context) {
     throw new Error(
-      'useTasksContext has to be used within <TasksContext.Provider>',
+      'useTasksContext must be used within a <TasksContextProvider>',
     );
   }
-
-  return tasksContext;
+  return context;
 };
