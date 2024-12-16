@@ -1,19 +1,8 @@
 // Import frameworks
 import { useState } from 'react';
-
-// Import icons
-import { ChevronsUpDown } from 'lucide-react';
-import { MdFolderOpen } from 'react-icons/md';
-import { FaChevronLeft } from 'react-icons/fa';
-
 // Import components
 import { Button } from '../ui/button';
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '../ui/collapsible';
-import DraggableItem from '../draggable/DraggableItem';
 import { mockUserEvents } from '@/mocks/MockData';
 import AddEventItemsDialog from '../dialogs/createEventItems';
 import AddEvent from '../dialogs/createEvent';
@@ -76,40 +65,6 @@ const SideBarActivity = () => {
     setEvents(updatedEvents); // Update state with the new events array
   };
 
-  return (
-    <div className="flex flex-col w-[14%] h-full relative">
-      <div className="w-full h-full flex flex-col px-2 py-1 border-r-[1px] border-indigo-100 relative overflow-y-hidden overflow-x-hidden">
-        <AddEvent onAddEvent={handleAddNewCategory} />
-        <hr className="my-2 border-[1px]" />
-        <div className="px-2 overflow-y-auto custom-scrollbar">
-          {events.map((eventCategory, index) => (
-            <div key={eventCategory.id}>
-              {' '}
-              {/* Added key to the parent div */}
-              <Collapsible
-                open={openCategories[eventCategory.name] || false}
-                onOpenChange={() => toggleCategory(eventCategory.name)} // Toggle the category's open state
-                className="w-full space-y-2"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex space-x-2 items-center">
-                    <CollapsibleTrigger asChild>
-                      <Button variant="ghost" size="sm" className="p-0">
-                        <ChevronsUpDown className="h-4 w-4" />
-                        <span className="sr-only">Toggle</span>
-                      </Button>
-                    </CollapsibleTrigger>
-                    <div className="flex items-center space-x-1">
-                      <MdFolderOpen />
-                      <h4 className="text-sm font-semibold">
-                        {eventCategory.name}
-                      </h4>
-                    </div>
-                  </div>
-                  <AddEventItemsDialog
-                    eventCategory={eventCategory}
-                    onAddEvent={handleAddEvenItem}
-                  />
                 </div>
                 {/* Render DraggableItems for each item in the category */}
                 {eventCategory.item.slice(0, 4).map((item) => (
@@ -176,7 +131,6 @@ const SideBarActivity = () => {
                 className={`my-2 border-[1px] ${index === events.length - 1 ? 'hidden' : ''}`}
               />
             </div>
-          ))}
         </div>
       </div>
       <div className="absolute p-2 bg-indigo-200 rounded-md -right-4 top-2 hover:cursor-pointer">

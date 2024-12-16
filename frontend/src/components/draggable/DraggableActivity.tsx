@@ -14,19 +14,19 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
+} from "../ui/dropdown-menu"
 import {
     Dialog,
     DialogContent,
     DialogDescription,
     DialogHeader,
     DialogTitle,
-} from "../../components/ui/dialog"
+} from "../ui/dialog"
 import NotifyDeletion from '../toast/notifyDeletion';
 import { Button } from '../ui/button';
 import EditEventItemsDialog from '../dialogs/editEventItems';
 
-type DraggableItemProps = {
+type DraggableActivityProps = {
     id: string;
     title: string;
     description: string;
@@ -37,10 +37,10 @@ type DraggableItemProps = {
     backgroundColor: string;
     textColor: string;
     duration: number;
-    category: DefinedEvents;
+    category: ActivityCategory;
 };
 
-const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundColor, textColor, description, startTime, endTime, date, duration, category }) => {
+const DraggableActivity: React.FC<DraggableActivityProps> = ({ title, type, backgroundColor, textColor, description, startTime, endTime, date, duration, category }) => {
     const [{ isDragging }, drag] = useDrag(() => ({
         type: 'ITEM',
         item: {
@@ -130,4 +130,4 @@ const DraggableItem: React.FC<DraggableItemProps> = ({ title, type, backgroundCo
     );
 };
 
-export default DraggableItem;
+export default DraggableActivity;

@@ -71,7 +71,7 @@ export const getCurrentWeek = (dateProp?: string) => {
 
 // Helper function to convert a time string with AM/PM to a 24-hour format and add minutes to it.
 export const addMinutesToTime = (time: string, minutesToAdd: number): string => {
-  // Match 12-hour time format (e.g., '09:30 AM')
+  // Match 12-hour time format (e.g., '9:30 AM' or '03:15 PM')
   const timeRegex = /(\d{1,2}):(\d{2}) (AM|PM)/;
   const match = time.match(timeRegex);
 
@@ -91,12 +91,17 @@ export const addMinutesToTime = (time: string, minutesToAdd: number): string => 
     const date = new Date(1970, 0, 1, hours, minutes); // Use January 1st, 1970 for consistency
     date.setMinutes(date.getMinutes() + minutesToAdd); // Add minutes to the time
 
-    // Format and return time in 12-hour format
-    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+    // Format and return time in 12-hour format without leading zero for hours
+    const options: Intl.DateTimeFormatOptions = {
+      hour: 'numeric', // 'numeric' avoids leading zeros for hours
+      minute: '2-digit',
+      hour12: true,
+    };
+    return date.toLocaleTimeString([], options);
   }
-
   return time; // If invalid format, return the original time
 };
+
 
 export const getTimeSlotIndex = (formattedTime: string): number => {
   // Example input: "09:15 AM"
@@ -126,6 +131,7 @@ export const getTimeSlotIndex = (formattedTime: string): number => {
 
 // Utility function to format time range
 export const formatTimeRange = (startTime: string, endTime: string): string => {
+  if (startTime == '' || endTime == '') return '';
   // Helper function to format time with AM/PM
   const formatTime = (time: string, removePeriod: boolean): string => {
     const [hour, minuteWithPeriod] = time.split(':'); // Split hour and minute part
@@ -161,4 +167,23 @@ export const transformBgColorToTextColor = (bgColor: string): string => {
     const newShade = Math.min(parseInt(shade, 10) * 10, 500); // Adjusting the shade to '500'
     return `text-${colorName}-${newShade}`;
   });
+};
+
+export const generateStylesFromParent = (gradient: string): string => {
+  // Extract the color from the gradient string
+  const match = gradient.match(/to-([a-z]+)-\d+/); // Matches the color like 'purple', 'blue', etc.
+  const color = match?.[1]; // Extract the color key
+
+  // Map of colors to styles
+  const colorStyles: { [key: string]: string } = {
+    purple: "bg-purple-100 border-l-[5px] border-l-purple-600",
+    blue: "bg-blue-100 border-l-[5px] border-l-blue-600",
+    green: "bg-green-100 border-l-[5px] border-l-green-600",
+    red: "bg-red-100 border-l-[5px] border-l-red-600",
+    yellow: "bg-yellow-100 border-l-[5px] border-l-yellow-600",
+    // Add more colors as needed
+  };
+
+  // Return the matched styles or a default style
+  return colorStyles[color || ""] || "bg-gray-100 border-l-[5px] border-l-gray-600";
 };

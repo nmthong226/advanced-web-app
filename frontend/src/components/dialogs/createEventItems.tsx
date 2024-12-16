@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 //Import icons
+import { BsPlusCircle } from "react-icons/bs";
 
 //Import components
 import { Button } from "../../components/ui/button"
@@ -15,7 +16,6 @@ import {
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import ColorPicker from "../colorpicker/ColorSelection";
-import { BsPlusCircle } from "react-icons/bs";
 
 interface AddEventDialogProps {
     eventCategory: { id: string; name: string };
@@ -109,7 +109,7 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
             <DialogTrigger asChild>
                 <div className="flex items-center text-indigo-600 hover:cursor-pointer">
                     <BsPlusCircle className="mr-1" />
-                    <button className="flex text-sm font-semibold">
+                    <button className="flex font-semibold text-sm">
                         Add
                     </button>
                 </div>
@@ -119,11 +119,11 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
                     <DialogTitle>Add New Event In {eventCategory.name}</DialogTitle>
                     <DialogDescription>Create a new event for you to track.</DialogDescription>
                 </DialogHeader>
-                <div className="grid gap-4">
+                <div className="gap-4 grid">
                     <div className={`flex w-full px-3 py-2 h-10 items-center font-mono ${newEventItemColor ? newEventItemColor : "bg-slate-100"}`}>
                         <p>{newEventItemTitle ? newEventItemTitle : "Preview event"}</p>
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-4">
+                    <div className="items-center gap-4 grid grid-cols-4">
                         <Label htmlFor="name" className="text-left">
                             Name<span className="text-red-500">*</span>
                         </Label>
@@ -135,7 +135,7 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
                             className="col-span-3"
                         />
                     </div>
-                    <div className="grid grid-cols-4 items-center gap-2">
+                    <div className="items-center gap-2 grid grid-cols-4">
                         <Label htmlFor="color" className="text-left">
                             Color Badge<span className="text-red-500">*</span>
                         </Label>
@@ -143,7 +143,7 @@ const AddEventItemsDialog: React.FC<AddEventDialogProps> = ({ eventCategory, onA
                             <ColorPicker selectedColor={selectedColor} onColorSelect={handleColorSelect} />
                         </div>
                     </div>
-                    <span className='text-xs italic text-end'>* required</span>
+                    <span className='text-end text-xs italic'>* required</span>
                 </div>
                 <DialogFooter>
                     <Button type="submit" onClick={handleAddEvent}>
