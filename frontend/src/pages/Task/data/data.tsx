@@ -4,11 +4,11 @@ import {
   IconArrowUp,
   IconCircle,
   IconCircleCheck,
-  IconCircleX,
   IconExclamationCircle,
   IconStopwatch,
-} from '@tabler/icons-react'
+} from '@tabler/icons-react';
 
+// Labels for categorizing tasks
 export const labels = [
   {
     value: 'bug',
@@ -22,8 +22,9 @@ export const labels = [
     value: 'documentation',
     label: 'Documentation',
   },
-]
+];
 
+// Statuses for task state management
 export const statuses = [
   {
     value: 'backlog',
@@ -31,27 +32,23 @@ export const statuses = [
     icon: IconExclamationCircle,
   },
   {
-    value: 'todo',
-    label: 'Todo',
+    value: 'pending',
+    label: 'Pending',
     icon: IconCircle,
   },
   {
-    value: 'in progress',
+    value: 'in-progress',
     label: 'In Progress',
     icon: IconStopwatch,
   },
   {
-    value: 'done',
-    label: 'Done',
+    value: 'completed',
+    label: 'Completed',
     icon: IconCircleCheck,
   },
-  {
-    value: 'canceled',
-    label: 'Canceled',
-    icon: IconCircleX,
-  },
-]
+];
 
+// Priorities for task urgency levels
 export const priorities = [
   {
     label: 'Low',
@@ -68,4 +65,4 @@ export const priorities = [
     value: 'high',
     icon: IconArrowUp,
   },
-]
+];
