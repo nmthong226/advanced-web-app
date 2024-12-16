@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 //Import icons
-import { IconDownload, IconPlus } from '@tabler/icons-react';
 
 //Import components
 import { Button } from '../../components/ui/button.tsx';
@@ -27,7 +26,8 @@ import {
   ToastViewport,
   ToastAction,
 } from 'src/components/ui/toast.tsx'; // Import ShadCN Toast components
-import { useTaskContext } from '@/contexts/TasksContext.tsx';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { Download, Plus } from 'lucide-react';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedTasksImportDialog = React.memo(TasksImportDialog);
@@ -142,10 +142,10 @@ const Tasks = () => {
                 className="space-x-1"
                 onClick={() => handleOpen('import')}
               >
-                <span>Import</span> <IconDownload size={18} />
+                <span>Import</span> <Download size={18} />
               </Button>
               <Button className="space-x-1" onClick={() => handleOpen('create')}>
-                <span>Create</span> <IconPlus size={18} />
+                <span>Create</span> <Plus size={18} />
               </Button>
             </div>
           </div>

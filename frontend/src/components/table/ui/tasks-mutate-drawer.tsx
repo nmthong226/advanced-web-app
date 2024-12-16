@@ -61,7 +61,6 @@ export function TasksMutateDrawer({
   const isUpdate = !!currentRow;
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]); // Manage the task list
-    const { handleOpen} = useTasksContext();
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: currentRow ?? {

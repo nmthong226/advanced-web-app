@@ -18,7 +18,7 @@ import TaskList from './pages/Task/TaskList.tsx';
 import Analytics from './pages/Analytics/Analytics.tsx';
 import TimeTable from './pages/Timetable/Timetable.tsx';
 import TasksContextProvider from './components/table/context/task-context.tsx';
-import { TaskProvider } from './contexts/TasksContext.tsx';
+import { TaskProvider } from './contexts/UserTaskContext.tsx';
 
 function App() {
   return (
