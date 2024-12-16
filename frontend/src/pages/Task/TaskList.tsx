@@ -52,13 +52,13 @@ const Tasks = () => {
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex items-start w-full h-full overflow-hidden">
-        <SideBarActivity />
-        <div className="w-full h-full">
+        {/* <SideBarActivity /> */}
+        <div className="px-2 w-full h-full">
           <TasksContextProvider
             value={{ open, setOpen, currentRow, setCurrentRow }}
           >
             {/* ===== Top Heading ===== */}
-            <div className="flex flex-wrap justify-between items-center gap-x-4 space-y-2 mb-2">
+            <div className="flex flex-wrap justify-between items-center gap-x-4 space-y-2 mb-2.5 w-full">
               <div></div>
               <div className="flex gap-2">
                 <Button
@@ -76,12 +76,11 @@ const Tasks = () => {
                 </Button>
               </div>
             </div>
-
+            <hr className='my-1 border-b w-full' />
             {/* ===== Data Table ===== */}
             <div className="lg:flex-row flex-1 lg:space-x-12 lg:space-y-0 -mx-4 px-4 py-1 overflow-auto">
               <DataTable data={tasks} columns={columns} />
             </div>
-
             {/* ===== Mutate Drawer & Import Dialog ===== */}
             <MemoizedTasksMutateDrawer
               key="task-create"
@@ -93,7 +92,6 @@ const Tasks = () => {
               open={open === 'import'}
               onOpenChange={() => handleOpen('import')}
             />
-
             {/* ===== Update Drawer & Delete Dialog (Conditional Rendering) ===== */}
             {currentRow && (
               <>
@@ -106,7 +104,6 @@ const Tasks = () => {
                   }}
                   currentRow={currentRow}
                 />
-
                 <MemoizedConfirmDialog
                   key="task-delete"
                   destructive

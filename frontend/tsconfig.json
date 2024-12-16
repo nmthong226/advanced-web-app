@@ -26,14 +26,6 @@
     "strict": false,
     "noUnusedLocals": false,
     "noUnusedParameters": false,
-    "preserveWatchOutput": true,
-    "exclude": [
-      "node_modules",
-      "dist",
-      "build",
-      "coverage",
-      "**/*.test.ts",
-      "**/*.test.tsx"
-    ]
+    "preserveWatchOutput": true
   }
 }
