@@ -1,8 +1,18 @@
-// Import frameworks
+//Import frameworks
 import { useState } from 'react';
-// Import components
+
+//Import icons
+import { ChevronsUpDown } from 'lucide-react';
+import { MdFolderOpen } from 'react-icons/md';
+
+//Import components
 import { Button } from '../ui/button';
 import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '../ui/collapsible';
+import DraggableActivity from '../draggable/DraggableActivity';
 import { mockUserEvents } from '@/mocks/MockData';
 import AddEventItemsDialog from '../dialogs/createEventItems';
 import AddEvent from '../dialogs/createEvent';
@@ -65,11 +75,44 @@ const SideBarActivity = () => {
     setEvents(updatedEvents); // Update state with the new events array
   };
 
+  return (
+    <div className="relative flex flex-col bg-white border rounded-lg w-[16%] h-full">
+      <div className="relative flex flex-col border-indigo-100 px-2 py-2 border-r-[1px] w-full h-full overflow-x-hidden overflow-y-hidden">
+        <AddEvent onAddEvent={handleAddNewCategory} />
+        <hr className="border-[1px] my-2" />
+        <div className="custom-scrollbar overflow-y-auto">
+          {events.map((eventCategory, index) => (
+            <>
+              <Collapsible
+                key={eventCategory.id}
+                open={openCategories[eventCategory.name] || false}
+                onOpenChange={() => toggleCategory(eventCategory.name)} // Toggle the category's open state
+                className="space-y-2 w-full"
+              >
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center">
+                    <CollapsibleTrigger asChild>
+                      <Button variant="ghost" size="sm" className="m-0 p-0">
+                        <ChevronsUpDown className="w-4 h-4" />
+                        <span className="sr-only">Toggle</span>
+                      </Button>
+                    </CollapsibleTrigger>
+                    <div className="flex items-center space-x-2">
+                      <MdFolderOpen />
+                      <h4 className="font-semibold text-sm">
+                        {eventCategory.name}
+                      </h4>
+                    </div>
+                  </div>
+                  <AddEventItemsDialog
+                    eventCategory={eventCategory}
+                    onAddEvent={handleAddEvenItem}
+                  />
                 </div>
-                {/* Render DraggableItems for each item in the category */}
+                {/* Render DraggableActivity for each item in the category */}
                 {eventCategory.item.slice(0, 4).map((item) => (
-                  <DraggableItem
-                    key={item.id} // Added key to each DraggableItem
+                  <DraggableActivity
+                    key={item.id}
                     id={item.id}
                     title={item.title}
                     type={'activity'} // Use category title to determine type
@@ -86,8 +129,8 @@ const SideBarActivity = () => {
                 {/* Collapsible Content */}
                 <CollapsibleContent className="space-y-2">
                   {eventCategory.item.slice(4).map((item) => (
-                    <DraggableItem
-                      key={item.id} // Added key to each DraggableItem
+                    <DraggableActivity
+                      key={item.id}
                       id={item.id}
                       title={item.title}
                       type={'activity'}
@@ -102,8 +145,8 @@ const SideBarActivity = () => {
                     />
                   ))}
                 </CollapsibleContent>
-                <div className="flex items-center justify-between">
-                  <div className="flex space-x-2 items-center">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-2">
                     {eventCategory.item.length > 4 && (
                       <CollapsibleTrigger asChild>
                         <Button variant="ghost" size="sm" className="p-0">
@@ -130,11 +173,9 @@ const SideBarActivity = () => {
               <hr
                 className={`my-2 border-[1px] ${index === events.length - 1 ? 'hidden' : ''}`}
               />
-            </div>
+            </>
+          ))}
         </div>
-      </div>
-      <div className="absolute p-2 bg-indigo-200 rounded-md -right-4 top-2 hover:cursor-pointer">
-        <FaChevronLeft />
       </div>
     </div>
   );

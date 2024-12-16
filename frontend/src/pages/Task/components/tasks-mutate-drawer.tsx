@@ -171,6 +171,7 @@ export function TasksMutateDrawer({
         open={open}
         onOpenChange={(v) => {
           onOpenChange(v);
+
           form.reset();
         }}
       >

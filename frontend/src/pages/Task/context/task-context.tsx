@@ -5,7 +5,7 @@ export type TasksDialogType = 'create' | 'update' | 'delete' | 'import';
 
 interface TasksContextType {
   open: TasksDialogType | null;
-  setOpen: (str: TasksDialogType | null) => void;
+  setOpen: (str: TasksDialogType | null) => void
   currentRow: Task | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<Task | null>>;
 }
