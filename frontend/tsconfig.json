@@ -18,6 +18,22 @@
       "@/style/*": ["./src/style/*"],
       "@/utils/*": ["./src/utils/*"],
       "@/types/*": ["./src/types/*"]
-    }
-  },
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "noEmit": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "preserveWatchOutput": true,
+    "exclude": [
+      "node_modules",
+      "dist",
+      "build",
+      "coverage",
+      "**/*.test.ts",
+      "**/*.test.tsx"
+    ]
+  }
 }
