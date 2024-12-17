@@ -33,6 +33,7 @@ type Task = {
 
 //This goes for tasks scheduling
 type TaskSchedule = {
+    userId: string;
     date: string; // e.g., '2024-11-20'
     dayOfWeek: string; // e.g., 'Wed'
     tasks: Task[]; 

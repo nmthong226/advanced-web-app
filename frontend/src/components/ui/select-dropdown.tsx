@@ -1,5 +1,5 @@
-import { IconLoader } from '@tabler/icons-react';
 import { cn } from '@/lib/utils';
+import { Loader } from 'lucide-react';
 import { FormControl } from 'src/components/ui/form';
 import {
   Select,
@@ -43,8 +43,8 @@ export function SelectDropdown({
       <SelectContent>
         {isPending ? (
           <SelectItem disabled value="loading" className="h-14">
-            <div className="flex items-center justify-center gap-2">
-              <IconLoader className="h-5 w-5 animate-spin" />
+            <div className="flex justify-center items-center gap-2">
+              <Loader className="w-5 h-5 animate-spin" />
               {'  '}
               Loading...
             </div>

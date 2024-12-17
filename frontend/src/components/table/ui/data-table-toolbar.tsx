@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuContent,
 } from 'src/components/ui/dropdown-menu';
-import { DataTableViewOptions } from '../components/data-table-view-options';
+import { DataTableViewOptions } from '../ui/data-table-view-options';
 import { priorities, statuses } from '../data/data';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
 
@@ -37,8 +37,8 @@ export function DataTableToolbar<TData>({
   };
 
   return (
-    <div className="flex items-center justify-between">
-      <div className="flex flex-1 flex-col-reverse items-start gap-y-2 sm:flex-row sm:items-center sm:space-x-2">
+    <div className="flex justify-between items-center">
+      <div className="flex sm:flex-row flex-col-reverse flex-1 items-start sm:items-center gap-y-2 sm:space-x-2">
         {/* Title Filter */}
         <Input
           placeholder="Filter tasks..."
@@ -46,7 +46,7 @@ export function DataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="w-[150px] lg:w-[250px] h-8"
         />
 
         {/* Faceted Filters */}
@@ -76,13 +76,13 @@ export function DataTableToolbar<TData>({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start" className="p-4 w-[280px]">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Start Date</label>
+              <label className="font-medium text-sm">Start Date</label>
               <Input
                 type="date"
                 value={fromDate || ''}
                 onChange={(e) => setFromDate(e.target.value)}
               />
-              <label className="text-sm font-medium mt-2">End Date</label>
+              <label className="mt-2 font-medium text-sm">End Date</label>
               <Input
                 type="date"
                 value={toDate || ''}
@@ -113,10 +113,10 @@ export function DataTableToolbar<TData>({
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
+            className="px-2 lg:px-3 h-8"
           >
             Reset
-            <Cross2Icon className="ml-2 h-4 w-4" />
+            <Cross2Icon className="ml-2 w-4 h-4" />
           </Button>
         )}
       </div>

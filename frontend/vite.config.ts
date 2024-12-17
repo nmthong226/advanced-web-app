@@ -14,4 +14,13 @@ export default defineConfig({
   optimizeDeps: {
     include: ['@radix-ui/react-dialog'],
   },
+  server: {
+    proxy: {
+      '/tasks': {
+        target: process.env.VITE_TEST_BACKEND,
+        changeOrigin: true,
+        secure: false, // Disable for self-signed certificates
+      },
+    },
+  },
 })

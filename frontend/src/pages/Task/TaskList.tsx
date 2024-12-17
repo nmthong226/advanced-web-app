@@ -1,70 +1,70 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { IconDownload, IconPlus } from '@tabler/icons-react';
+
+// Import components
 import { Button } from '../../components/ui/button.tsx';
 import { ConfirmDialog } from '../../components/ui/confirm-dialog.tsx';
-import { columns } from './components/columns';
-import { DataTable } from './components/data-table';
-import { TasksImportDialog } from './components/tasks-import-dialog';
-import { TasksMutateDrawer } from './components/tasks-mutate-drawer';
-import { Task } from './data/schema';
-import TasksContextProvider, {
-  TasksDialogType,
-} from './context/task-context.tsx';
-import useDialogState from '@/hooks/use-dialog-state';
-import axios from 'axios'; // Ensure axios is installed
-import ProgressBar from 'src/components/ProgressBar/ProgressBar.tsx';
+import { columns } from '../../components/table/ui/columns.tsx';
+import { DataTable } from '../../components/table/ui/data-table.tsx';
+import { TasksImportDialog } from '../../components/table/ui/tasks-import-dialog.tsx';
+import { TasksMutateDrawer } from '../../components/table/ui/tasks-mutate-drawer.tsx';
+import { Task } from '../../components/table/data/schema.ts';
+
+// Import hooks
+import { useTasksContext } from 'src/components/table/context/task-context.tsx';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import axios from 'axios';
+
+// Import ShadCN Toast components
 import {
   ToastProvider,
   Toast,
   ToastViewport,
   ToastAction,
-} from 'src/components/ui/toast.tsx'; // Import ShadCN Toast components
+} from 'src/components/ui/toast.tsx';
+
+import { Download, Plus } from 'lucide-react';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedTasksImportDialog = React.memo(TasksImportDialog);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [currentRow, setCurrentRow] = useState<Task | null>(null);
-  const [open, setOpen] = useDialogState<TasksDialogType>(null);
+  const { tasks, setTasks, fetchTasks } = useTaskContext();
+  const { open, currentRow, setCurrentRow, setOpen, handleOpen } =
+    useTasksContext();
   const [pendingDeletes, setPendingDeletes] = useState<
     Map<string, NodeJS.Timeout>
   >(new Map());
   const [toastQueue, setToastQueue] = useState<{ id: string; task: Task }[]>(
     [],
-  ); // Manage active toasts
+  );
 
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get(
-          'http://localhost:3000/tasks/user/USER-1234',
-        );
-        setTasks(response.data);
-      } catch (error) {
-        console.error('Error fetching tasks:', error);
-      }
-    };
-
     fetchTasks();
   }, []);
 
-  const handleOpen = useCallback((type: TasksDialogType) => {
-    setOpen(type);
-  }, []);
-  // Callback to update the task list
-  const handleTaskMutate = useCallback((task: Task, isUpdate: boolean) => {
-    setTasks((prevTasks) => {
-      if (isUpdate) {
-        // Update an existing task
-        return prevTasks.map((t) => (t.id === task.id ? task : t));
-      } else {
-        // Add a new task
-        return [...prevTasks, task];
-      }
-    });
-  }, []);
+  // Handle row click to update the current row in TasksContext
+  const handleRowClick = (task: Task) => {
+    setCurrentRow(task);
+    handleOpen('update');
+  };
+
+  // Handle task creation and update using useTaskContext
+  const handleTaskMutate = useCallback(
+    (task: Task, isUpdate: boolean) => {
+      setTasks((prevTasks) => {
+        if (isUpdate) {
+          // Update an existing task
+          return prevTasks.map((t) => (t.id === task.id ? task : t));
+        } else {
+          // Add a new task
+          return [...prevTasks, task];
+        }
+      });
+    },
+    [setTasks],
+  );
+
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
 
@@ -80,10 +80,10 @@ const Tasks = () => {
         await axios.delete(`http://localhost:3000/tasks/${taskId}`);
         setToastQueue((prevQueue) =>
           prevQueue.filter((item) => item.id !== taskId),
-        ); // Remove toast from queue
+        );
       } catch (error) {
         console.error('Error deleting task:', error);
-        setTasks((prevTasks) => [...prevTasks, taskToDelete]); // Restore task if delete fails
+        setTasks((prevTasks) => [...prevTasks, taskToDelete]);
       }
       setPendingDeletes((prev) => {
         const newMap = new Map(prev);
@@ -92,19 +92,16 @@ const Tasks = () => {
       });
     }, 10000); // 10 seconds timeout
 
-    // Add the delete task to pendingDeletes map
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
       newMap.set(taskId, timeoutId);
       return newMap;
     });
 
-    // Add toast for undo
     setToastQueue((prevQueue) => [
       ...prevQueue,
       { id: taskId, task: taskToDelete },
     ]);
-
     setCurrentRow(null);
     setOpen(null);
   }, [currentRow, setTasks, setOpen, setPendingDeletes]);
@@ -113,120 +110,81 @@ const Tasks = () => {
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
       if (newMap.has(task.id)) {
-        clearTimeout(newMap.get(task.id)); // Clear timeout
+        clearTimeout(newMap.get(task.id));
         newMap.delete(task.id);
       }
       return newMap;
     });
-    setTasks((prevTasks) => [...prevTasks, task]); // Restore the task
+    setTasks((prevTasks) => [...prevTasks, task]);
     setToastQueue((prevQueue) =>
       prevQueue.filter((item) => item.id !== task.id),
-    ); // Remove undo toast
+    );
   }, []);
 
   return (
-    <TasksContextProvider value={{ open, setOpen, currentRow, setCurrentRow }}>
-      <ToastProvider>
-        {/* Toast Viewport */}
-        <ToastViewport />
+    <ToastProvider>
+      <ToastViewport />
+      <div className="flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden">
+        <div className="flex flex-col bg-white border rounded-md w-full h-full">
+          {/* ===== Top Heading ===== */}
+          <div className="flex flex-wrap justify-between items-center gap-x-4 p-2">
+            <button className="px-2 font-semibold text-indigo-500 text-lg">
+              TaskList
+              <span className="ml-2 font-normal text-gray-500">|</span>
+              <span className="ml-2 font-normal text-[12px] text-gray-500">
+                This section manages your daily activity calendar.
+              </span>
+            </button>
 
-        {/* ===== Top Heading ===== */}
-        <div className="mb-2 flex items-center justify-between space-y-2 flex-wrap gap-x-4">
-          <div></div>
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="space-x-1"
-              onClick={() => handleOpen('import')}
-            >
-              <span>Import</span> <IconDownload size={18} />
-            </Button>
-            <Button className="space-x-1" onClick={() => handleOpen('create')}>
-              <span>Create</span> <IconPlus size={18} />
+            <Button onClick={() => handleOpen('create')}>
+              Create <Plus size={18} />
             </Button>
           </div>
-        </div>
 
-        {/* ===== Data Table ===== */}
-        <div className="-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-x-12 lg:space-y-0">
+          <hr className="my-1 w-full" />
+
+          {/* ===== Data Table ===== */}
           <DataTable data={tasks} columns={columns} />
-        </div>
 
-        {/* ===== Mutate Drawer & Import Dialog ===== */}
-        <MemoizedTasksMutateDrawer
-          key="task-create"
-          open={open === 'create'}
-          onOpenChange={() => handleOpen('create')}
-          onTaskMutate={handleTaskMutate}
-        />
-        <MemoizedTasksImportDialog
-          key="tasks-import"
-          open={open === 'import'}
-          onOpenChange={() => handleOpen('import')}
-        />
+          <MemoizedTasksMutateDrawer />
 
-        {/* ===== Toasts for Undo ===== */}
-        {toastQueue.map(({ id, task }) => (
-          <Toast key={id} variant="default">
-            <div className="flex justify-between">
-              <div>
-                <p className="text-sm font-semibold">{task.title} deleted.</p>
-                <p className="text-xs">
-                  Will be permanently removed in 10 seconds.
-                </p>
-              </div>
-              <ToastAction
-                altText="Undo Deletion"
-                asChild
-                onClick={() => undoDelete(task)}
-              >
-                <Button variant="link" size="sm">
+          {/* ===== Toasts for Undo ===== */}
+          {toastQueue.map(({ id, task }) => (
+            <Toast key={id} variant="default">
+              <div className="flex justify-between">
+                <p>{task.title} deleted.</p>
+                <ToastAction
+                  altText="Undo Deletion"
+                  onClick={() => undoDelete(task)}
+                >
                   Undo
-                </Button>
-              </ToastAction>
-            </div>
-          </Toast>
-        ))}
+                </ToastAction>
+              </div>
+            </Toast>
+          ))}
 
-        {/* ===== Update Drawer & Delete Dialog ===== */}
-        {currentRow && (
-          <>
-            <MemoizedTasksMutateDrawer
-              key={`task-update-${currentRow.id}`}
-              open={open === 'update'}
-              onOpenChange={() => {
-                handleOpen('update');
-                setTimeout(() => setCurrentRow(null), 500);
-              }}
-              currentRow={currentRow}
-              onTaskMutate={handleTaskMutate}
-            />
-            <MemoizedConfirmDialog
-              key="task-delete"
-              destructive
-              open={open === 'delete'}
-              onOpenChange={() => {
-                handleOpen('delete');
-                setTimeout(() => {
-                  setCurrentRow(null);
-                }, 500);
-              }}
-              handleConfirm={handleConfirmDelete}
-              className="max-w-md"
-              title={`Delete this task: ${currentRow?.id}?`}
-              desc={
-                <>
-                  You are about to delete a task with the ID{' '}
-                  <strong>{currentRow?.id}</strong>. <br />
-                  This action can be undone in 10 seconds.
-                </>
-              }
-              confirmText="Delete"
-            />
-          </>
-        )}
-      </ToastProvider>
-    </TasksContextProvider>
+          {/* ===== Update Drawer & Delete Dialog ===== */}
+          {currentRow && (
+            <>
+              <MemoizedConfirmDialog
+                destructive
+                open={open === 'delete'}
+                onOpenChange={() => setOpen(null)}
+                handleConfirm={handleConfirmDelete}
+                title={`Delete this task: ${currentRow?.id}?`}
+                desc={
+                  <p>
+                    You are about to delete task{' '}
+                    <strong>{currentRow?.title}</strong>.
+                  </p>
+                }
+                confirmText="Delete"
+              />
+            </>
+          )}
+        </div>
+      </div>
+    </ToastProvider>
   );
 };
 

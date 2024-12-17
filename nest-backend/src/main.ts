@@ -6,8 +6,9 @@ async function bootstrap() {
 
   // Enable CORS
   app.enableCors({
-    origin: 'http://localhost:5173', // Allow requests from your frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific HTTP methods
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    allowedHeaders: ['Content-Type', 'ngrok-skip-browser-warning', 'User-Agent'], // Specify allowed headers
     credentials: true, // Allow credentials (if needed)
   });
 

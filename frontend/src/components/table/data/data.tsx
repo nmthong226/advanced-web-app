@@ -1,12 +1,6 @@
-import {
-  IconArrowDown,
-  IconArrowRight,
-  IconArrowUp,
-  IconCircle,
-  IconCircleCheck,
-  IconExclamationCircle,
-  IconStopwatch,
-} from '@tabler/icons-react';
+import { ExclamationTriangleIcon, StopwatchIcon } from "@radix-ui/react-icons";
+import { ArrowDown, ArrowRight, ArrowUp, CheckCircle, Clock } from "lucide-react";
+import { IoArrowDownCircleOutline } from "react-icons/io5";
 
 // Labels for categorizing tasks
 export const labels = [
@@ -29,22 +23,22 @@ export const statuses = [
   {
     value: 'backlog',
     label: 'Backlog',
-    icon: IconExclamationCircle,
+    icon: ExclamationTriangleIcon,
   },
   {
     value: 'pending',
     label: 'Pending',
-    icon: IconCircle,
+    icon: Clock,
   },
   {
     value: 'in-progress',
     label: 'In Progress',
-    icon: IconStopwatch,
+    icon: StopwatchIcon,
   },
   {
     value: 'completed',
     label: 'Completed',
-    icon: IconCircleCheck,
+    icon: CheckCircle,
   },
 ];
 
@@ -53,16 +47,16 @@ export const priorities = [
   {
     label: 'Low',
     value: 'low',
-    icon: IconArrowDown,
+    icon: ArrowDown,
   },
   {
     label: 'Medium',
     value: 'medium',
-    icon: IconArrowRight,
+    icon: ArrowRight,
   },
   {
     label: 'High',
     value: 'high',
-    icon: IconArrowUp,
+    icon: ArrowUp,
   },
 ];

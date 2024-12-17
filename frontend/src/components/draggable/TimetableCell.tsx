@@ -112,7 +112,7 @@ const TimetableCell: React.FC<CalendarCellProps> = ({
                                 <p className="font-semibold text-[10px] text-zinc-600 truncate">{activity.title}</p>
                             </div>
                         ) : (
-                            <div className={`flex flex-col p-2 ${activity.style.backgroundColor} rounded-md shadow-md w-[96%] h-full`}>
+                            <div className={`flex flex-col p-2 ${activity.style.backgroundColor} border-l-0 border-b rounded-md shadow-md w-[96%] h-full`}>
                                 <p className={cn(`text-[10px] font-semibold`, activity.style.textColor)}>
                                     {activity ? formatTimeRange(activity.startTime, activity.endTime) : ''}
                                 </p>
