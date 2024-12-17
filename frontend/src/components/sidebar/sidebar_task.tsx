@@ -17,6 +17,7 @@ import { FiPlusCircle } from 'react-icons/fi';
 import { RiFireFill } from 'react-icons/ri';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { ChevronsUpDown } from 'lucide-react';
+import { GiEmptyChessboard } from "react-icons/gi";
 
 //Import mock data
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
@@ -81,6 +82,12 @@ const SideBarTask = () => {
                     </CollapsibleContent>
                 </Collapsible>
                 <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
+                    {UserTasks.length === 0 && (
+                        <div className='flex flex-col items-center space-x-2 space-y-2 px-2 p-2 w-full text-sm text-zinc-500'>
+                            <GiEmptyChessboard className='size-10'/>
+                            <p className='text-xs'>No tasks available for you yet.</p>
+                        </div>
+                    )}
                     {UserTasks.map(task => (
                         <DraggableTask
                             key={task._id}

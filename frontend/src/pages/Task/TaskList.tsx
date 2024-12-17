@@ -54,7 +54,7 @@ const Tasks = () => {
     const timeoutId = setTimeout(async () => {
       try {
         await axios.delete(
-          `https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks/${taskId}`,
+          `${import.meta.env.VITE_BACKEND}/tasks/${taskId}`,
         );
         setToastQueue((prevQueue) =>
           prevQueue.filter((item) => item.id !== taskId),
