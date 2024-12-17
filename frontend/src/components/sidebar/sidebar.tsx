@@ -9,7 +9,6 @@ import { TfiTimer } from "react-icons/tfi";
 import { TfiHelpAlt } from "react-icons/tfi";
 import { BsCalendarCheck } from "react-icons/bs";
 import { FaRegChartBar } from "react-icons/fa";
-import { HiOutlineCog6Tooth } from "react-icons/hi2";
 
 //Import components
 import { UserButton } from "@clerk/clerk-react";
