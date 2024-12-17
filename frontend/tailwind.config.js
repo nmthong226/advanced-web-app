@@ -16,7 +16,12 @@ export default {
 		'row-span-16', 'row-span-17', 'row-span-18',
 		'row-span-19', 'row-span-20', 'row-span-21',
 		'row-span-22', 'row-span-23', 'row-span-24',
-		/^row-span-\d{1,2}$/, // Safelist all row-span classes up to two digits (e.g., row-span-12, row-span-13, etc.)
+		/^row-span-\d{1,2}$/, // Safelist all row-span classes up to two digits
+		//Safelist for colors
+		'bg-green-600', 'bg-blue-600', 'bg-red-600',
+		'bg-purple-600', 'bg-emerald-600', 'bg-sky-600',
+		'bg-orange-600', 'bg-amber-600', 'bg-pink-600',
+		'bg-rose-600', 'bg-teal-600', 'bg-lime-600',
 	],
 	theme: {
 		extend: {

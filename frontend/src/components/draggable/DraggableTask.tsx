@@ -10,17 +10,18 @@ import {
     DropdownMenu,
 } from "../ui/dropdown-menu";
 // import EditEventItemsDialog from '../dialogs/editEventItems';
-import { cn, generateStylesFromParent } from '@/lib/utils';
+import { cn } from '@/lib/utils';
+import { Badge } from '../ui/badge';
 
 type DraggableTaskProps = {
     id: string;
     title: string;
-    description: string;
-    startTime: string;
-    endTime: string;
-    dueTime: string;
-    estimatedTime: number;
-    backgroundColor: string;
+    description: string | undefined;
+    startTime: string | undefined;
+    endTime: string | undefined;
+    dueTime: string | undefined;
+    estimatedTime: number | undefined;
+    backgroundColor: string | undefined;
     textColor: string;
     activity: string;
     status: string;
@@ -52,9 +53,10 @@ const DraggableTask: React.FC<DraggableTaskProps> =
                 estimatedTime,
                 dueTime,
                 style: {
-                    backgroundColor: generateStylesFromParent(backgroundColor),
+                    backgroundColor,
                     textColor,
                 },
+                isOnCalendar: true,
             },
             collect: (monitor) => ({
                 isDragging: !!monitor.isDragging(),
@@ -74,11 +76,11 @@ const DraggableTask: React.FC<DraggableTaskProps> =
 
         return (
             <DropdownMenu>
-                <div className={cn('relative flex flex-col px-2 py-2 space-y-1 border rounded-md text-sm truncate hover:cursor-grab shadow-md', backgroundColor)} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                <div className={cn('relative flex flex-col px-2 py-1.5 space-y-1 border rounded-md text-sm truncate hover:cursor-grab shadow-md')} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
                     {/* Task Header */}
                     <div className='flex text-[11px] truncate'>
                         <p className={cn(`flex items-center font-semibold truncate`, textColor)}>
-                            {activity}
+                            <Badge className={`text-white ${backgroundColor}` }>{activity}</Badge>
                         </p>
                         <p className='mx-1'>|</p>
                         {priority === 'high' && <p className='flex items-center truncate'><GoArrowUp className='mr-1' /> High</p>}
@@ -86,11 +88,11 @@ const DraggableTask: React.FC<DraggableTaskProps> =
                         {priority === 'low' && <p className='flex items-center truncate'><GoArrowDown className='mr-1' /> Low</p>}
                     </div>
                     {/* Task Title */}
-                    <p className='font-[500] text-base truncate'>{title}</p>
+                    <p className='m-0 font-[500] text-base truncate'>{title}</p>
                     {/* Task Times */}
                     <div className='flex flex-col text-[11px] leading-snug'>
                         <p>
-                            Due to: <span className='ml-1'>{formatDueTime(dueTime)}</span>
+                            Due to: <span className='ml-1'>{formatDueTime((dueTime || ''))}</span>
                         </p>
                         <p>
                             Status: <span className='ml-2 text-pretty capitalize'>{status}</span>

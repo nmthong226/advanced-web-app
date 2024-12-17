@@ -1,7 +1,7 @@
 ///Import frameworks
 import React, { useState } from 'react';
 //Import libs
-import { addMinutesToTime, cn, formatTimeRange } from '@/lib/utils';
+import { addMinutesToTime, cn, formatTimeRange, generateStylesFromParent } from '@/lib/utils';
 //Import packages
 import { useDrop } from 'react-dnd';
 import { Rnd } from 'react-rnd';
@@ -36,6 +36,7 @@ import { FcCancel } from "react-icons/fc";
 import { RiProgress5Line } from "react-icons/ri";
 import { MdOutlineRestartAlt } from "react-icons/md";
 import { FaHourglassStart } from "react-icons/fa6";
+import { Task } from '../table/data/schema';
 
 type CalendarCellProps = {
     time: string;
@@ -91,7 +92,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                 const updatedEndTime = addMinutesToTime(time, 0); // Updated end time
 
                 // Compare dueTime with the provided date and time
-                const isExpired = compareDueTime(item.dueTime, date, updatedEndTime);
+                const isExpired = compareDueTime((item.dueTime || ''), date, updatedEndTime);
 
                 // Update the task details
                 const updatedItem = {
@@ -126,7 +127,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                 <Rnd
                     size={{
                         width: '100%', // Adjust width as necessary
-                        height: Math.floor(task.estimatedTime / 15) * 20 + rowSpan * 2 + 'px', // Set initial height based on task duration
+                        height: Math.floor((task.estimatedTime || 0) / 15) * 20 + rowSpan * 2 + 'px', // Set initial height based on task duration
                     }}
                     position={{ x: 0, y: 0 }}
                     onResizeStop={(_e, _direction, ref, _delta, _position) => {
@@ -152,7 +153,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                 >
                     {rowSpan === 1 ?
                         (
-                            <div className={`flex flex-row items-center h-full w-[96%] rounded-r-md shadow-md font-semibold ${task.style.backgroundColor}`}>
+                            <div className={`flex flex-row items-center h-full w-[96%] rounded-r-md shadow-md font-semibold ${generateStylesFromParent(task.style.backgroundColor)}`}>
                                 {task.status === 'completed' && (
                                     <>
                                         <div className='flex justify-center items-center bg-emerald-400 w-5 h-full'>

@@ -23,6 +23,7 @@ import {
 } from 'src/components/ui/toast.tsx';
 
 import { Download, Plus } from 'lucide-react';
+import { Calendar } from '../../components/ui/calendar.tsx';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedTasksImportDialog = React.memo(TasksImportDialog);
@@ -121,11 +122,25 @@ const Tasks = () => {
     );
   }, []);
 
+  const [date, setDate] = React.useState<Date | undefined>(new Date())
+
   return (
     <ToastProvider>
       <ToastViewport />
-      <div className="flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden">
-        <div className="flex flex-col bg-white border rounded-md w-full h-full">
+      <div className='flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden'>
+        <div className='flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden'>
+          <div className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
+            <p>Calendar</p>
+          </div>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="p-1 border rounded-md scale-95"
+          />
+          <hr className='my-2 border-t w-full' />
+        </div>
+        <div className='flex flex-col bg-white border rounded-md w-[84%] h-full'>
           {/* ===== Top Heading ===== */}
           <div className="flex flex-wrap justify-between items-center gap-x-4 p-2">
             <button className="px-2 font-semibold text-indigo-500 text-lg">

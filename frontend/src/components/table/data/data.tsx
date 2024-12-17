@@ -1,6 +1,6 @@
-import { ExclamationTriangleIcon, StopwatchIcon } from "@radix-ui/react-icons";
+import { Cancel } from "@radix-ui/react-alert-dialog";
+import { StopwatchIcon } from "@radix-ui/react-icons";
 import { ArrowDown, ArrowRight, ArrowUp, CheckCircle, Clock } from "lucide-react";
-import { IoArrowDownCircleOutline } from "react-icons/io5";
 
 // Labels for categorizing tasks
 export const labels = [
@@ -21,11 +21,6 @@ export const labels = [
 // Statuses for task state management
 export const statuses = [
   {
-    value: 'backlog',
-    label: 'Backlog',
-    icon: ExclamationTriangleIcon,
-  },
-  {
     value: 'pending',
     label: 'Pending',
     icon: Clock,
@@ -40,6 +35,11 @@ export const statuses = [
     label: 'Completed',
     icon: CheckCircle,
   },
+  {
+    value: 'expired',
+    label: 'Expired',
+    icon: Cancel
+  }
 ];
 
 // Priorities for task urgency levels

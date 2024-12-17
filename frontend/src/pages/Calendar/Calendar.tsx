@@ -22,7 +22,12 @@ import TasksContextProvider from '../../components/table/context/task-context.ts
 
 const Calendar = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const [startDate, setStartDate] = useState('2024-12-08'); // Default date
+
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    // Format the date as 'YYYY-MM-DD'
+    return today.toISOString().split('T')[0];
+  });
 
   const toggleCalendar = () => {
     setIsCalendarVisible(!isCalendarVisible); // Toggle visibility

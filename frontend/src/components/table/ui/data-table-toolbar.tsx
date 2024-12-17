@@ -1,16 +1,17 @@
-import React, { useState } from 'react';
+// import { useState } from 'react';
 import { Cross2Icon } from '@radix-ui/react-icons';
 import { Table } from '@tanstack/react-table';
 import { Input } from 'src/components/ui/input';
 import { Button } from 'src/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-} from 'src/components/ui/dropdown-menu';
+// import {
+//   DropdownMenu,
+//   DropdownMenuTrigger,
+//   DropdownMenuContent,
+// } from 'src/components/ui/dropdown-menu';
 import { DataTableViewOptions } from '../ui/data-table-view-options';
 import { priorities, statuses } from '../data/data';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
+import { useState } from 'react';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -48,7 +49,6 @@ export function DataTableToolbar<TData>({
           }
           className="w-[150px] lg:w-[250px] h-8"
         />
-
         {/* Faceted Filters */}
         <div className="flex gap-x-2">
           {table.getColumn('status') && (
@@ -67,8 +67,7 @@ export function DataTableToolbar<TData>({
           )}
         </div>
 
-        {/* Filter by Date Dropdown */}
-        <DropdownMenu>
+        {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
               Filter by Date
@@ -106,8 +105,7 @@ export function DataTableToolbar<TData>({
               </Button>
             </div>
           </DropdownMenuContent>
-        </DropdownMenu>
-
+        </DropdownMenu> */}
         {/* Reset All Filters Button */}
         {isFiltered && (
           <Button

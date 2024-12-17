@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import CalendarCell from "./CalendarCell";
-import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
+import { addMinutesToTime, convertToPeriodTime, formatTime, getCurrentWeek, initialCurrentWeek } from '@/lib/utils';
 import { initialTaskData } from '@/mocks/MockData';
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
 
@@ -31,22 +31,59 @@ import {
     SheetTrigger,
 } from "../../components/ui/sheet"
 
+//Import context
+import { useTaskContext } from '@/contexts/UserTaskContext';
+
+//Import types
+import { TaskSchedule } from '../../types/type';
+import { Task } from '../table/data/schema';
+
 // Define the type for the draggable item.
 const CalendarGrid = ({ date }: { date: string }) => {
     // Get current week
     const currentWeek = getCurrentWeek(date);
     // Calculate the current week based on the date prop
     const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
+    const { tasks } = useTaskContext();
+
+    console.log(calendarData);
 
     useEffect(() => {
-        // Calculate the current week whenever `date` changes
-        const currentWeek = getCurrentWeek(date);
-        const currentWeekDates = currentWeek.map((day) => day.fullDate);
+        const currentWeek = initialCurrentWeek(date);
+        const currentWeekDates = currentWeek.map((day) => day.date);
 
-        // Filter the initial calendar data to include only the current week
-        const filteredData = initialTaskData.filter((data) =>
-            currentWeekDates.includes(data.date)
-        );
+        // Dynamically initialize the initial calendar data with all days of the week
+        const initialTaskData = currentWeek.map((day) => ({
+            date: day.date,
+            dayOfWeek: day.dayOfWeek,
+            userId: 'user-1', // Assuming a default user for simplicity
+            tasks: [], // Empty task list initially
+        }));
+
+        const filteredData = tasks.reduce((acc: TaskSchedule[], task) => {
+            if (!task.dueTime) return acc; // Ignore tasks without due time
+
+            // Format dueTime as "dd-mm-yyyy"
+            const formattedDueTime = new Date(task.dueTime).toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+            // Get the day of the week (e.g., 'Mon', 'Tue', 'Wed', etc.)
+            const dayOfWeek = new Date(task.dueTime).toLocaleDateString('en-GB', { weekday: 'short' });
+
+            // Check if the formatted dueTime matches any of the current week's dates
+            if (currentWeekDates.includes(formattedDueTime)) {
+                const existingGroup = acc.find(group => group.date === formattedDueTime);
+
+                if (existingGroup) {
+                    existingGroup.tasks.push(task); // Group the task
+                } else {
+                    acc.push({ date: formattedDueTime, dayOfWeek, userId: task.userId, tasks: [task] });
+                }
+            }
+            return acc;
+        }, initialTaskData); // Use the dynamically initialized task data
 
         setCalendarData(filteredData);
     }, [date]); // Dependency array ensures this runs whenever `date` changes
@@ -249,20 +286,19 @@ const CalendarGrid = ({ date }: { date: string }) => {
                 <div className="grid grid-cols-7 grid-rows-[repeat(96,20px)] grid-flow-row-dense w-[95%] h-full">
                     {Array.from({ length: slotsPerDay }, (_, index) => {
                         const formattedTime = formatTime(startHour * (60 / interval) + index, interval);
-
                         return (
                             <>
                                 {Array.from({ length: 7 }, (_, day) => {
                                     if (occupiedSlots[day][index]) {
                                         return null;
                                     }
-
-                                    const task = calendarData[day]?.tasks.find(task => task.endTime === formattedTime);
-                                    const shouldSpanRows = task && task.estimatedTime > 0;
+                                    
+                                    const task = calendarData[day]?.tasks.find(task => convertToPeriodTime((task.dueTime || '')) === formattedTime);
+                                    const shouldSpanRows = task && task.estimatedTime && task.estimatedTime > 0;
 
                                     let spanRows = 1; // Default to 1 row
                                     if (shouldSpanRows) {
-                                        spanRows = Math.ceil(task.estimatedTime / interval);
+                                        spanRows = Math.ceil((task.estimatedTime || 0 ) / interval);
                                     }
 
                                     if (shouldSpanRows) {

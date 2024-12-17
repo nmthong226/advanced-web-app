@@ -10,9 +10,16 @@ import { TaskSchedulesModule } from './task-schedules/task-schedules.module';
 import { TaskStatisticsModule } from './task-statistics/task-statistics.module';
 import { DailyAnalyticsModule } from './daily-analytics/daily-analytics.module';
 import { ActivityModule } from './activity/activity.module';
-
+import { ConfigModule } from '@nestjs/config';
 @Module({
-  imports: [UsersModule, TasksModule, AiFeedbacksModule, SocialAuthProvidersModule, FocusSessionsModule, TaskSchedulesModule, TaskStatisticsModule, DailyAnalyticsModule, ActivityModule],
+  imports: [UsersModule, TasksModule, AiFeedbacksModule, SocialAuthProvidersModule, FocusSessionsModule, TaskSchedulesModule, TaskStatisticsModule, DailyAnalyticsModule, ActivityModule,
+  ConfigModule.forRoot({
+    isGlobal: true, // Make ConfigModule available globally
+    envFilePath: '.env', // Specify the .env file path
+  }),
+
+
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
