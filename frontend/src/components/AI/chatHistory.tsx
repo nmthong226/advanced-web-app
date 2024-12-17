@@ -40,7 +40,7 @@ const ChatAI = () => {
             setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
             setMessageInput("");
 
-            const aiResponse = await analyzeSchedule("userid-1", tasks, newMessage.message);
+            const aiResponse = await analyzeSchedule("userid-1", [], newMessage.message);
 
             if (aiResponse && aiResponse.feedback) {
                 const botMessage = { type: 'ai', message: aiResponse.feedback };

@@ -51,7 +51,7 @@ export class AiFeedbacksController {
         throw new BadRequestException('UserId is required.');
       }
 
-      if (!tasks || tasks.length === 0) {
+      if (!tasks) {
         throw new BadRequestException('Tasks array cannot be empty.');
       }
 
