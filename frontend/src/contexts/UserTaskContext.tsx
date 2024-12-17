@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import axios from 'axios';
-import { useAuth, useUser } from '@clerk/clerk-react';
+import { useAuth } from '@clerk/clerk-react';
 import { Task } from '../types/task';
 
 interface TaskContextValue {
@@ -21,26 +21,17 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const {userId} = useAuth();
+  const { userId } = useAuth();
 
-  // Save user ID to localStorage
-  // useEffect(() => {
-  //   if (user.isSignedIn && userd) {
-  //     localStorage.setItem('userId', user.user.id);
-  //   } else {
-  //     localStorage.removeItem('userId'); // Clear on logout
-  //   }
-  // }, [user.isSignedIn, user.user?.id]);
-
-  // Fetch tasks for the user
   const fetchTasks = async () => {
+    if (!userId) {
+      console.warn('User ID is not available.');
+      return;
+    }
     try {
-      const userId = localStorage.getItem('userId');
-      if (!userId) return; // Prevent fetching if no user ID is found
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND}tasks/user/${userId}`,
+        `${import.meta.env.VITE_BACKEND}tasks/user/${userId}`
       );
-      console.log(response.data);
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);
@@ -48,8 +39,10 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
   };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (userId) {
+      fetchTasks();
+    }
+  }, [userId]);
 
   return (
     <UserTaskContext.Provider value={{ tasks, setTasks, fetchTasks }}>
