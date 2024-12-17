@@ -9,13 +9,13 @@ import './style.css';
 
 //Import components
 import SideBarActivity from '../../components/sidebar/sidebar_activity.tsx';
-import TimeTableGrid from '../../components/draggable/TimeTableGrid.tsx';
 
 //Import libs/packages
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
 import { CalendarDaysIcon } from 'lucide-react';
+import TimeTableGrid from '../../components/draggable/TimetableGrid.tsx';
 
 const TimeTable = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);

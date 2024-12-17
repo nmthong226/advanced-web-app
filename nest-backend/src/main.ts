@@ -2,9 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule); // Start HTTP server
-  await app.listen(3000); // Listen on port 3000
-  console.log('Application is running on http://localhost:3000');
-}
+  const app = await NestFactory.create(AppModule);
 
+  // Enable CORS
+  app.enableCors({
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific HTTP methods
+    origin: 'http://localhost:5173', // Allow requests from this origin
+    allowedHeaders: ['Content-Type', 'ngrok-skip-browser-warning', 'User-Agent'], // Specify allowed headers
+    credentials: true, // Allow credentials (if needed)
+  });
+
+  await app.listen(3000); // Ensure this matches your backend's port
+  console.log('Backend is running on http://localhost:3000');
+}
 bootstrap();
