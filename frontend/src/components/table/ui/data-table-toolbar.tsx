@@ -11,6 +11,7 @@ import { Button } from 'src/components/ui/button';
 import { DataTableViewOptions } from '../ui/data-table-view-options';
 import { priorities, statuses } from '../data/data';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
+import { useState } from 'react';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -23,18 +24,18 @@ export function DataTableToolbar<TData>({
   const isFiltered = table.getState().columnFilters.length > 0;
 
   // State for Date Filter
-  // const [fromDate, setFromDate] = useState<string | null>(null);
-  // const [toDate, setToDate] = useState<string | null>(null);
+  const [fromDate, setFromDate] = useState<string | null>(null);
+  const [toDate, setToDate] = useState<string | null>(null);
 
   // Get the date column
-  // const dateColumn = table.getColumn('startDate');
+  const dateColumn = table.getColumn('startDate');
 
   // Apply date filter logic
-  // const applyDateFilter = () => {
-  //   if (fromDate && toDate && dateColumn) {
-  //     dateColumn.setFilterValue({ fromDate, toDate });
-  //   }
-  // };
+  const applyDateFilter = () => {
+    if (fromDate && toDate && dateColumn) {
+      dateColumn.setFilterValue({ fromDate, toDate });
+    }
+  };
 
   return (
     <div className="flex justify-between items-center">
@@ -48,7 +49,6 @@ export function DataTableToolbar<TData>({
           }
           className="w-[150px] lg:w-[250px] h-8"
         />
-
         {/* Faceted Filters */}
         <div className="flex gap-x-2">
           {table.getColumn('status') && (
@@ -67,7 +67,6 @@ export function DataTableToolbar<TData>({
           )}
         </div>
 
-        Filter by Date Dropdown
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">
@@ -107,7 +106,6 @@ export function DataTableToolbar<TData>({
             </div>
           </DropdownMenuContent>
         </DropdownMenu> */}
-
         {/* Reset All Filters Button */}
         {isFiltered && (
           <Button

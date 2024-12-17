@@ -36,123 +36,119 @@ import axios from 'axios';
 import { useState } from 'react';
 
 // Validation Schema
+// New Validation Schema
 const formSchema = z.object({
+  id: z.string().optional(),
+  userId: z.string().min(1, 'UserId is required.'),
   title: z.string().min(1, 'Title is required.'),
-  status: z.string().min(1, 'Please select a status.'),
-  label: z.string().min(1, 'Please select a label.'),
-  priority: z.string().min(1, 'Please choose a priority.'),
-  startDate: z.string().min(1, 'Start date is required.'),
-  endDate: z.string().min(1, 'End date is required.'),
-  description: z.string().min(1, 'Description is required.'),
-  userId: z.string().min(1, 'UserId is required.'), // Ensure this is included
+  description: z.string().optional(),
+  status: z.enum(['pending', 'in-progress', 'completed', 'expired'], {
+    errorMap: () => ({ message: 'Select a valid status.' }),
+  }),
+  priority: z.enum(['high', 'medium', 'low'], {
+    errorMap: () => ({ message: 'Select a valid priority.' }),
+  }),
+
+  category: z.string().min(1, 'Category is required.'),
+  startTime: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+  endTime: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+  dueTime: z
+    .string()
+    .datetime()
+    .optional()
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+  estimatedTime: z.number().optional(),
+  style: z
+    .object({
+      backgroundColor: z.string(),
+      textColor: z.string(),
+    })
+    .optional(),
 });
 
 type TasksForm = z.infer<typeof formSchema>;
 
 export function TasksMutateDrawer() {
-  const { open, currentRow, handleOpen } = useTasksContext(); // Manage drawer state
-  const { setTasks } = useTaskContext(); // Manage task list
+  const { open, currentRow, handleOpen } = useTasksContext();
+  const { setTasks } = useTaskContext();
   const isUpdate = open === 'update';
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  // Form management
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
-    defaultValues: isUpdate
-      ? {
-          title: currentRow?.title || '',
-          status: currentRow?.status || '',
-          label: currentRow?.category || '',
-          priority: currentRow?.priority || '',
-          startDate: currentRow?.startTime || '',
-          endDate: currentRow?.endTime || '',
-          description: currentRow?.description || '',
-          userId: currentRow?.userId || '', // Include userId in update mode
-        }
-      : {
-          title: '',
-          status: '',
-          category: '',
-          priority: '',
-          startDate: '',
-          endDate: '',
-          description: '',
-          dueTime: '',
-          userId: 'USER-1234', // Default userId for create mode
-        },
+    defaultValues: {
+      id: '',
+      userId: 'USER-1234',
+      title: '',
+      description: '',
+      status: 'pending',
+      priority: 'low',
+      category: '',
+      startTime: '',
+      endTime: '',
+      dueTime: '',
+      estimatedTime: undefined,
+      style: {
+        backgroundColor: '#ffffff',
+        textColor: '#000000',
+      },
+    },
   });
 
-  // Update form values when `currentRow` changes
+  // Load currentRow data into the form when updating
   useEffect(() => {
     if (isUpdate && currentRow) {
       form.reset({
+        id: currentRow.id,
+        userId: currentRow.userId,
         title: currentRow.title,
+        description: currentRow.description || '',
         status: currentRow.status,
-        label: currentRow.category,
         priority: currentRow.priority,
-        startDate: currentRow.startTime,
-        endDate: currentRow.endTime,
-        description: currentRow.description,
-        userId: currentRow.userId, // Reset userId in update mode
-      });
-    } else if (!isUpdate) {
-      form.reset({
-        title: '',
-        status: '',
-        label: '',
-        priority: '',
-        startDate: '',
-        endDate: '',
-        description: '',
-        userId: 'USER-1234', // Default userId for create mode
+        category: currentRow.category,
+        startTime: currentRow.startTime || '',
+        endTime: currentRow.endTime || '',
+        dueTime: currentRow.dueTime || '',
+        estimatedTime: currentRow.estimatedTime,
+        style: currentRow.style || {
+          backgroundColor: '#ffffff',
+          textColor: '#000000',
+        },
       });
     }
   }, [currentRow, isUpdate]);
 
   const onSubmit = async (data: TasksForm) => {
-    console.log('onSubmit triggered'); // Debug: Check if onSubmit is called
-    console.log('Form data:', data); // Debug: Check the data passed to the function
-
     try {
       if (isUpdate) {
-        console.log('Update mode detected'); // Debug: Check if it's in update mode
-
-        const updatedTask = { ...currentRow!, ...data }; // Merge new data with current task
-        console.log('Updated task object:', updatedTask); // Debug: Check the task object to be sent
-
-        await axios.patch(
-          `http://localhost:3000/tasks/${currentRow?.id}`,
-          data,
-        );
-
-        // Update task list in context
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === updatedTask.id ? updatedTask : task,
+        await axios.patch(`http://localhost:3000/tasks/${data.id}`, data);
+        setTasks((prev) =>
+          prev.map((task) =>
+            task.id === data.id ? { ...task, ...data } : task,
           ),
         );
-
         setToastMessage(`Task "${data.title}" has been successfully updated.`);
       } else {
-        console.log('Create mode detected'); // Debug: Check if it's in create mode
-
+        console.log(data);
         const response = await axios.post('http://localhost:3000/tasks', data);
-
-        console.log('Response from server:', response.data); // Debug: Check the response from the server
-
-        // Add the new task to the context
-        setTasks((prevTasks) => [...prevTasks, response.data]);
-
+        setTasks((prev) => [...prev, response.data]);
         setToastMessage(
           `Task "${response.data.title}" has been successfully created.`,
         );
       }
 
-      handleOpen(null); // Close the drawer
-      form.reset(); // Reset form fields
-      console.log('Form successfully submitted'); // Debug: Ensure form submission logic completes
+      handleOpen(null);
+      form.reset();
     } catch (error) {
-      console.error('Error submitting task:', error); // Debug: Check for any errors
+      console.error('Error submitting task:', error);
       setToastMessage('Failed to save the task. Please try again later.');
     }
   };
@@ -180,7 +176,10 @@ export function TasksMutateDrawer() {
       <Sheet
         open={open === 'create' || open === 'update'}
         onOpenChange={(v) => {
-          if (!v) handleOpen(null); // Close drawer when toggled off
+          if (!v) {
+            handleOpen(null); // Close drawer when toggled off
+            form.reset();
+          }
         }}
       >
         <SheetContent className="flex flex-col max-h-[100h] overflow-y-auto">
@@ -202,7 +201,8 @@ export function TasksMutateDrawer() {
                   console.log('Form successfully submitted with data:', data); // Should log if no errors
                   onSubmit(data);
                 },
-                (errors) => {
+                (errors, data) => {
+                  console.log('Form not submitted with data:', data); // Should log if no errors
                   console.error('Validation errors:', errors); // Debug validation errors
                 },
               )}
@@ -263,7 +263,7 @@ export function TasksMutateDrawer() {
               {/* Label Field */}
               <FormField
                 control={form.control}
-                name="label"
+                name="category"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
                     <FormLabel>Label</FormLabel>
@@ -304,15 +304,54 @@ export function TasksMutateDrawer() {
                 )}
               />
 
-              {/* Start Date Field */}
+              {/* Due Date Field */}
               <FormField
                 control={form.control}
-                name="startDate"
+                name="dueTime"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Due Time</FormLabel>
+                    <FormControl>
+                      <Input
+                        {...field}
+                        type="datetime-local"
+                        value={
+                          field.value
+                            ? field.value.replace('Z', '').slice(0, 16)
+                            : ''
+                        } // Trim to fit "YYYY-MM-DDTHH:MM"
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          const isoValue = new Date(inputValue).toISOString();
+                          field.onChange(isoValue);
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="startTime"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
                     <FormLabel>Start Date</FormLabel>
                     <FormControl>
-                      <Input {...field} type="date" />
+                      <Input
+                        {...field}
+                        type="datetime-local"
+                        value={
+                          field.value
+                            ? field.value.replace('Z', '').slice(0, 16)
+                            : ''
+                        } // Trim to fit "YYYY-MM-DDTHH:MM"
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          const isoValue = new Date(inputValue).toISOString();
+                          field.onChange(isoValue);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -322,12 +361,25 @@ export function TasksMutateDrawer() {
               {/* End Date Field */}
               <FormField
                 control={form.control}
-                name="endDate"
+                name="endTime"
                 render={({ field }) => (
                   <FormItem className="space-y-1">
                     <FormLabel>End Date</FormLabel>
                     <FormControl>
-                      <Input {...field} type="date" />
+                      <Input
+                        {...field}
+                        type="datetime-local"
+                        value={
+                          field.value
+                            ? field.value.replace('Z', '').slice(0, 16)
+                            : ''
+                        } // Trim to fit "YYYY-MM-DDTHH:MM"
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          const isoValue = new Date(inputValue).toISOString();
+                          field.onChange(isoValue);
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
