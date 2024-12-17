@@ -162,6 +162,7 @@ export function TasksMutateDrawer() {
         setTasks((prev) =>
           prev.map((task) =>
             task._id === data._id ? { ...task, ...payload } : task,
+
           ),
         );
         setToastMessage(`Task "${data.title}" has been successfully updated.`);

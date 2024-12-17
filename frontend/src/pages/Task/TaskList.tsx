@@ -100,7 +100,7 @@ const Tasks = () => {
   }, []);
 
   const [date, setDate] = React.useState<Date | undefined>(new Date());
-
+    
   // // Step 1: Count tasks per category
   // const categoryCounts = tasks?.reduce<Record<string, number>>(
   //   (counts, task) => {
@@ -116,6 +116,7 @@ const Tasks = () => {
   //   .sort(([, countA], [, countB]) => countB - countA) // Sort by task count in descending order
   //   .slice(0, 10); // Get top 10 or all current categories
 
+
   return (
     <ToastProvider>
       <ToastViewport />
@@ -123,6 +124,7 @@ const Tasks = () => {
         <div className="flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden">
           <div className="flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white">
             <IoCalendarOutline />
+
             <p>Calendar</p>
           </div>
           <hr className="my-2 border-t w-full" />

@@ -160,8 +160,6 @@ export const columns: ColumnDef<Task>[] = [
       } else {
         displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than 1 week
       }
-  
-      // Handle edge case for `0h`
       return (
         <div className="flex justify-center items-center w-[40px]">
           {displayValue === '0h' ? '-' : displayValue}
