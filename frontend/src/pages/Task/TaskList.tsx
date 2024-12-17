@@ -30,6 +30,8 @@ const MemoizedConfirmDialog = React.memo(ConfirmDialog);
 const Tasks = () => {
   const { tasks, setTasks } = useTaskContext();
 
+  console.log(tasks);
+
   const { open, currentRow, setCurrentRow, setOpen, handleOpen } =
     useTasksContext();
   const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
@@ -100,7 +102,7 @@ const Tasks = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   // Step 1: Count tasks per category
-  const categoryCounts = tasks.reduce<Record<string, number>>(
+  const categoryCounts = tasks?.reduce<Record<string, number>>(
     (counts, task) => {
       counts[task.category] = (counts[task.category] || 0) + 1;
       return counts;
