@@ -101,20 +101,20 @@ const Tasks = () => {
 
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
-  // Step 1: Count tasks per category
-  const categoryCounts = tasks?.reduce<Record<string, number>>(
-    (counts, task) => {
-      counts[task.category] = (counts[task.category] || 0) + 1;
-      return counts;
-    },
-    {},
-  );
+  // // Step 1: Count tasks per category
+  // const categoryCounts = tasks?.reduce<Record<string, number>>(
+  //   (counts, task) => {
+  //     counts[task.category] = (counts[task.category] || 0) + 1;
+  //     return counts;
+  //   },
+  //   {},
+  // );
 
-  // Step 2: Sort categories by task count and get the top 10
-  const currentCategories = Object.entries(categoryCounts)
-    .filter(([, count]) => count > 0) // Filter categories with tasks
-    .sort(([, countA], [, countB]) => countB - countA) // Sort by task count in descending order
-    .slice(0, 10); // Get top 10 or all current categories
+  // // Step 2: Sort categories by task count and get the top 10
+  // const currentCategories = Object.entries(categoryCounts)
+  //   .filter(([, count]) => count > 0) // Filter categories with tasks
+  //   .sort(([, countA], [, countB]) => countB - countA) // Sort by task count in descending order
+  //   .slice(0, 10); // Get top 10 or all current categories
 
   return (
     <ToastProvider>
@@ -134,7 +134,7 @@ const Tasks = () => {
           />
           <hr className="my-2 border-t w-full" />
           <p className="text-gray-600 text-xs">Your current tasks category</p>
-          <ul className="mt-4 w-full list-disc">
+          {/* <ul className="mt-4 w-full list-disc">
             {currentCategories.map(([category, count]) => (
               <li
                 key={category}
@@ -144,7 +144,7 @@ const Tasks = () => {
                 <span className="text-gray-500 text-xs">{count} tasks</span>
               </li>
             ))}
-          </ul>
+          </ul> */}
         </div>
         <div className="flex flex-col bg-white border rounded-md w-[84%] h-full">
           {/* ===== Top Heading ===== */}
