@@ -8,30 +8,44 @@ import {
     SheetTrigger,
 } from "../../components/ui/sheet";
 import MessageInput from '../../components/AI/chatInput.tsx';
+import axios from 'axios';
+import { tasks } from './mock-data-ai.tsx';
 
 
 const ChatAI = () => {
     const [messageInput, setMessageInput] = useState<string>("");
-    const [chatHistory, setChatHistory] = useState<Array<{ type: string; message: string }>>([]); // Chat history state
+    const [chatHistory, setChatHistory] = useState<Array<{ type: string; message: string }>>([]); 
+    
+    const analyzeSchedule = async (userId: string, tasks: any[], user_prompt: string) => {
+        try {
+            const response = await axios.post('http://localhost:3000/ai-feedbacks/analyze-schedule', {
+                userId,
+                tasks,
+                user_prompt
+            });
+    
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            // Handle any errors
+            console.error('Error analyzing schedule:', error);
+        }
+    };
 
-    const sendMessage = () => {
+    const sendMessage = async () => {
         if (messageInput.trim() !== "") {
             const newMessage = { type: 'user', message: messageInput };
 
             // Add user message to chat history
             setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
-            setMessageInput(""); // Clear the input after sending
+            setMessageInput("");
 
-            // Simulate AI response after a delay
-            setTimeout(() => {
-                const aiResponse = {
-                    type: 'ai',
-                    message: "Sure! I recommend focusing on the high-priority tasks first, like 'Homework HW3.' Would you like me to rearrange your schedule?",
-                };
+            const aiResponse = await analyzeSchedule("userid-1", [], newMessage.message);
 
-                // Add AI response to chat history
-                setChatHistory((prevChatHistory) => [...prevChatHistory, aiResponse]);
-            }, 1000); // Delay for AI response
+            if (aiResponse && aiResponse.feedback) {
+                const botMessage = { type: 'ai', message: aiResponse.feedback };
+                setChatHistory((prevChatHistory) => [...prevChatHistory, botMessage]);
+            }
         }
     };
     return (

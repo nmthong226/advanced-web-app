@@ -4,6 +4,6 @@ import { AiFeedbacksService } from './ai-feedbacks.service';
 
 @Module({
   controllers: [AiFeedbacksController],
-  providers: [AiFeedbacksService]
+  providers: [AiFeedbacksService],
 })
 export class AiFeedbacksModule {}
