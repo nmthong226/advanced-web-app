@@ -62,21 +62,22 @@ export function TasksMutateDrawer() {
       ? {
           title: currentRow?.title || '',
           status: currentRow?.status || '',
-          label: currentRow?.label || '',
+          label: currentRow?.category || '',
           priority: currentRow?.priority || '',
-          startDate: currentRow?.startDate || '',
-          endDate: currentRow?.endDate || '',
+          startDate: currentRow?.startTime || '',
+          endDate: currentRow?.endTime || '',
           description: currentRow?.description || '',
           userId: currentRow?.userId || '', // Include userId in update mode
         }
       : {
           title: '',
           status: '',
-          label: '',
+          category: '',
           priority: '',
           startDate: '',
           endDate: '',
           description: '',
+          dueTime: '',
           userId: 'USER-1234', // Default userId for create mode
         },
   });
@@ -87,10 +88,10 @@ export function TasksMutateDrawer() {
       form.reset({
         title: currentRow.title,
         status: currentRow.status,
-        label: currentRow.label,
+        label: currentRow.category,
         priority: currentRow.priority,
-        startDate: currentRow.startDate,
-        endDate: currentRow.endDate,
+        startDate: currentRow.startTime,
+        endDate: currentRow.endTime,
         description: currentRow.description,
         userId: currentRow.userId, // Reset userId in update mode
       });
