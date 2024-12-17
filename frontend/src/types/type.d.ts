@@ -1,6 +1,9 @@
 // Define a type for Activity and Task
+//Import data schema
+import { Task } from '../components/table/data/schema.ts';
+
 type Style = {
-    backgroundColor: string;
+    bgColor: string;
     textColor: string;
 }
 
@@ -14,21 +17,6 @@ type Activity = {
     style: Style;
     duration: number;
     relatedItems?: string[];
-};
-
-type Task = {
-    id: string;
-    userId: string;
-    title: string;
-    description: string;
-    status?: 'pending' | 'in-progress' | 'completed' | 'expired';
-    priority: 'high' | 'medium' | 'low';
-    category: string;
-    style: Style;
-    startTime?: string;
-    endTime?: string;
-    dueTime: string;
-    estimatedTime: number;
 };
 
 //This goes for tasks scheduling

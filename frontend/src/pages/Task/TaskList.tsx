@@ -125,8 +125,17 @@ const Tasks = () => {
       {/* Toast Viewport */}
       <ToastViewport />
       <div className='flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden'>
-        <div className='flex justify-center items-center bg-white rounded-md w-[16%] h-full overflow-hidden'>
-          
+        <div className='flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden'>
+          <div className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
+            <p>Calendar</p>
+          </div>
+          <Calendar
+            mode="single"
+            selected={date}
+            onSelect={setDate}
+            className="p-1 border rounded-md scale-95"
+          />
+          <hr className='my-2 border-t w-full' />
         </div>
         <div className='flex flex-col bg-white border rounded-md w-[84%] h-full'>
           {/* ===== Top Heading ===== */}
@@ -154,7 +163,6 @@ const Tasks = () => {
           <div className="lg:flex-row flex-1 lg:space-x-12 lg:space-y-0 -mx-4 px-6 py-1 overflow-x-auto">
             <DataTable data={tasks} columns={columns} />
           </div>
-
           {/* ===== Mutate Drawer & Import Dialog ===== */}
           <MemoizedTasksMutateDrawer
             key="task-create"

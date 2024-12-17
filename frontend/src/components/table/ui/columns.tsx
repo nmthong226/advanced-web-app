@@ -46,12 +46,11 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Title" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.label);
-
+      const label = labels.find((label) => label.value === row.original.category);
       return (
         <div className="flex space-x-2">
           {label && <Badge variant="outline">{label.label}</Badge>}
-          <span className="max-w-32 sm:max-w-72 md:max-w-[31rem] font-medium truncate">
+          <span className="max-w-32 sm:max-w-72 md:max-w-[24rem] font-medium truncate">
             {row.getValue('title')}
           </span>
         </div>
@@ -113,13 +112,25 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: 'startDate',
+    accessorKey: 'dueTime',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Start Date" />
+      <DataTableColumnHeader column={column} title="Due to" />
     ),
-    cell: ({ row }) => (
-      <div className="w-[120px]">{row.getValue('startDate') || 'N/A'}</div>
-    ),
+    cell: ({ row }) => {
+      const dueTime = new Date(row.getValue('dueTime'));
+      if (isNaN(dueTime.getTime())) return 'N/A'; // Handle invalid dates
+
+      // Format date to "HH:MM, DD MMM" with 24-hour format
+      const formattedDueTime = dueTime.toLocaleDateString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        day: '2-digit',
+        month: 'short',
+        hour12: false, // 24-hour format
+      });
+
+      return <div className="w-[120px]">{formattedDueTime}</div>;
+    },
     filterFn: (row, columnId, filterValue) => {
       const rowDate = new Date(row.getValue(columnId));
       const fromDate = new Date(filterValue?.fromDate);
@@ -137,32 +148,31 @@ export const columns: ColumnDef<Task>[] = [
     },
   },
   {
-    accessorKey: 'endDate',
+    accessorKey: 'estimatedTime',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="End Date" />
+      <DataTableColumnHeader column={column} title="Es.Time"/>
     ),
-    cell: ({ row }) => (
-      <div className="w-[120px]">{row.getValue('endDate') || 'N/A'}</div>
-    ),
-    filterFn: (row, columnId, filterValue) => {
-      const rowDate = new Date(row.getValue(columnId));
-      const fromDate = new Date(filterValue?.fromDate);
-      const toDate = new Date(filterValue?.toDate);
+    cell: ({ row }) => {
+      const estimatedTime = parseInt(row.getValue('estimatedTime'));
+      let displayValue = '';
 
-      // Debug logs for filtering logic
-      console.log('Row Date:', rowDate);
-      console.log('Filter From Date:', fromDate);
-      console.log('Filter To Date:', toDate);
+      if (estimatedTime < 24) {
+        displayValue = `${estimatedTime}h`; // Less than a day in hours
+      } else if (estimatedTime >= 24 && estimatedTime < 48) {
+        displayValue = '1d'; // 1 day
+      } else if (estimatedTime >= 48 && estimatedTime < 168) {
+        displayValue = `${Math.ceil(estimatedTime / 24)}d`; // 2-7 days
+      } else {
+        displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than a week
+      }
 
-      if (!rowDate || isNaN(rowDate.getTime())) return false; // Skip invalid dates
-      if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) return true; // If no valid filter, include all
-
-      return rowDate >= fromDate && rowDate <= toDate;
+      return <div className="flex justify-center items-center w-[40px]">{displayValue === '0h' ? '-' : displayValue}</div>;
     },
+    enableSorting: true,
+    enableHiding: false,
   },
-
   {
     id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    cell: ({ row }) => <DataTableRowActions row={row}/>,
   },
 ];

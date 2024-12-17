@@ -1,7 +1,5 @@
-import React, { useEffect, useState, useContext, useCallback } from 'react';
-import axios from 'axios';
+import React, { useState, useContext, useCallback } from 'react';
 import { Task } from '../data/schema';
-import { useTaskContext } from '@/contexts/TasksContext';
 
 export type TasksDialogType = 'create' | 'update' | 'delete' | 'import';
 

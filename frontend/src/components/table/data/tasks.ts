@@ -5,7 +5,7 @@ export const tasks = [
     title:
       "You can't compress the program without quantifying the open-source SSD pixel!",
     status: 'in-progress',  // Changed to in-progress
-    label: 'documentation',
+    category: 'documentation',
     priority: 'medium',
     description: 'This task involves optimizing the SSD compression method.',
     startDate: '2024-01-01',
@@ -19,7 +19,7 @@ export const tasks = [
     title:
       'Try to calculate the EXE feed, maybe it will index the multi-byte pixel!',
     status: 'backlog',  // Kept as backlog
-    label: 'documentation',
+    category: 'documentation',
     priority: 'medium',
     description: 'Work on indexing the EXE feed with multi-byte pixel support.',
     startDate: '2024-02-01',
@@ -32,7 +32,7 @@ export const tasks = [
     userId: 'USER-5678',
     title: 'We need to bypass the neural TCP card!',
     status: 'pending',  // Changed to pending
-    label: 'bug',
+    category: 'bug',
     priority: 'high',
     description: 'Fix the issue with the neural TCP card communication.',
     startDate: '2024-01-15',
@@ -46,7 +46,7 @@ export const tasks = [
     title:
       'The SAS interface is down, bypass the open-source pixel so we can back up the PNG bandwidth!',
     status: 'backlog',  // Kept as backlog
-    label: 'feature',
+    category: 'feature',
     priority: 'medium',
     description: 'Resolve issues with the SAS interface to ensure proper PNG bandwidth backup.',
     startDate: '2024-02-05',
@@ -60,7 +60,7 @@ export const tasks = [
     title:
       "I'll parse the wireless SSL protocol, that should driver the API panel!",
     status: 'completed',  // Changed to completed
-    label: 'feature',
+    category: 'feature',
     priority: 'medium',
     description: 'Attempted parsing of SSL protocols for API integration, but canceled due to incompatibility.',
     startDate: '2024-01-01',
@@ -74,7 +74,7 @@ export const tasks = [
     title:
       'Use the digital TLS panel, then you can transmit the haptic system!',
     status: 'completed',  // Changed to completed
-    label: 'bug',
+    category: 'bug',
     priority: 'high',
     description: 'Resolved bug related to digital TLS panel and haptic system transmission.',
     startDate: '2024-01-10',
@@ -88,7 +88,7 @@ export const tasks = [
     title:
       'The UTF8 application is down, parse the neural bandwidth so we can back up the PNG firewall!',
     status: 'pending',  // Changed to pending
-    label: 'feature',
+    category: 'feature',
     priority: 'high',
     description: 'Fix UTF8 application down by parsing neural bandwidth for firewall support.',
     startDate: '2024-01-05',
@@ -102,7 +102,7 @@ export const tasks = [
     title:
       "Generating the driver won't do anything, we need to quantify the 1080p SMTP bandwidth!",
     status: 'in-progress',  // Changed to in-progress
-    label: 'feature',
+    category: 'feature',
     priority: 'medium',
     description: 'Currently quantifying 1080p SMTP bandwidth for driver development.',
     startDate: '2024-01-20',
@@ -115,7 +115,7 @@ export const tasks = [
     userId: 'USER-1234',
     title: 'We need to program the back-end THX pixel!',
     status: 'pending',  // Changed to pending
-    label: 'feature',
+    category: 'feature',
     priority: 'low',
     description: 'Back-end programming for THX pixel required.',
     startDate: '2024-02-10',
@@ -129,7 +129,7 @@ export const tasks = [
     title:
       "Calculating the bus won't do anything, we need to navigate the back-end JSON protocol!",
     status: 'in-progress',  // Changed to in-progress
-    label: 'documentation',
+    category: 'documentation',
     priority: 'high',
     description: 'Working on the back-end JSON protocol navigation and data handling.',
     startDate: '2024-01-18',
@@ -143,7 +143,7 @@ export const tasks = [
     title:
       "Generating the driver won't do anything, we need to index the online SSL application!",
     status: 'completed',  // Changed to completed
-    label: 'documentation',
+    category: 'documentation',
     priority: 'medium',
     description: 'Documented the process of indexing online SSL applications for integration.',
     startDate: '2024-01-12',
@@ -157,7 +157,7 @@ export const tasks = [
     title:
       "I'll transmit the wireless JBOD capacitor, that should hard drive the SSD feed!",
     status: 'backlog',  // Kept as backlog
-    label: 'documentation',
+    category: 'documentation',
     priority: 'medium',
     description: 'The task involves transmitting the wireless JBOD capacitor to support SSD feed.',
     startDate: '2024-02-10',

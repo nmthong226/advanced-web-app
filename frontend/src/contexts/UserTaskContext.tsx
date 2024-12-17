@@ -16,36 +16,38 @@ const UserTaskContext = createContext<TaskContextValue | undefined>(undefined);
 export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [tasks, setTasks] = useState<Task[]>([]);
 
-    // const fetchTasks = async () => {
-    //     try {
-    //         const response = await axios.get(
-    //             'http://localhost:3000/tasks/user/USER-1234',
-    //         );
-    //         setTasks(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching tasks:', error);
-    //     }
-    // };
-
-    const [taskSchedule, setTaskSchedule] = useState<TaskSchedule[]>([]);
-
     const fetchTasks = async () => {
         try {
             const response = await axios.get(
-                import.meta.env.VITE_TEST_BACKEND,
-                {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true', // Skip Ngrok security warning
-                    },
-                },
+                'http://localhost:3000/tasks/user/USER-1234',
             );
-            console.log("TEST", response.data);
             setTasks(response.data);
         } catch (error) {
             console.error('Error fetching tasks:', error);
         }
-    }; 
+    };
+
+    // const [taskSchedule, setTaskSchedule] = useState<TaskSchedule[]>([]);
+
+    
+
+    // const fetchTasks = async () => {
+    //     try {
+    //         const response = await axios.get(
+    //             import.meta.env.VITE_TEST_BACKEND,
+    //             {
+    //                 headers: {
+    //                     'Content-Type': 'application/json',
+    //                     'ngrok-skip-browser-warning': 'true', // Skip Ngrok security warning
+    //                 },
+    //             },
+    //         );
+    //         console.log("TEST", response.data);
+    //         setTasks(response.data);
+    //     } catch (error) {
+    //         console.error('Error fetching tasks:', error);
+    //     }
+    // }; 
 
     useEffect(() => {
         fetchTasks();
