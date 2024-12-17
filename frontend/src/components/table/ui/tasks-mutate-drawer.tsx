@@ -34,6 +34,7 @@ import { useTasksContext } from '../context/task-context'; // Task UI management
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx'; // Task data management
 import axios from 'axios';
 import { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
 
 // Validation Schema
 // New Validation Schema
@@ -81,11 +82,11 @@ export function TasksMutateDrawer() {
   const { setTasks } = useTaskContext();
   const isUpdate = open === 'update';
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-
+  const user = useUser();
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userId: 'USER-1234',
+      userId: user.user?.id,
       title: '',
       description: '',
       status: 'pending',
@@ -126,7 +127,7 @@ export function TasksMutateDrawer() {
     } else {
       // Reset form to default values in create mode
       form.reset({
-        userId: 'USER-1234', // Default userId
+        userId: user.user?.id, // Default userId
         title: '',
         description: '',
         status: 'pending',
@@ -146,17 +147,30 @@ export function TasksMutateDrawer() {
 
   const onSubmit = async (data: TasksForm) => {
     try {
+      // Transform _id to id for backend compatibility
+      const payload = {
+        ...data,
+        id: data._id || `TASK-${Date.now()}`, // Generate a new ID if not updating
+      };
+      delete payload._id; // Remove _id field to avoid conflicts
+
       if (isUpdate) {
-        await axios.patch(`http://localhost:3000/tasks/${data._id}`, data);
+        await axios.patch(
+          `https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks/${data._id}`,
+          payload,
+        );
         setTasks((prev) =>
           prev.map((task) =>
-            task._id === data._id ? { ...task, ...data } : task,
+            task._id === data._id ? { ...task, ...payload } : task,
           ),
         );
         setToastMessage(`Task "${data.title}" has been successfully updated.`);
       } else {
-        console.log(data);
-        const response = await axios.post('http://localhost:3000/tasks', data);
+        console.log(payload);
+        const response = await axios.post(
+          'https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks',
+          payload,
+        );
         setTasks((prev) => [...prev, response.data]);
         setToastMessage(
           `Task "${response.data.title}" has been successfully created.`,

@@ -5,7 +5,6 @@ import { Button } from '../../components/ui/button.tsx';
 import { ConfirmDialog } from '../../components/ui/confirm-dialog.tsx';
 import { columns } from '../../components/table/ui/columns.tsx';
 import { DataTable } from '../../components/table/ui/data-table.tsx';
-import { TasksImportDialog } from '../../components/table/ui/tasks-import-dialog.tsx';
 import { TasksMutateDrawer } from '../../components/table/ui/tasks-mutate-drawer.tsx';
 import { Task } from '../../components/table/data/schema.ts';
 import { Calendar } from '../../components/ui/calendar.tsx';
@@ -22,21 +21,19 @@ import {
   ToastViewport,
   ToastAction,
 } from 'src/components/ui/toast.tsx';
-import { IoCalendarOutline } from "react-icons/io5";
-import { Download, Plus } from 'lucide-react';
-import TaskCategoryChart from '../../components/charts/TaskChartList.tsx';
+import { IoCalendarOutline } from 'react-icons/io5';
+import { Plus } from 'lucide-react';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
-const MemoizedTasksImportDialog = React.memo(TasksImportDialog);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
 
 const Tasks = () => {
   const { tasks, setTasks, fetchTasks } = useTaskContext();
   const { open, currentRow, setCurrentRow, setOpen, handleOpen } =
     useTasksContext();
-  const [pendingDeletes, setPendingDeletes] = useState<
-    Map<string, NodeJS.Timeout>
-  >(new Map());
+  const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
+    new Map(),
+  );
   const [toastQueue, setToastQueue] = useState<{ id: string; task: Task }[]>(
     [],
   );
@@ -44,28 +41,6 @@ const Tasks = () => {
   useEffect(() => {
     fetchTasks();
   }, []);
-
-  // Handle row click to update the current row in TasksContext
-  const handleRowClick = (task: Task) => {
-    setCurrentRow(task);
-    handleOpen('update');
-  };
-
-  // Handle task creation and update using useTaskContext
-  const handleTaskMutate = useCallback(
-    (task: Task, isUpdate: boolean) => {
-      setTasks((prevTasks) => {
-        if (isUpdate) {
-          // Update an existing task
-          return prevTasks.map((t) => (t._id === task._id ? task : t));
-        } else {
-          // Add a new task
-          return [...prevTasks, task];
-        }
-      });
-    },
-    [setTasks],
-  );
 
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
@@ -79,7 +54,9 @@ const Tasks = () => {
     // Create a timeout for permanent deletion
     const timeoutId = setTimeout(async () => {
       try {
-        await axios.delete(`http://localhost:3000/tasks/${taskId}`);
+        await axios.delete(
+          `https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks/${taskId}`,
+        );
         setToastQueue((prevQueue) =>
           prevQueue.filter((item) => item.id !== taskId),
         );
@@ -123,13 +100,16 @@ const Tasks = () => {
     );
   }, []);
 
-  const [date, setDate] = React.useState<Date | undefined>(new Date())
+  const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   // Step 1: Count tasks per category
-  const categoryCounts = tasks.reduce<Record<string, number>>((counts, task) => {
-    counts[task.category] = (counts[task.category] || 0) + 1;
-    return counts;
-  }, {});
+  const categoryCounts = tasks.reduce<Record<string, number>>(
+    (counts, task) => {
+      counts[task.category] = (counts[task.category] || 0) + 1;
+      return counts;
+    },
+    {},
+  );
 
   // Step 2: Sort categories by task count and get the top 10
   const currentCategories = Object.entries(categoryCounts)
@@ -137,30 +117,32 @@ const Tasks = () => {
     .sort(([, countA], [, countB]) => countB - countA) // Sort by task count in descending order
     .slice(0, 10); // Get top 10 or all current categories
 
-
   return (
     <ToastProvider>
       <ToastViewport />
-      <div className='flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden'>
-        <div className='flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden'>
-          <div className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
+      <div className="flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden">
+        <div className="flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden">
+          <div className="flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white">
             <IoCalendarOutline />
             <p>Calendar</p>
           </div>
-          <hr className='my-2 border-t w-full' />
+          <hr className="my-2 border-t w-full" />
           <Calendar
             mode="single"
             selected={date}
             onSelect={setDate}
             className="p-1 border rounded-md scale-95"
           />
-          <hr className='my-2 border-t w-full' />
-          <p className='text-gray-600 text-xs'>Your current tasks category</p>
-          <ul className='mt-4 w-full list-disc'>
+          <hr className="my-2 border-t w-full" />
+          <p className="text-gray-600 text-xs">Your current tasks category</p>
+          <ul className="mt-4 w-full list-disc">
             {currentCategories.map(([category, count]) => (
-              <li key={category} className='flex justify-between items-center py-2'>
-                <span className='text-gray-700 text-sm'>{category}</span>
-                <span className='text-gray-500 text-xs'>{count} tasks</span>
+              <li
+                key={category}
+                className="flex justify-between items-center py-2"
+              >
+                <span className="text-gray-700 text-sm">{category}</span>
+                <span className="text-gray-500 text-xs">{count} tasks</span>
               </li>
             ))}
           </ul>
@@ -176,7 +158,7 @@ const Tasks = () => {
               </span>
             </button>
 
-            <Button onClick={() => handleOpen('create')} className=''>
+            <Button onClick={() => handleOpen('create')} className="">
               Create <Plus size={12} />
             </Button>
           </div>
