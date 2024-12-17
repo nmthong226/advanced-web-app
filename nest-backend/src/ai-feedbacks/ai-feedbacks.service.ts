@@ -11,7 +11,7 @@ export class AiFeedbacksService {
   private userChatSessions: Map<string, ChatSession> = new Map();
   
   constructor() {
-    const apiKey = "AIzaSyBF2CAgrYu_pE02VtTPr8Blpddl3lk8sbQ";
+    const apiKey = process.env.GEMINI_API_KEY
     if (!apiKey) {
       throw new Error('GEMINI_API_KEY is not defined in environment variables.');
     }
