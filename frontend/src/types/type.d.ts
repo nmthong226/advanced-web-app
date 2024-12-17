@@ -49,7 +49,7 @@ type EventCategory = {
 
 type User = {
     id: string;
-    clerkId: string;
+    clerkId?: string;
     tasks: Task[];
     eventCategories: EventCategory[];
     activitySchedule: ActivitySchedule[];

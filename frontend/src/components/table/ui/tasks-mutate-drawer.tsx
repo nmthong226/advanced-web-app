@@ -38,7 +38,7 @@ import { useState } from 'react';
 // Validation Schema
 // New Validation Schema
 const formSchema = z.object({
-  id: z.string().optional(),
+  _id: z.string().optional(),
   userId: z.string().min(1, 'UserId is required.'),
   title: z.string().min(1, 'Title is required.'),
   description: z.string().optional(),
@@ -85,7 +85,6 @@ export function TasksMutateDrawer() {
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      id: '',
       userId: 'USER-1234',
       title: '',
       description: '',
@@ -95,7 +94,7 @@ export function TasksMutateDrawer() {
       startTime: '',
       endTime: '',
       dueTime: '',
-      estimatedTime: undefined,
+      estimatedTime: 30,
       style: {
         backgroundColor: '#ffffff',
         textColor: '#000000',
@@ -106,8 +105,9 @@ export function TasksMutateDrawer() {
   // Load currentRow data into the form when updating
   useEffect(() => {
     if (isUpdate && currentRow) {
+      // Populate form with currentRow data in update mode
       form.reset({
-        id: currentRow.id,
+        _id: currentRow._id,
         userId: currentRow.userId,
         title: currentRow.title,
         description: currentRow.description || '',
@@ -123,16 +123,34 @@ export function TasksMutateDrawer() {
           textColor: '#000000',
         },
       });
+    } else {
+      // Reset form to default values in create mode
+      form.reset({
+        userId: 'USER-1234', // Default userId
+        title: '',
+        description: '',
+        status: 'pending',
+        priority: 'low',
+        category: '',
+        startTime: '',
+        endTime: '',
+        dueTime: '',
+        estimatedTime: undefined,
+        style: {
+          backgroundColor: '#ffffff',
+          textColor: '#000000',
+        },
+      });
     }
   }, [currentRow, isUpdate]);
 
   const onSubmit = async (data: TasksForm) => {
     try {
       if (isUpdate) {
-        await axios.patch(`http://localhost:3000/tasks/${data.id}`, data);
+        await axios.patch(`http://localhost:3000/tasks/${data._id}`, data);
         setTasks((prev) =>
           prev.map((task) =>
-            task.id === data.id ? { ...task, ...data } : task,
+            task._id === data._id ? { ...task, ...data } : task,
           ),
         );
         setToastMessage(`Task "${data.title}" has been successfully updated.`);

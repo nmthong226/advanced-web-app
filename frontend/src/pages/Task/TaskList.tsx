@@ -57,7 +57,7 @@ const Tasks = () => {
       setTasks((prevTasks) => {
         if (isUpdate) {
           // Update an existing task
-          return prevTasks.map((t) => (t.id === task.id ? task : t));
+          return prevTasks.map((t) => (t._id === task._id ? task : t));
         } else {
           // Add a new task
           return [...prevTasks, task];
@@ -70,11 +70,11 @@ const Tasks = () => {
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
 
-    const taskId = currentRow.id;
+    const taskId = currentRow._id;
     const taskToDelete = currentRow;
 
     // Temporarily remove the task from the list
-    setTasks((prevTasks) => prevTasks.filter((t) => t.id !== taskId));
+    setTasks((prevTasks) => prevTasks.filter((t) => t._id !== taskId));
 
     // Create a timeout for permanent deletion
     const timeoutId = setTimeout(async () => {
@@ -111,15 +111,15 @@ const Tasks = () => {
   const undoDelete = useCallback((task: Task) => {
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
-      if (newMap.has(task.id)) {
-        clearTimeout(newMap.get(task.id));
-        newMap.delete(task.id);
+      if (newMap.has(task._id)) {
+        clearTimeout(newMap.get(task._id));
+        newMap.delete(task._id);
       }
       return newMap;
     });
     setTasks((prevTasks) => [...prevTasks, task]);
     setToastQueue((prevQueue) =>
-      prevQueue.filter((item) => item.id !== task.id),
+      prevQueue.filter((item) => item.id !== task._id),
     );
   }, []);
 
@@ -165,7 +165,7 @@ const Tasks = () => {
             ))}
           </ul>
         </div>
-        <div className='flex flex-col bg-white border rounded-md w-[84%] h-full'>
+        <div className="flex flex-col bg-white border rounded-md w-[84%] h-full">
           {/* ===== Top Heading ===== */}
           <div className="flex flex-wrap justify-between items-center gap-x-4 p-2">
             <button className="px-2 font-semibold text-indigo-500 text-lg">
@@ -209,7 +209,7 @@ const Tasks = () => {
                 open={open === 'delete'}
                 onOpenChange={() => setOpen(null)}
                 handleConfirm={handleConfirmDelete}
-                title={`Delete this task: ${currentRow?.id}?`}
+                title={`Delete this task: ${currentRow?._id}?`}
                 desc={
                   <p>
                     You are about to delete task{' '}
