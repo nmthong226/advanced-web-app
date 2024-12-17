@@ -1,6 +1,6 @@
 // Define a type for Activity and Task
 //Import data schema
-import { Task } from '../components/table/data/schema.ts';
+import { Task } from './task.d.ts';
 
 type Style = {
     bgColor: string;
@@ -49,10 +49,7 @@ type EventCategory = {
 
 type User = {
     id: string;
-    name: string;
-    email: string;
-    avatar?: string;
-    taskSchedule: TaskSchedule[];
+    clerkId: string;
     tasks: Task[];
     eventCategories: EventCategory[];
     activitySchedule: ActivitySchedule[];
@@ -61,5 +58,4 @@ type User = {
         notifications: boolean;
         language: string;
     };
-    // activities: Activity[]; expand later for activity management
 };

@@ -10,8 +10,7 @@ import React, {
 import axios from 'axios';
 
 //Import data schema
-import { Task } from '../components/table/data/schema.ts';
-
+import { Task } from '../types/task';
 interface TaskContextValue {
   tasks: Task[];
   fetchTasks: () => void;

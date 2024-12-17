@@ -19,46 +19,49 @@ import Analytics from './pages/Analytics/Analytics.tsx';
 import TimeTable from './pages/Timetable/Timetable.tsx';
 import TasksContextProvider from './components/table/context/task-context.tsx';
 import { TaskProvider } from './contexts/UserTaskContext.tsx';
+import { UserProvider } from './contexts/UserContext.tsx';
 
 function App() {
   return (
-    <TaskProvider>
-      <TasksContextProvider>
-        <SettingsProvider>
-          <Router>
-            <Routes>
-              {/* Protected Route */}
-              <Route
-                path="/"
-                element={
-                  <>
-                    <SignedIn>
-                      <Layout />
-                    </SignedIn>
-                    <SignedOut>
-                      <RedirectToSignIn />
-                    </SignedOut>
-                  </>
-                }
-              >
-                <Route path="/home" element={<Home />} />
-                <Route path='/calendar' element={<Canlendar />} />
-                <Route path='/task' element={<TaskList />} />
-                <Route path='/timetable' element={<TimeTable />} />
-                <Route path='/timer' element={<Timer />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/analytics" element={<Analytics />} />
+    <UserProvider>
+      <TaskProvider>
+        <TasksContextProvider>
+          <SettingsProvider>
+            <Router>
+              <Routes>
+                {/* Protected Route */}
+                <Route
+                  path="/"
+                  element={
+                    <>
+                      <SignedIn>
+                        <Layout />
+                      </SignedIn>
+                      <SignedOut>
+                        <RedirectToSignIn />
+                      </SignedOut>
+                    </>
+                  }
+                >
+                  <Route path="/home" element={<Home />} />
+                  <Route path='/calendar' element={<Canlendar />} />
+                  <Route path='/task' element={<TaskList />} />
+                  <Route path='/timetable' element={<TimeTable />} />
+                  <Route path='/timer' element={<Timer />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/signin" element={<SignIn />} />
+                  <Route path="/" element={<Navigate to="/home" replace />} />
+                  <Route path="*" element={<Navigate to={"/home"} />} />
+                </Route>
+                {/* Public Route */}
                 <Route path="/signin" element={<SignIn />} />
-                <Route path="/" element={<Navigate to="/home" replace />} />
-                <Route path="*" element={<Navigate to={"/home"} />} />
-              </Route>
-              {/* Public Route */}
-              <Route path="/signin" element={<SignIn />} />
-            </Routes>
-          </Router>
-        </SettingsProvider>
-      </TasksContextProvider>
-    </TaskProvider>
+              </Routes>
+            </Router>
+          </SettingsProvider>
+        </TasksContextProvider>
+      </TaskProvider>
+    </UserProvider>
   )
 }
 
