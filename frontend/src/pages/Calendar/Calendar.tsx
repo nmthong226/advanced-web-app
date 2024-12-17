@@ -18,7 +18,7 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
 import { CalendarDaysIcon } from 'lucide-react';
 import ChatAI from '../../components/AI/chatHistory.tsx';
-import TasksContextProvider from '../../components/table/context/task-context.tsx';
+// import TasksContextProvider from '../../components/table/context/task-context.tsx';
 
 const Calendar = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
