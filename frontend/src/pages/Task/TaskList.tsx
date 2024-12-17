@@ -68,7 +68,7 @@ const Tasks = () => {
         newMap.delete(taskId);
         return newMap;
       });
-    }, 10000); // 10 seconds timeout
+    }, 4000); // 10 seconds timeout
 
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
