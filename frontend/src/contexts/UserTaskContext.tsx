@@ -1,15 +1,21 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useEffect,
+} from 'react';
 
 //Import packages
-import axios from "axios";
+import axios from 'axios';
 
 //Import data schema
 import { Task } from '../components/table/data/schema.ts';
 
 interface TaskContextValue {
-    tasks: Task[];
-    fetchTasks: () => void;
-    setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
+  tasks: Task[];
+  fetchTasks: () => void;
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
 const UserTaskContext = createContext<TaskContextValue | undefined>(undefined);
 
@@ -49,21 +55,21 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     //     }
     // }; 
 
-    useEffect(() => {
-        fetchTasks();
-    }, []);
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
-    return (
-        <UserTaskContext.Provider value={{ tasks, setTasks, fetchTasks }}>
-            {children}
-        </UserTaskContext.Provider>
-    );
+  return (
+    <UserTaskContext.Provider value={{ tasks, setTasks, fetchTasks }}>
+      {children}
+    </UserTaskContext.Provider>
+  );
 };
 
 export const useTaskContext = () => {
-    const context = useContext(UserTaskContext);
-    if (!context) {
-        throw new Error("useTaskContext must be used within a TaskProvider");
-    }
-    return context;
+  const context = useContext(UserTaskContext);
+  if (!context) {
+    throw new Error('useTaskContext must be used within a TaskProvider');
+  }
+  return context;
 };

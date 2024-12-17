@@ -8,7 +8,7 @@ interface TasksContextType {
   setOpen: (str: TasksDialogType | null) => void;
   currentRow: Task | null;
   setCurrentRow: React.Dispatch<React.SetStateAction<Task | null>>;
-  handleOpen: (type: TasksDialogType) => void;
+  handleOpen: (type: TasksDialogType | null) => void;
 }
 
 const TasksContext = React.createContext<TasksContextType | null>(null);
@@ -21,10 +21,10 @@ export default function TasksContextProvider({ children }: Props) {
   const [open, setOpen] = useState<TasksDialogType | null>(null);
   const [currentRow, setCurrentRow] = useState<Task | null>(null);
 
-  const handleOpen = useCallback((type: TasksDialogType) => {
+  const handleOpen = useCallback((type: TasksDialogType | null) => {
     setOpen(type);
   }, []);
-  
+
   return (
     <TasksContext.Provider
       value={{

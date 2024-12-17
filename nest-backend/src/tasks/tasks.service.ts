@@ -9,7 +9,7 @@ export class TasksService {
     {
       id: 'TASK-8782',
       userId: 'USER-1234',
-      title: "You can't compress the program without quantifying the open-source SSD pixel!",
+      title: "Co len bro",
       status: 'in-progress',
       priority: 'medium',
       description: 'This task involves optimizing the SSD compression method.',
