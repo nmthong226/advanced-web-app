@@ -83,8 +83,8 @@ const SideBarTask = () => {
                 <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
                     {UserTasks.map(task => (
                         <DraggableTask
-                            key={task.id}
-                            id={task.id}
+                            key={task._id}
+                            id={task._id}
                             title={task.title}
                             description={task?.description}
                             startTime={task.startTime || 'No Info'}

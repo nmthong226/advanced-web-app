@@ -5,59 +5,44 @@ import React, {
   ReactNode,
   useEffect,
 } from 'react';
-
-//Import packages
 import axios from 'axios';
-
-//Import data schema
-import { Task } from '../components/table/data/schema.ts';
+import { useAuth } from '@clerk/clerk-react';
+import { Task } from '../types/task';
 
 interface TaskContextValue {
   tasks: Task[];
   fetchTasks: () => void;
   setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
 }
+
 const UserTaskContext = createContext<TaskContextValue | undefined>(undefined);
 
-export const TaskProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    const [tasks, setTasks] = useState<Task[]>([]);
+export const TaskProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const { userId } = useAuth();
 
-    const fetchTasks = async () => {
-        try {
-            const response = await axios.get(
-                'http://localhost:3000/tasks/user/USER-1234',
-            );
-            setTasks(response.data);
-        } catch (error) {
-            console.error('Error fetching tasks:', error);
-        }
-    };
-
-    // const [taskSchedule, setTaskSchedule] = useState<TaskSchedule[]>([]);
-
-    
-
-    // const fetchTasks = async () => {
-    //     try {
-    //         const response = await axios.get(
-    //             import.meta.env.VITE_TEST_BACKEND,
-    //             {
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                     'ngrok-skip-browser-warning': 'true', // Skip Ngrok security warning
-    //                 },
-    //             },
-    //         );
-    //         console.log("TEST", response.data);
-    //         setTasks(response.data);
-    //     } catch (error) {
-    //         console.error('Error fetching tasks:', error);
-    //     }
-    // }; 
+  const fetchTasks = async () => {
+    if (!userId) {
+      console.warn('User ID is not available.');
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND}tasks/user/${userId}`
+      );
+      setTasks(response.data);
+    } catch (error) {
+      console.error('Error fetching tasks:', error);
+    }
+  };
 
   useEffect(() => {
-    fetchTasks();
-  }, []);
+    if (userId) {
+      fetchTasks();
+    }
+  }, [userId]);
 
   return (
     <UserTaskContext.Provider value={{ tasks, setTasks, fetchTasks }}>

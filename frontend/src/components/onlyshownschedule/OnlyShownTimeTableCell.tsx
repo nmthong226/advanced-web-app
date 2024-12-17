@@ -2,6 +2,7 @@
 import React from 'react';
 //Import libs
 import { cn, formatTimeRange } from '@/lib/utils';
+import { Activity } from '../../types/type';
 
 type CalendarCellProps = {
     time: string;
@@ -21,7 +22,7 @@ const OnlyShownTimeTableCell: React.FC<CalendarCellProps> = ({
         <div
             className={cn(
                 `relative flex h-full bg-gray-50 p-1'}`,
-                activity?.style.backgroundColor,
+                activity?.style.bgColor,
                 className
             )}
         >

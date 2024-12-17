@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Column } from '@tanstack/react-table';
 import {
   DropdownMenu,
@@ -37,13 +37,13 @@ export function DataTableDateFilter({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="p-4 w-[280px]">
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium">Start Date</label>
+          <label className="font-medium text-sm">Start Date</label>
           <Input
             type="date"
             value={fromDate || ''}
             onChange={(e) => setFromDate(e.target.value)}
           />
-          <label className="text-sm font-medium mt-2">End Date</label>
+          <label className="mt-2 font-medium text-sm">End Date</label>
           <Input
             type="date"
             value={toDate || ''}

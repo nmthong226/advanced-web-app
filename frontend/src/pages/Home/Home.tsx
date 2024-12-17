@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "../../components/ui/select"
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
-import OnlyShownTaskSchedule from "../../components/onlyshownschedule/OnlyShownTaskSchedule";
+// import OnlyShownTaskSchedule from "../../components/onlyshownschedule/OnlyShownTaskSchedule";
 
 //Import icons
 import { BsCollection } from "react-icons/bs";
@@ -30,8 +30,10 @@ import { IoMdSettings } from "react-icons/io";
 
 //Import contexts
 import { useSettings } from "../../contexts/SettingsContext";
+import { useUser } from "@clerk/clerk-react";
 
 const Home = () => {
+  const { user } = useUser();
   const [currentTime, setCurrentTime] = useState<string>("");
   const [isMorning, setIsMorning] = useState<boolean>(true);
   const [greeting, setGreeting] = useState<string>("Good Morning");
@@ -72,18 +74,6 @@ const Home = () => {
   }, []);
 
   const table1Ref = useRef(null);
-  const table2Ref = useRef(null);
-
-  const syncScroll = (sourceRef: React.RefObject<HTMLElement>, targetRef: React.RefObject<HTMLElement>) => {
-    // Ensure both refs are valid before accessing the scroll properties
-    if (sourceRef.current && targetRef.current) {
-        // Synchronize the scroll positions of the source and target elements
-        targetRef.current.scrollTop = sourceRef.current.scrollTop;
-        targetRef.current.scrollLeft = sourceRef.current.scrollLeft;
-    } else {
-        console.warn('Both source and target refs must be valid to synchronize scroll.');
-    }
-};
 
   return (
     <div className="flex items-center space-x-2 bg-indigo-50 p-2 w-full h-full overflow-y-hidden">
@@ -97,7 +87,7 @@ const Home = () => {
           ${isMorning ? 'bg-gradient-to-b from-sky-400 to-indigo-100' : 'bg-gradient-to-b from-purple-400 to-indigo-100'}`}
               >
                 <p className="font-semibold text-sm text-zinc-600">{currentTime}</p>
-                <p className="font-bold text-lg text-zinc-700">{greeting}, Minh Thong</p>
+                <p className="font-bold text-lg text-zinc-700 truncate">{greeting}, {user?.fullName}!</p>
               </div>
             </div>
           )}

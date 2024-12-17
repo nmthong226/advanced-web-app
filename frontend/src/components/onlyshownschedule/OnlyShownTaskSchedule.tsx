@@ -5,6 +5,7 @@ import { initialTaskData } from '@/mocks/MockData';
 //Import icons
 import { CiClock1 } from "react-icons/ci";
 import OnlyShownTaskCell from './OnlyShownTaskCell';
+import { TaskSchedule } from '../../types/type';
 
 type Props = {
     className: string,
@@ -143,11 +144,11 @@ const OnlyShownTaskSchedule: React.FC<Props> = ({ className, tableClassName }) =
                                     const task = calendarData[day]?.tasks
                                         .find(task => task.startTime === formattedTime);
 
-                                    const shouldSpanRows = task && task.estimatedTime > 0;
+                                    const shouldSpanRows = task && task.estimatedTime && task.estimatedTime > 0;
 
                                     let spanRows = 1;
                                     if (shouldSpanRows) {
-                                        spanRows = Math.ceil(task.estimatedTime / interval);
+                                        spanRows = Math.ceil((task.estimatedTime || 0) / interval);
                                     }
 
                                     if (shouldSpanRows) {

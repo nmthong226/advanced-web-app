@@ -147,19 +147,19 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Es.Time" />
     ),
     cell: ({ row }) => {
-      const estimatedTime = parseInt(row.getValue('estimatedTime'));
-      let displayValue = '';
-
-      if (estimatedTime < 24) {
-        displayValue = `${estimatedTime}h`; // Less than a day in hours
-      } else if (estimatedTime >= 24 && estimatedTime < 48) {
-        displayValue = '1d'; // 1 day
-      } else if (estimatedTime >= 48 && estimatedTime < 168) {
-        displayValue = `${Math.ceil(estimatedTime / 24)}d`; // 2-7 days
-      } else {
-        displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than a week
+      const estimatedTime = parseInt(row.getValue('estimatedTime'), 10);
+      if (isNaN(estimatedTime)) {
+        return <div className="flex justify-center items-center w-[40px]">-</div>;
       }
-
+  
+      let displayValue;
+      if (estimatedTime < 24) {
+        displayValue = `${estimatedTime}h`; // Less than 1 day in hours
+      } else if (estimatedTime < 168) {
+        displayValue = `${Math.ceil(estimatedTime / 24)}d`; // Between 1 day and 1 week
+      } else {
+        displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than 1 week
+      }
       return (
         <div className="flex justify-center items-center w-[40px]">
           {displayValue === '0h' ? '-' : displayValue}

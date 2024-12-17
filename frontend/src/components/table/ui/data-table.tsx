@@ -64,7 +64,7 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex flex-col justify-between h-full">
+    <div className="flex flex-col justify-between p-2 h-full">
       <div className='space-y-2'>
         <DataTableToolbar table={table} />
         <div className="border rounded-md">
