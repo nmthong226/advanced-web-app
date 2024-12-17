@@ -31,22 +31,16 @@ export const columns: ColumnDef<Task>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-  {
-    accessorKey: 'id',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Task" />
-    ),
-    cell: ({ row }) => <div className="w-[80px]">{row.getValue('id')}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
+
   {
     accessorKey: 'title',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Title" />
     ),
     cell: ({ row }) => {
-      const label = labels.find((label) => label.value === row.original.category);
+      const label = labels.find(
+        (label) => label.value === row.original.category,
+      );
       return (
         <div className="flex space-x-2">
           {label && <Badge variant="outline">{label.label}</Badge>}
@@ -150,7 +144,7 @@ export const columns: ColumnDef<Task>[] = [
   {
     accessorKey: 'estimatedTime',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Es.Time"/>
+      <DataTableColumnHeader column={column} title="Es.Time" />
     ),
     cell: ({ row }) => {
       const estimatedTime = parseInt(row.getValue('estimatedTime'));
@@ -166,13 +160,17 @@ export const columns: ColumnDef<Task>[] = [
         displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than a week
       }
 
-      return <div className="flex justify-center items-center w-[40px]">{displayValue === '0h' ? '-' : displayValue}</div>;
+      return (
+        <div className="flex justify-center items-center w-[40px]">
+          {displayValue === '0h' ? '-' : displayValue}
+        </div>
+      );
     },
     enableSorting: true,
     enableHiding: false,
   },
   {
     id: 'actions',
-    cell: ({ row }) => <DataTableRowActions row={row}/>,
+    cell: ({ row }) => <DataTableRowActions row={row} />,
   },
 ];

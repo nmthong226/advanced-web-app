@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const taskSchema = z.object({
-  id: z.string(),
+  _id: z.string(),
   userId: z.string(), // Field for associating the task with a user
   title: z.string(),
   description: z.string().optional(), // Optional task description
