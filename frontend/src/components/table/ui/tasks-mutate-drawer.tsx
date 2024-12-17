@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
+import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   ToastProvider,
@@ -29,18 +30,12 @@ import {
   SheetTitle,
 } from 'src/components/ui/sheet';
 import { SelectDropdown } from 'src/components/ui/select-dropdown';
-import { Task } from '../data/schema';
+import { useTasksContext } from '../context/task-context'; // Task UI management
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx'; // Task data management
 import axios from 'axios';
 import { useState } from 'react';
-import { useTasksContext } from '../context/task-context';
 
-interface Props {
-  open: boolean; // Determines if the drawer is open
-  onOpenChange: (open: boolean) => void; // Callback to toggle the drawer's open state
-  currentRow?: Task; // Optional current task for editing
-  onTaskMutate: (task: Task, isUpdate: boolean) => void; // Callback to handle task creation or updates
-}
-
+// Validation Schema
 const formSchema = z.object({
   title: z.string().min(1, 'Title is required.'),
   status: z.string().min(1, 'Please select a status.'),
@@ -49,100 +44,114 @@ const formSchema = z.object({
   startDate: z.string().min(1, 'Start date is required.'),
   endDate: z.string().min(1, 'End date is required.'),
   description: z.string().min(1, 'Description is required.'),
+  userId: z.string().min(1, 'UserId is required.'), // Ensure this is included
 });
+
 type TasksForm = z.infer<typeof formSchema>;
 
-export function TasksMutateDrawer({
-  open,
-  onOpenChange,
-  onTaskMutate,
-  currentRow,
-}: Props) {
-  const isUpdate = !!currentRow;
+export function TasksMutateDrawer() {
+  const { open, currentRow, handleOpen } = useTasksContext(); // Manage drawer state
+  const { setTasks } = useTaskContext(); // Manage task list
+  const isUpdate = open === 'update';
   const [toastMessage, setToastMessage] = useState<string | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]); // Manage the task list
+
+  // Form management
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
-    defaultValues: currentRow ?? {
-      title: '',
-      status: '',
-      label: '',
-      priority: '',
-      startDate: '',
-      endDate: '',
-      description: '',
-    },
+    defaultValues: isUpdate
+      ? {
+          title: currentRow?.title || '',
+          status: currentRow?.status || '',
+          label: currentRow?.label || '',
+          priority: currentRow?.priority || '',
+          startDate: currentRow?.startDate || '',
+          endDate: currentRow?.endDate || '',
+          description: currentRow?.description || '',
+          userId: currentRow?.userId || '', // Include userId in update mode
+        }
+      : {
+          title: '',
+          status: '',
+          label: '',
+          priority: '',
+          startDate: '',
+          endDate: '',
+          description: '',
+          userId: 'USER-1234', // Default userId for create mode
+        },
   });
 
+  // Update form values when `currentRow` changes
+  useEffect(() => {
+    if (isUpdate && currentRow) {
+      form.reset({
+        title: currentRow.title,
+        status: currentRow.status,
+        label: currentRow.label,
+        priority: currentRow.priority,
+        startDate: currentRow.startDate,
+        endDate: currentRow.endDate,
+        description: currentRow.description,
+        userId: currentRow.userId, // Reset userId in update mode
+      });
+    } else if (!isUpdate) {
+      form.reset({
+        title: '',
+        status: '',
+        label: '',
+        priority: '',
+        startDate: '',
+        endDate: '',
+        description: '',
+        userId: 'USER-1234', // Default userId for create mode
+      });
+    }
+  }, [currentRow, isUpdate]);
+
   const onSubmit = async (data: TasksForm) => {
+    console.log('onSubmit triggered'); // Debug: Check if onSubmit is called
+    console.log('Form data:', data); // Debug: Check the data passed to the function
+
     try {
-      let updatedTask: Task;
-
       if (isUpdate) {
-        // Prepare the updated task with user input
-        updatedTask = { ...currentRow!, ...data };
+        console.log('Update mode detected'); // Debug: Check if it's in update mode
 
-        // Optimistically update the frontend
+        const updatedTask = { ...currentRow!, ...data }; // Merge new data with current task
+        console.log('Updated task object:', updatedTask); // Debug: Check the task object to be sent
+
+        await axios.patch(
+          `http://localhost:3000/tasks/${currentRow?.id}`,
+          data,
+        );
+
+        // Update task list in context
         setTasks((prevTasks) =>
           prevTasks.map((task) =>
             task.id === updatedTask.id ? updatedTask : task,
           ),
         );
 
-        // Call the backend to persist the changes
-        await axios.patch(
-          `http://localhost:3000/tasks/${currentRow?.id}`,
-          data,
-        );
-
-        // Show success toast
         setToastMessage(`Task "${data.title}" has been successfully updated.`);
       } else {
-        // Prepare the new task with a temporary ID
-        const newTask: Task = {
-          ...data,
-          id: `TEMP-${Date.now()}`, // Temporary ID for optimistic UI
-          userId: 'USER-1234', // Replace with actual userId
-        };
+        console.log('Create mode detected'); // Debug: Check if it's in create mode
 
-        // Optimistically add the task to the frontend
-        setTasks((prevTasks) => [...prevTasks, newTask]);
-
-        // Call the backend to create the new task
         const response = await axios.post('http://localhost:3000/tasks', data);
 
-        // Replace the temporary task with the server-generated task
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task.id === newTask.id ? response.data : task,
-          ),
-        );
+        console.log('Response from server:', response.data); // Debug: Check the response from the server
 
-        // Show success toast
+        // Add the new task to the context
+        setTasks((prevTasks) => [...prevTasks, response.data]);
+
         setToastMessage(
           `Task "${response.data.title}" has been successfully created.`,
         );
       }
 
-      onOpenChange(false); // Close the drawer
-      form.reset(); // Reset the form fields
+      handleOpen(null); // Close the drawer
+      form.reset(); // Reset form fields
+      console.log('Form successfully submitted'); // Debug: Ensure form submission logic completes
     } catch (error) {
-      console.error('Error submitting task:', error);
-
-      // Revert changes in case of an error
-      setTasks((prevTasks) => {
-        if (isUpdate) {
-          // Revert the update
-          return prevTasks.map((task) =>
-            task.id === currentRow!.id ? currentRow! : task,
-          );
-        } else {
-          // Remove the optimistically added task
-          return prevTasks.filter((task) => !task.id.startsWith('TEMP-'));
-        }
-      });
-
-      // Show error toast
+      console.error('Error submitting task:', error); // Debug: Check for any errors
       setToastMessage('Failed to save the task. Please try again later.');
     }
   };
@@ -153,7 +162,7 @@ export function TasksMutateDrawer({
       {toastMessage && (
         <Toast
           variant="default"
-          duration={3000} // Toast stays for 3 seconds
+          duration={3000}
           onOpenChange={() => setToastMessage(null)}
         >
           <ToastTitle>{isUpdate ? 'Task Updated' : 'Task Created'}</ToastTitle>
@@ -168,10 +177,9 @@ export function TasksMutateDrawer({
       )}
 
       <Sheet
-        open={open}
+        open={open === 'create' || open === 'update'}
         onOpenChange={(v) => {
-          onOpenChange(v);
-          form.reset();
+          if (!v) handleOpen(null); // Close drawer when toggled off
         }}
       >
         <SheetContent className="flex flex-col max-h-[100h] overflow-y-auto">
@@ -188,7 +196,15 @@ export function TasksMutateDrawer({
           <Form {...form}>
             <form
               id="tasks-form"
-              onSubmit={form.handleSubmit(onSubmit)}
+              onSubmit={form.handleSubmit(
+                (data) => {
+                  console.log('Form successfully submitted with data:', data); // Should log if no errors
+                  onSubmit(data);
+                },
+                (errors) => {
+                  console.error('Validation errors:', errors); // Debug validation errors
+                },
+              )}
               className="flex-1 space-y-5"
             >
               {/* Title Field */}
@@ -218,19 +234,32 @@ export function TasksMutateDrawer({
                       onValueChange={field.onChange}
                       placeholder="Select status"
                       items={[
-                        { label: 'In Progress', value: 'in progress' },
-                        { label: 'Backlog', value: 'backlog' },
-                        { label: 'Todo', value: 'todo' },
-                        { label: 'Canceled', value: 'canceled' },
-                        { label: 'Done', value: 'done' },
+                        { label: 'Pending', value: 'pending' },
+                        { label: 'In Progress', value: 'in-progress' },
+                        { label: 'Compeleted', value: 'completed' },
+                        { label: 'Expired', value: 'expired' },
                       ]}
                     />
                     <FormMessage />
                   </FormItem>
                 )}
               />
+              {/*Descri[tion*/}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter a description" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-              {/* Label Field (Dropdown) */}
+              {/* Label Field */}
               <FormField
                 control={form.control}
                 name="label"
@@ -252,7 +281,7 @@ export function TasksMutateDrawer({
                 )}
               />
 
-              {/* Priority Field (Dropdown) */}
+              {/* Priority Field */}
               <FormField
                 control={form.control}
                 name="priority"
