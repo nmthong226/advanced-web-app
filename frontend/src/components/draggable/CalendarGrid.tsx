@@ -42,8 +42,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
   const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
   const { tasks } = useTaskContext();
 
-  console.log(calendarData);
-
   useEffect(() => {
     const currentWeek = initialCurrentWeek(date);
     const currentWeekDates = currentWeek.map((day) => day.date);
@@ -52,7 +50,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
     const initialTaskData = currentWeek.map((day) => ({
       date: day.date,
       dayOfWeek: day.dayOfWeek,
-      userId: 'user-1', // Assuming a default user for simplicity
+      userId: '', // Assuming a default user for simplicity
       tasks: [], // Empty task list initially
     }));
 
