@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useCallback } from 'react';
 
 // Import components
 import { Button } from '../../components/ui/button.tsx';
@@ -28,7 +28,8 @@ const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
 
 const Tasks = () => {
-  const { tasks, setTasks, fetchTasks } = useTaskContext();
+  const { tasks, setTasks } = useTaskContext();
+
   const { open, currentRow, setCurrentRow, setOpen, handleOpen } =
     useTasksContext();
   const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
@@ -37,10 +38,6 @@ const Tasks = () => {
   const [toastQueue, setToastQueue] = useState<{ id: string; task: Task }[]>(
     [],
   );
-
-  useEffect(() => {
-    fetchTasks();
-  }, []);
 
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
