@@ -1,65 +1,50 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-// Define the TaskPriority and TaskStatus as TypeScript types
-export type TaskPriority = 'low' | 'medium' | 'high';
-export type TaskStatus = 'pending' | 'in-progress' | 'completed' | 'expired';
-
-// Interface for TaskStyle
-export interface TaskStyle {
-  backgroundColor: string;
-  textColor: string;
-}
-
-// Define the Task Document type for Mongoose
 export type TaskDocument = Task & Document;
 
-@Schema({ timestamps: true }) // Adds createdAt and updatedAt fields automatically
+@Schema()
 export class Task {
+  @Prop({ required: true })
+  id: string;
+
   @Prop({ required: true })
   userId: string;
 
   @Prop({ required: true })
   title: string;
 
-  @Prop({ required: false })
+  @Prop()
   description?: string;
 
   @Prop({ required: true })
+  status: 'pending' | 'in-progress' | 'completed' | 'expired';
+
+  @Prop({ required: true })
+  priority: 'low' | 'medium' | 'high';
+
+  @Prop()
   category: string;
 
-  @Prop({ required: true, enum: ['low', 'medium', 'high'] })
-  priority: TaskPriority;
+  @Prop()
+  startTime?: Date;
 
-  @Prop({
-    required: true,
-    enum: ['pending', 'in-progress', 'completed', 'expired'],
-  })
-  status: TaskStatus;
+  @Prop()
+  endTime?: Date;
 
-  @Prop({ type: Date, required: false })
-  startDate?: Date;
-
-  @Prop({ type: Date, required: false })
-  endDate?: Date;
-
-  @Prop({ type: Date, required: false })
+  @Prop()
   dueTime?: Date;
 
-  @Prop({ type: Number, required: false })
+  @Prop()
   estimatedTime?: number;
 
   @Prop({
     type: {
-      backgroundColor: { type: String, required: true },
-      textColor: { type: String, required: true },
+      backgroundColor: { type: String },
+      textColor: { type: String },
     },
-    required: false,
   })
-  style?: TaskStyle;
-
-  @Prop({ type: Boolean, default: false })
-  isOnCalendar?: boolean;
+  style?: { backgroundColor: string; textColor: string };
 }
 
 export const TaskSchema = SchemaFactory.createForClass(Task);
