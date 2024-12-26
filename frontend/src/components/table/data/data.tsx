@@ -7,14 +7,26 @@ export const labels = [
   {
     value: 'bug',
     label: 'Bug',
+    style: {
+      backgroundColor: 'bg-[#2F2F31]',
+      textColor: 'text-[#FFFFFF]',
+    }
   },
   {
     value: 'feature',
     label: 'Feature',
+    style: {
+      backgroundColor: 'bg-[#2F2F31]',
+      textColor: 'text-[#FFFFFF]',
+    }
   },
   {
     value: 'documentation',
     label: 'Documentation',
+    style: {
+      backgroundColor: 'bg-[#2F2F31]',
+      textColor: 'text-[#FFFFFF]',
+    }
   },
 ];
 

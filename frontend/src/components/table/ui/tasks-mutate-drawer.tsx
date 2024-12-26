@@ -1,15 +1,10 @@
+//Import frameworks
+import { useState, useEffect } from 'react';
 import { z } from 'zod';
 import { useForm } from 'react-hook-form';
-import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  ToastProvider,
-  Toast,
-  ToastViewport,
-  ToastAction,
-  ToastTitle,
-  ToastDescription,
-} from 'src/components/ui/toast';
+
+//Import components
 import { Button } from 'src/components/ui/button';
 import {
   Form,
@@ -21,20 +16,33 @@ import {
 } from 'src/components/ui/form';
 import { Input } from 'src/components/ui/input';
 import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetFooter,
-  SheetHeader,
-  SheetTitle,
-} from 'src/components/ui/sheet';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../ui/dialog";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../../ui/tooltip";
 import { SelectDropdown } from 'src/components/ui/select-dropdown';
+import { Switch } from '../../ui/switch';
+
+//Import icons
+import { LuInfo } from "react-icons/lu";
+
+//Import context
 import { useTasksContext } from '../context/task-context'; // Task UI management
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx'; // Task data management
+
+//Import packages/libs
 import axios from 'axios';
-import { useState } from 'react';
 import { useUser } from '@clerk/clerk-react';
+import { toast } from "react-toastify";
 
 // Validation Schema
 // New Validation Schema
@@ -49,7 +57,6 @@ const formSchema = z.object({
   priority: z.enum(['high', 'medium', 'low'], {
     errorMap: () => ({ message: 'Select a valid priority.' }),
   }),
-
   category: z.string().min(1, 'Category is required.'),
   startTime: z
     .string()
@@ -79,9 +86,9 @@ type TasksForm = z.infer<typeof formSchema>;
 
 export function TasksMutateDrawer() {
   const { open, currentRow, handleOpen } = useTasksContext();
+  const [isDisabled, setIsDisabled] = useState(true);
   const { setTasks } = useTaskContext();
   const isUpdate = open === 'update';
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
   const user = useUser();
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
@@ -136,7 +143,7 @@ export function TasksMutateDrawer() {
         startTime: '',
         endTime: '',
         dueTime: '',
-        estimatedTime: undefined,
+        estimatedTime: 0,
         style: {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -156,25 +163,30 @@ export function TasksMutateDrawer() {
 
       if (isUpdate) {
         await axios.patch(
-          `https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks/${data._id}`,
+          `${import.meta.env.VITE_BACKEND}/tasks/${data._id}`,
           payload,
         );
         setTasks((prev) =>
           prev.map((task) =>
             task._id === data._id ? { ...task, ...payload } : task,
-
           ),
         );
-        setToastMessage(`Task "${data.title}" has been successfully updated.`);
+        toast.success(
+          <p className='text-sm'>
+            Your task has been successfully updated.
+          </p>
+        );
       } else {
         console.log(payload);
         const response = await axios.post(
-          'https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/tasks',
+          `${import.meta.env.VITE_BACKEND}/tasks`,
           payload,
         );
         setTasks((prev) => [...prev, response.data]);
-        setToastMessage(
-          `Task "${response.data.title}" has been successfully created.`,
+        toast.success(
+          <p className='text-sm'>
+            Your task has been successfully created.
+          </p>
         );
       }
 
@@ -182,49 +194,44 @@ export function TasksMutateDrawer() {
       form.reset();
     } catch (error) {
       console.error('Error submitting task:', error);
-      setToastMessage('Failed to save the task. Please try again later.');
+      toast.error(
+        <p className='text-sm'>
+          Failed to save the task. Please try again later.
+        </p>
+      );
+    }
+  };
+
+  const handleToggle = (value: any) => {
+    setIsDisabled(!value); // Toggle the disabled state
+    if (!value) {
+      // Reset the form fields when switching to disabled
+      form.reset({
+        startTime: '', // Default or initial values
+        endTime: '',
+        estimatedTime: 0,
+      });
     }
   };
 
   return (
-    <ToastProvider>
-      <ToastViewport />
-      {toastMessage && (
-        <Toast
-          variant="default"
-          duration={3000}
-          onOpenChange={() => setToastMessage(null)}
-        >
-          <ToastTitle>{isUpdate ? 'Task Updated' : 'Task Created'}</ToastTitle>
-          <ToastDescription>{toastMessage}</ToastDescription>
-          <ToastAction
-            altText="Dismiss Notification"
-            onClick={() => setToastMessage(null)}
-          >
-            Dismiss
-          </ToastAction>
-        </Toast>
-      )}
-
-      <Sheet
-        open={open === 'create' || open === 'update'}
-        onOpenChange={(v) => {
-          if (!v) {
-            handleOpen(null); // Close drawer when toggled off
-            form.reset();
-          }
-        }}
-      >
-        <SheetContent className="flex flex-col max-h-[100h] overflow-y-auto">
-          <SheetHeader>
-            <SheetTitle>{isUpdate ? 'Update' : 'Create'} Task</SheetTitle>
-            <SheetDescription>
+    <>
+      <Dialog open={open === 'create' || open === 'update'} onOpenChange={(v) => {
+        if (!v) {
+          handleOpen(null); // Close dialog when toggled off
+          form.reset();
+        }
+      }}>
+        <DialogContent className="flex flex-col custom-scrollbar min-w-[640px] max-h-[100vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className='text-bold text-indigo-800'>{isUpdate ? 'Update' : 'Create'} Task</DialogTitle>
+            <DialogDescription>
               {isUpdate
-                ? 'Update the task by providing the necessary info.'
-                : 'Add a new task by providing the necessary info.'}
+                ? 'Update the task by providing the necessary info. '
+                : 'Add a new task by providing the necessary info. '}
               Click save when you're done.
-            </SheetDescription>
-          </SheetHeader>
+            </DialogDescription>
+          </DialogHeader>
 
           <Form {...form}>
             <form
@@ -234,203 +241,306 @@ export function TasksMutateDrawer() {
                   console.log('Form successfully submitted with data:', data); // Should log if no errors
                   onSubmit(data);
                 },
-                (errors, data) => {
-                  console.log('Form not submitted with data:', data); // Should log if no errors
+                (errors) => {
                   console.error('Validation errors:', errors); // Debug validation errors
                 },
               )}
-              className="flex-1 space-y-5"
-            >
+              className="flex flex-col flex-1">
               {/* Title Field */}
-              <FormField
-                control={form.control}
-                name="title"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Title</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter a title" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Status Field */}
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Status</FormLabel>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Select status"
-                      items={[
-                        { label: 'Pending', value: 'pending' },
-                        { label: 'In Progress', value: 'in-progress' },
-                        { label: 'Compeleted', value: 'completed' },
-                        { label: 'Expired', value: 'expired' },
-                      ]}
+              <div className='flex justify-between w-full'>
+                <div className='w-1/4'>
+                  <p className='font-semibold text-indigo-700 text-sm'>Task details</p>
+                </div>
+                <div className='flex flex-col space-y-4 w-3/4'>
+                  <FormField
+                    control={form.control}
+                    name="title"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel>Title</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter a title" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <div className='flex flex-row space-x-2'>
+                    {/* Status Field */}
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1 w-1/2">
+                          <FormLabel>Status</FormLabel>
+                          <SelectDropdown
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                            placeholder="Select status"
+                            items={[
+                              { label: 'Pending', value: 'pending' },
+                              { label: 'In Progress', value: 'in-progress' },
+                              { label: 'Completed', value: 'completed' },
+                              { label: 'Expired', value: 'expired' },
+                            ]}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {/*Descri[tion*/}
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Enter a description" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Label Field */}
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Label</FormLabel>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Select label"
-                      items={[
-                        { label: 'Documentation', value: 'documentation' },
-                        { label: 'Feature', value: 'feature' },
-                        { label: 'Bug', value: 'bug' },
-                      ]}
+                    {/* Priority Field */}
+                    <FormField
+                      control={form.control}
+                      name="priority"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1 w-1/2">
+                          <FormLabel>Priority</FormLabel>
+                          <SelectDropdown
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                            placeholder="Select priority"
+                            items={[
+                              { label: 'High', value: 'high' },
+                              { label: 'Medium', value: 'medium' },
+                              { label: 'Low', value: 'low' },
+                            ]}
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Priority Field */}
-              <FormField
-                control={form.control}
-                name="priority"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Priority</FormLabel>
-                    <SelectDropdown
-                      defaultValue={field.value}
-                      onValueChange={field.onChange}
-                      placeholder="Select priority"
-                      items={[
-                        { label: 'High', value: 'high' },
-                        { label: 'Medium', value: 'medium' },
-                        { label: 'Low', value: 'low' },
-                      ]}
+                  </div>
+                  {/* Category Field */}
+                  <FormField
+                    control={form.control}
+                    name="category"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1 w-1/2">
+                        <FormLabel>Label</FormLabel>
+                        <SelectDropdown
+                          defaultValue={field.value}
+                          onValueChange={field.onChange}
+                          placeholder="Select label"
+                          items={[
+                            { label: 'Documentation', value: 'documentation' },
+                            { label: 'Feature', value: 'feature' },
+                            { label: 'Bug', value: 'bug' },
+                          ]}
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {/* Due Date Field */}
+                  <FormField
+                    control={form.control}
+                    name="dueTime"
+                    render={({ field }) => (
+                      <FormItem className="space-y-2 w-1/2">
+                        <FormLabel className='flex items-center space-x-2'>
+                          <p>Due Time</p>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger disabled>
+                                <LuInfo
+                                  className="text-gray-500 hover:cursor-default pointer-events-none"
+                                />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                This is the task's deadline.
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            type="datetime-local"
+                            value={field.value ? field.value.slice(0, 16) : ''}
+                            onChange={(e) => {
+                              const inputValue = e.target.value; // This is in local datetime format
+                              const vnLocalDate = new Date(inputValue); // Parse it as a local date
+                              const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
+                              const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
+                                .toISOString()
+                              field.onChange(localTime); // Save the local time string
+                            }}
+                            className="bg-white"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+              <hr className='my-4' />
+              <div className='flex justify-between w-full'>
+                <div className='space-y-1.5 pr-4 w-1/4'>
+                  <p className='font-semibold text-indigo-700 text-sm'>Time track options</p>
+                  <div className='flex flex-col p-2 border rounded-md w-[120px]'>
+                    <div className='flex items-center space-x-2 mx-auto'>
+                      <p className='text-xs'>Set active:</p>
+                      <Switch
+                        checked={!isDisabled} // Toggle state
+                        onCheckedChange={handleToggle}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div className='flex flex-col space-y-4 mt-1 w-3/4'>
+                  <div className='flex justify-between space-x-2'>
+                    {/* Start Date Field */}
+                    <FormField
+                      control={form.control}
+                      name="startTime"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 w-1/2">
+                          <FormLabel className='flex items-center space-x-2'>
+                            <p>Start Time</p>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger disabled>
+                                  <LuInfo
+                                    className="text-gray-500 hover:cursor-default pointer-events-none"
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Your time to start this task.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="datetime-local"
+                              value={field.value ? field.value.slice(0, 16) : ''}
+                              onChange={(e) => {
+                                const inputValue = e.target.value; // This is in local datetime format
+                                const vnLocalDate = new Date(inputValue); // Parse it as a local date
+                                const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
+                                const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
+                                  .toISOString()
+                                field.onChange(localTime); // Save the local time string
+                              }}
+                              className="bg-white"
+                              disabled={isDisabled}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
                     />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Due Date Field */}
-              <FormField
-                control={form.control}
-                name="dueTime"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Due Time</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="datetime-local"
-                        value={
-                          field.value
-                            ? field.value.replace('Z', '').slice(0, 16)
-                            : ''
-                        } // Trim to fit "YYYY-MM-DDTHH:MM"
-                        onChange={(e) => {
-                          const inputValue = e.target.value;
-                          const isoValue = new Date(inputValue).toISOString();
-                          field.onChange(isoValue);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="startTime"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Start Date</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="datetime-local"
-                        value={
-                          field.value
-                            ? field.value.replace('Z', '').slice(0, 16)
-                            : ''
-                        } // Trim to fit "YYYY-MM-DDTHH:MM"
-                        onChange={(e) => {
-                          const inputValue = e.target.value;
-                          const isoValue = new Date(inputValue).toISOString();
-                          field.onChange(isoValue);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* End Date Field */}
-              <FormField
-                control={form.control}
-                name="endTime"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>End Date</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="datetime-local"
-                        value={
-                          field.value
-                            ? field.value.replace('Z', '').slice(0, 16)
-                            : ''
-                        } // Trim to fit "YYYY-MM-DDTHH:MM"
-                        onChange={(e) => {
-                          const inputValue = e.target.value;
-                          const isoValue = new Date(inputValue).toISOString();
-                          field.onChange(isoValue);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    {/* End Date Field */}
+                    <FormField
+                      control={form.control}
+                      name="endTime"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 w-1/2">
+                          <FormLabel className='flex items-center space-x-2'>
+                            <p>End Time</p>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger disabled>
+                                  <LuInfo
+                                    className="text-gray-500 hover:cursor-default pointer-events-none"
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Your time to end this task before or at the due date.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="datetime-local"
+                              value={field.value ? field.value.slice(0, 16) : ''}
+                              onChange={(e) => {
+                                const inputValue = e.target.value; // This is in local datetime format
+                                const vnLocalDate = new Date(inputValue); // Parse it as a local date
+                                const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
+                                const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
+                                  .toISOString()
+                                field.onChange(localTime); // Save the local time string
+                              }}
+                              className="bg-white"
+                              disabled={isDisabled}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className='flex space-x-2'>
+                    {/* Estimated time Field */}
+                    <FormField
+                      control={form.control}
+                      name="estimatedTime"
+                      render={({ field }) => (
+                        <FormItem className="space-y-2 w-1/2">
+                          <FormLabel className='flex items-center space-x-2'>
+                            <p>Estimated Time</p>
+                            <TooltipProvider>
+                              <Tooltip>
+                                <TooltipTrigger disabled>
+                                  <LuInfo
+                                    className="text-gray-500 hover:cursor-default pointer-events-none"
+                                  />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  Your estimated time to finish this task with start and end time.
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              type="number"
+                              value={field.value}
+                              onChange={(e) => {
+                                field.onChange(e);
+                              }}
+                              disabled={true}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  {/* Description
+                  <FormField
+                    control={form.control}
+                    name="description"
+                    render={({ field }) => (
+                      <FormItem className="space-y-1">
+                        <FormLabel>Description</FormLabel>
+                        <FormControl>
+                          <Input {...field} placeholder="Enter a description" />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  /> */}
+                </div>
+              </div>
             </form>
           </Form>
-
-          <SheetFooter className="gap-2 mb-4">
-            <SheetClose asChild>
+          <div className="flex justify-end gap-2 mt-4">
+            <DialogTrigger asChild>
               <Button variant="outline">Close</Button>
-            </SheetClose>
-            <Button form="tasks-form" type="submit">
+            </DialogTrigger>
+            <Button form="tasks-form" type="submit" className='bg-indigo-800'>
               Save changes
             </Button>
-          </SheetFooter>
-        </SheetContent>
-      </Sheet>
-    </ToastProvider>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

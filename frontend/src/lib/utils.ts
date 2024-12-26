@@ -192,13 +192,13 @@ export const generateStylesFromParent = (color: string): string => {
 };
 
 export const convertToPeriodTime = (dueTime: string): string => {
-  const date = new Date(dueTime);
-  const options: Intl.DateTimeFormatOptions = {
-    hour: 'numeric',   // No leading zeros for hours
-    minute: '2-digit', // Always show two digits for minutes
-    hour12: true       // Use AM/PM notation
-  };
-  return date.toLocaleTimeString('en-US', options);
+  const date = new Date(dueTime).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+  });
+  return date;
 };
 
 // Function to get the current week from a given date
@@ -219,4 +219,12 @@ export const initialCurrentWeek = (date: any) => {
     };
   });
   return week;
+};
+
+// Convert UTC ISO string to local time in Vietnam (UTC+7)
+export const convertToLocalTime = (isoString: string, offset: number) => {
+  const date = new Date(isoString);
+  // Adjust by the offset (in hours)
+  const localDate = new Date(date.getTime() + offset * 60 * 60 * 1000);
+  return localDate.toISOString();
 };

@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import CalendarCell from './CalendarCell';
 import {
   addMinutesToTime,
-  convertToPeriodTime,
   formatTime,
   getCurrentWeek,
   initialCurrentWeek,
@@ -40,7 +39,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
   const currentWeek = getCurrentWeek(date);
   // Calculate the current week based on the date prop
   const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
-  const { tasks } = useTaskContext();
+  const { tasks, setTasks } = useTaskContext();
 
   useEffect(() => {
     const currentWeek = initialCurrentWeek(date);
@@ -92,25 +91,37 @@ const CalendarGrid = ({ date }: { date: string }) => {
     }, initialTaskData); // Use the dynamically initialized task data
 
     setCalendarData(filteredData);
-  }, [date]); // Dependency array ensures this runs whenever `date` changes
+  }, [date]); // Dependency array ensures this runs whenever date changes
+  console.log(calendarData);
 
   const handleDrop = (item: Task, time: string, date: string) => {
     console.log(`Item dropped at ${time} on ${date}:`, item);
+
+    // Update the task in the context
+    updateTaskContext(item._id, { isOnCalendar: true }); // Function to update tasks in the context
+
+    // Add the task to the calendar list
     setCalendarData((prevData) => {
       const updatedData = prevData.map((day) => {
         if (day.date === date) {
+          // Ensure no duplicate tasks
+          const taskExists = day.tasks.some((task) => task._id === item._id);
+          if (taskExists) return day;
+
+          // Create a new task object with calendar-specific updates
           const newItem = {
             ...item,
-            id: item._id || uuidv4(), // Use provided ID or generate a new one
+            id: item._id || uuidv4(),
             startTime: time,
-            endTime: addMinutesToTime(time, 0),
-            estimatedTime: 15,
+            endTime: addMinutesToTime(time, 30),
+            estimatedTime: 30,
             date: date,
+            isOnCalendar: true,
           };
-          const updatedTasks = [...day.tasks, newItem];
+
           return {
             ...day,
-            tasks: updatedTasks, // Update the activities within the day
+            tasks: [...day.tasks, newItem],
           };
         }
         return day; // If the date doesn't match, return the day unchanged
@@ -119,7 +130,17 @@ const CalendarGrid = ({ date }: { date: string }) => {
     });
   };
 
-  const handleResize = (id: string, date: string, newDuration: number) => {
+  console.log('123', tasks);
+
+  const updateTaskContext = (taskId: string, updates: Partial<Task>) => {
+    setTasks((prevTasks) =>
+      prevTasks.map((task) =>
+        task._id === taskId ? { ...task, ...updates } : task
+      )
+    );
+  };
+
+  const handleResize = (id: string, date: string, newEstimatedTime: number) => {
     // Find the activity in the data and adjust its duration
     setCalendarData((prevData) =>
       prevData.map((day) => {
@@ -129,8 +150,8 @@ const CalendarGrid = ({ date }: { date: string }) => {
               // Match by id
               return {
                 ...task,
-                duration: newDuration,
-                endTime: addMinutesToTime(task.startTime || '', newDuration), // Update the end time
+                estimatedTime: newEstimatedTime,
+                endTime: addMinutesToTime(task.startTime || '', newEstimatedTime), // Update the end time
               };
             }
             return task;
@@ -152,6 +173,11 @@ const CalendarGrid = ({ date }: { date: string }) => {
   const occupiedSlots = Array(7)
     .fill(null)
     .map(() => new Array(slotsPerDay).fill(false));
+
+  if (!calendarData) {
+    return <div>Loading...</div>; // Or any custom loading component
+  }
+
   return (
     <div className="flex flex-col bg-white w-full h-full overflow-hidden">
       <div className="flex">
@@ -289,7 +315,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
             return (
               <div
                 key={index}
-                className="flex justify-center items-center h-20 text-[11px]"
+                className="flex justify-center items-start h-20 text-[11px]"
               >
                 {/* Display the hour in 12-hour AM/PM format */}
                 {hour === 0 ? '12 AM' : hour} {period}
@@ -309,13 +335,13 @@ const CalendarGrid = ({ date }: { date: string }) => {
                   if (occupiedSlots[day][index]) {
                     return null;
                   }
-
                   const task = calendarData[day]?.tasks.find(
-                    (task) =>
-                      convertToPeriodTime(task.dueTime || '') === formattedTime,
+                    (task) => {
+                      return (task.startTime || '') === formattedTime;
+                    },
                   );
-                  const shouldSpanRows =
-                    task && task.estimatedTime && task.estimatedTime > 0;
+
+                  const shouldSpanRows = task && task.estimatedTime && task.estimatedTime > 0;
 
                   let spanRows = 1; // Default to 1 row
                   if (shouldSpanRows) {
@@ -352,7 +378,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
                           currentWeek[day].fullDate,
                         )
                       }
-                      className={`${task ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r ` : 'col-span-1 row-span-1 h-5 text-[10px] border-r'} ${isBorderRow ? 'border-b border-gray-300' : ''}`}
+                      className={`${task ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r` : 'col-span-1 row-span-1 h-5 text-[10px] border-r'} ${isBorderRow && !task ? 'border-b border-gray-300' : ''}`}
                       style={{
                         gridRow: `${gridRowStart} / ${gridRowEnd}`,
                       }}

@@ -111,18 +111,25 @@ export const columns: ColumnDef<Task>[] = [
       <DataTableColumnHeader column={column} title="Due to" />
     ),
     cell: ({ row }) => {
-      const dueTime = new Date(row.getValue('dueTime'));
-      if (isNaN(dueTime.getTime())) return 'N/A'; // Handle invalid dates
-
-      // Format date to "HH:MM, DD MMM" with 24-hour format
-      const formattedDueTime = dueTime.toLocaleDateString('en-US', {
+      const dueTime = row.getValue('dueTime') as string | undefined; // Get value from the row
+    
+      if (!dueTime) return 'N/A'; // Handle missing value
+    
+      const utcDate = new Date(dueTime); // Parse ISO string from database
+    
+      // Check for invalid date
+      if (isNaN(utcDate.getTime())) return 'N/A';
+    
+      // Format date as "HH:mm, DD MMM"
+      const formattedDueTime = utcDate.toLocaleDateString('en-US', {
         hour: '2-digit',
         minute: '2-digit',
         day: '2-digit',
         month: 'short',
-        hour12: false, // 24-hour format
+        hour12: false, // Use 24-hour format
+        timeZone: 'UTC', // Ensure time stays as UTC
       });
-
+    
       return <div className="w-[120px]">{formattedDueTime}</div>;
     },
     filterFn: (row, columnId, filterValue) => {

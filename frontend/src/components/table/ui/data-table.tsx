@@ -67,7 +67,7 @@ export function DataTable<TData, TValue>({
     <div className="flex flex-col justify-between p-2 h-full">
       <div className='space-y-2'>
         <DataTableToolbar table={table} />
-        <div className="border rounded-md">
+        <div className="border rounded-md min-h-[calc(100vh-200px)]">
           <Table>
             <TableHeader>
               {table.getHeaderGroups().map((headerGroup) => (
@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id}>
+                      <TableCell key={cell.id} className='border-b'>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),

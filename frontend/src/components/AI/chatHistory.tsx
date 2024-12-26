@@ -26,7 +26,7 @@ const ChatAI = () => {
   ) => {
     try {
       const response = await axios.post(
-        'https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/ai-feedbacks/analyze-schedule',
+        `${import.meta.env.VITE_BACKEND}/ai-feedbacks/analyze-schedule`,
         {
           userId,
           tasks: tasks,

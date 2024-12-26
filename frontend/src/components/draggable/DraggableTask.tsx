@@ -14,7 +14,7 @@ import { cn } from '@/lib/utils';
 import { Badge } from '../ui/badge';
 
 type DraggableTaskProps = {
-    id: string;
+    _id: string;
     title: string;
     description: string | undefined;
     startTime: string | undefined;
@@ -26,10 +26,13 @@ type DraggableTaskProps = {
     activity: string;
     status: string;
     priority: string;
+    isOnCalendar: boolean;
 };
 
 const DraggableTask: React.FC<DraggableTaskProps> =
-    ({ title,
+    ({  
+        _id,
+        title,
         status,
         priority,
         backgroundColor,
@@ -39,11 +42,13 @@ const DraggableTask: React.FC<DraggableTaskProps> =
         endTime,
         activity,
         estimatedTime,
-        dueTime }) => {
-
+        dueTime,
+        isOnCalendar
+    }) => {
         const [{ isDragging }, drag] = useDrag(() => ({
             type: 'ITEM',
             item: {
+                _id,
                 title,
                 description,
                 startTime,
@@ -56,7 +61,7 @@ const DraggableTask: React.FC<DraggableTaskProps> =
                     backgroundColor,
                     textColor,
                 },
-                isOnCalendar: true,
+                isOnCalendar: isOnCalendar,
             },
             collect: (monitor) => ({
                 isDragging: !!monitor.isDragging(),
@@ -64,23 +69,25 @@ const DraggableTask: React.FC<DraggableTaskProps> =
         }));
 
         function formatDueTime(isoDate: string): string {
-            const date = new Date(isoDate);
-            const day = date.getDate();
-            const month = date.toLocaleString('default', { month: 'short' }); // Short month name like Dec
-            const hours = date.getHours();
-            const minutes = date.getMinutes();
-            const period = hours >= 12 ? 'PM' : 'AM';
-            const formattedHours = hours % 12 || 12; // Convert 24-hour to 12-hour format
-            return `${formattedHours}:${minutes.toString().padStart(2, '0')} ${period}, ${month} ${day}`;
+            const date = new Date(isoDate); // Parse ISO string as is
+
+            // Extract individual components
+            const day = date.getUTCDate();
+            const month = date.toLocaleString('en-US', { month: 'short', timeZone: 'UTC' }); // Short month name like Dec
+            const hours = date.getUTCHours(); // Use UTC hours to match database
+            const minutes = date.getUTCMinutes();
+
+            // Final formatted string
+            return `${hours}:${minutes.toString().padStart(2, '0')}, ${month} ${day}`;
         }
 
         return (
             <DropdownMenu>
-                <div className={cn('relative flex flex-col px-2 py-1.5 space-y-1 border rounded-md text-sm truncate hover:cursor-grab shadow-md')} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                <div className={cn('relative flex flex-col px-2 py-1.5 space-y-1 border rounded-md text-sm hover:cursor-grab shadow-md')} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
                     {/* Task Header */}
                     <div className='flex text-[11px] truncate'>
                         <p className={cn(`flex items-center font-semibold truncate`, textColor)}>
-                            <Badge className={`text-white ${backgroundColor}` }>{activity}</Badge>
+                            <Badge className={`text-white ${backgroundColor}`}>{activity}</Badge>
                         </p>
                         <p className='mx-1'>|</p>
                         {priority === 'high' && <p className='flex items-center truncate'><GoArrowUp className='mr-1' /> High</p>}
@@ -88,11 +95,11 @@ const DraggableTask: React.FC<DraggableTaskProps> =
                         {priority === 'low' && <p className='flex items-center truncate'><GoArrowDown className='mr-1' /> Low</p>}
                     </div>
                     {/* Task Title */}
-                    <p className='m-0 font-[500] text-base truncate'>{title}</p>
+                    <p className='font-[500] text-base truncate'>{title}</p>
                     {/* Task Times */}
                     <div className='flex flex-col text-[11px] leading-snug'>
                         <p>
-                            Due to: <span className='ml-1'>{formatDueTime((dueTime || ''))}</span>
+                            Due to: <span className='ml-1'>{dueTime ? formatDueTime((dueTime || '')) : 'Not setup'}</span>
                         </p>
                         <p>
                             Status: <span className='ml-2 text-pretty capitalize'>{status}</span>

@@ -30,7 +30,7 @@ const Settings = () => {
                     <HiOutlineCog6Tooth className="w-6 h-6" />
                 </div>
             </DialogTrigger>
-            <DialogContent className="flex gap-0 bg-[#F7F7F7] p-0 sm:rounded-xl max-w-[880px] h-[700px]" overlayBgColor="bg-black/70">
+            <DialogContent className="flex gap-0 bg-[#F7F7F7] p-0 sm:rounded-xl max-w-[880px] h-[700px]" bgOverlay='bg-black/40' >
                 {/* Sidebar */}
                 <div className="flex flex-col bg-white rounded-r-none rounded-xl w-[25%]">
                     <div className='flex flex-col p-6 pb-0'>
@@ -61,6 +61,16 @@ const Settings = () => {
                             <h2 className="font-bold text-base">General Settings</h2>
                             <hr className='my-3' />
                             <p className='font-semibold text-gray-700 text-sm'>Theme</p>
+                            <div className='flex space-x-4 mt-4'>
+                                <div className='relative flex shadow-lg p-1 border rounded-md w-[40%] h-20'>
+                                    <p className='text-4xl'>☀️</p>
+                                    <p className='right-3 bottom-2 absolute font-bold text-xl'>Light</p>
+                                </div>
+                                <div className='relative flex bg-zinc-700 shadow-lg p-1 border rounded-md w-[40%] h-20'>
+                                    <p className='text-4xl'>🌙</p>
+                                    <p className='right-3 bottom-2 absolute font-bold text-white text-xl'>Dark</p>
+                                </div>
+                            </div>
                         </div>
                     )}
                     {activeTab === 'UI' && (

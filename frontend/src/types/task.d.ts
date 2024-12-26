@@ -15,7 +15,8 @@ export const taskSchema = z.object({
   style: z.object({ // Object for task styles
     backgroundColor: z.string(), // Background color
     textColor: z.string() // Text color
-  })
+  }),
+  isOnCalendar: z.boolean()
 });
 
 export type Task = z.infer<typeof taskSchema>

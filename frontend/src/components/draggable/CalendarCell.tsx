@@ -1,7 +1,7 @@
 ///Import frameworks
 import React, { useState } from 'react';
 //Import libs
-import { addMinutesToTime, cn, generateStylesFromParent } from '@/lib/utils';
+import { addMinutesToTime, cn } from '@/lib/utils';
 //Import packages
 import { useDrop } from 'react-dnd';
 import { Rnd } from 'react-rnd';
@@ -23,20 +23,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu"
+
 //Import icons
-import { GoPencil } from 'react-icons/go';
 import { Button } from '../ui/button';
 import { Label } from '@radix-ui/react-label';
 import { Input } from '../ui/input';
-import { GoTrash } from 'react-icons/go';
 import NotifyDeletion from '../toast/notifyDeletion';
 import { LuSave } from 'react-icons/lu';
-import { FaCheck } from 'react-icons/fa6';
-import { FcCancel } from 'react-icons/fc';
-import { RiProgress5Line } from 'react-icons/ri';
-import { MdOutlineRestartAlt } from 'react-icons/md';
-import { FaHourglassStart } from 'react-icons/fa6';
 import { Task } from '../table/data/schema';
+import { FaRegCircleCheck } from "react-icons/fa6";
+import { FaRegCircle } from "react-icons/fa6";
+import { FaRegCircleXmark } from "react-icons/fa6";
+import { BiSolidCircleQuarter } from "react-icons/bi";
 
 type CalendarCellProps = {
   time: string;
@@ -93,28 +97,26 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
   const [{ isOver }, drop] = useDrop<Task, void, { isOver: boolean }>({
     accept: 'ITEM',
     drop: (item) => {
-      if (item._id === task?._id) {
-        const updatedEndTime = addMinutesToTime(time, 0); // Updated end time
+      console.log("true");
+      const updatedEndTime = addMinutesToTime(time, 30); // Updated end time
 
-        // Compare dueTime with the provided date and time
-        const isExpired = compareDueTime(
-          item.dueTime || '',
-          date,
-          updatedEndTime,
-        );
+      // Compare dueTime with the provided date and time
+      const isExpired = compareDueTime(
+        item.dueTime || '',
+        date,
+        updatedEndTime,
+      );
 
-        // Update the task details
-        const updatedItem = {
-          ...item,
-          startTime: time,
-          endTime: updatedEndTime,
-          date: date,
-          status: isExpired ? 'expired' : item.status, // Mark as expired if true
-        };
-
-        // Handle the updated task
-        onDrop(updatedItem, time, date);
-      }
+      // Update the task details
+      const updatedItem = {
+        ...item,
+        startTime: time,
+        endTime: updatedEndTime,
+        date: date,
+        status: isExpired ? 'expired' : item.status, // Mark as expired if true
+      };
+      // Handle the updated task
+      onDrop(updatedItem, time, date);
     },
     collect: (monitor) => ({
       isOver: !!monitor.isOver(),
@@ -122,7 +124,6 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
   });
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   return (
     <div
@@ -163,132 +164,119 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
           disableDragging={true} // Disable dragging to prevent moving the activity around
           className={`z-10 group`}
         >
-          {rowSpan === 1 ? (
-            <div
-              className={`flex flex-row items-center h-full w-[96%] rounded-r-md shadow-md font-semibold ${generateStylesFromParent(task.style.backgroundColor)}`}
-            >
-              {task.status === 'completed' && (
-                <>
-                  <div className="flex justify-center items-center bg-emerald-400 w-5 h-full">
-                    <div className="flex justify-center items-center bg-white rounded-full w-4 h-4">
-                      <FaCheck className="text-emerald-700" />
-                    </div>
-                  </div>
-                  <span className="mx-1 text-[10px]">-</span>
-                  <p className="text-[10px] text-zinc-600 truncate">
-                    {task.title}
-                  </p>
-                </>
-              )}
-              {task.status === 'in-progress' && (
-                <>
-                  <div className="flex justify-center items-center bg-amber-400 w-5 h-full">
-                    <div className="flex justify-center items-center bg-white rounded-full w-4 h-4">
-                      <MdOutlineRestartAlt className="text-amber-700" />
-                    </div>
-                  </div>
-                  <span className="mx-1 text-[10px]">-</span>
-                  <p className="text-[10px] text-zinc-600 truncate">
-                    {task.title}
-                  </p>
-                </>
-              )}
-              {task.status === 'pending' && (
-                <>
-                  <div className="flex justify-center items-center bg-blue-400 w-5 h-full">
-                    <div className="flex justify-center items-center bg-white rounded-full w-4 h-4">
-                      <FaHourglassStart className="w-3 h-3 text-blue-700" />
-                    </div>
-                  </div>
-                  <span className="mx-1 text-[10px]">-</span>
-                  <p className="text-[10px] text-zinc-600 truncate">
-                    {task.title}
-                  </p>
-                </>
-              )}
-              {task.status === 'expired' && (
-                <>
-                  <div className="flex justify-center items-center bg-red-400 w-5 h-5">
-                    <div className="bg-white rounded-full w-4 h-4">
-                      <FcCancel />
-                    </div>
-                  </div>
-                  <span className="mx-1 text-[10px]">-</span>
-                  <p className="text-[10px] text-zinc-600 truncate">
-                    {task.title}
-                  </p>
-                </>
-              )}
-            </div>
-          ) : (
-            <div className="flex flex-col p-2">
-              <div className="flex flex-row items-center space-x-1">
-                {task.status === 'completed' && (
-                  <div className="flex justify-center items-center bg-emerald-400 w-5 h-5">
-                    <div className="bg-white rounded-full w-4 h-4">
-                      <FaCheck className="text-emerald-700" />
-                    </div>
-                  </div>
-                )}
-                {task.status === 'in-progress' && (
-                  <div className="flex justify-center items-center bg-amber-400 w-5 h-5">
-                    <div className="bg-white rounded-full w-4 h-4">
-                      <RiProgress5Line className="text-amber-700" />
-                    </div>
-                  </div>
-                )}
-                {task.status === 'pending' && (
-                  <>
-                    <div className="flex justify-center items-center bg-gray-400 w-5 h-5">
-                      <div className="bg-white rounded-full w-4 h-4">
-                        <FaHourglassStart />
-                      </div>
-                    </div>
-                    <span className="mx-1 text-[10px]">-</span>
-                    <p className="text-[10px] text-zinc-600 truncate">
-                      {task.title}
-                    </p>
-                  </>
-                )}
-                {task.status === 'expired' && (
-                  <>
-                    <div className="flex justify-center items-center bg-red-400 w-5 h-5">
-                      <div className="bg-white rounded-full w-4 h-4">
-                        <FcCancel />
-                      </div>
-                    </div>
-                    <span className="mx-1 text-[10px]">-</span>
-                    <p className="text-[10px] text-zinc-600 truncate">
-                      {task.title}
-                    </p>
-                  </>
-                )}
-                <p
-                  className={cn(
-                    `text-[10px] font-semibold ${task.status === 'completed' && 'line-through'}`,
-                    task.style.textColor,
-                  )}
-                >
-                  {/* {task
-                    ? formatTimeRange(
-                        task?.startTime || '',
-                        task?.endTime || '',
-                      )
-                    : ''} */}
-                </p>
-              </div>
-              <p
-                className={`font-semibold text-[12px] text-zinc-600 leading-tight ${task.status === 'completed' && 'line-through'}`}
-              >
-                {task.title}
-              </p>
-            </div>
-          )}
           <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
-            <DialogTrigger asChild>
-              <div className="group-hover:flex top-0 right-0 absolute justify-center items-center border-[1px] border-zinc-300 hidden bg-white rounded-full w-6 h-6 hover:cursor-pointer">
-                <GoPencil />
-              </div>
+            <DialogTrigger asChild className='hover:cursor-pointer'>
+              {rowSpan === 1 ? (
+                <div
+                  className={`flex flex-row items-center space-x-1 justify-start h-full w-[96%] rounded-md shadow-md font-semibold bg-indigo-50 border-[1px] border-black/30`}
+                >
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className='outline-none'>
+                      <div className='flex items-center space-x-1 w-full h-full'>
+                        <div className='hover:bg-slate-200 px-0.5 hover:cursor-pointer'>
+                          {task.status === 'pending' && (
+                            <FaRegCircle className='text-purple-700' />
+                          )}
+                          {task.status === 'in-progress' && (
+                            <div className="flex justify-center items-center border-2 border-blue-700 rounded-full w-4 h-4 hover:cursor-pointer">
+                              <div className="flex justify-center items-center rounded-full w-4 h-4">
+                                <BiSolidCircleQuarter className="text-blue-700" />
+                              </div>
+                            </div>
+                          )}
+                          {task.status === 'completed' && (
+                            <FaRegCircleCheck className='text-emerald-700' />
+                          )}
+                          {task.status === 'expired' && (
+                            <FaRegCircleXmark className='text-red-700' />
+                          )}
+                        </div>
+                      </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className='space-y-1'>
+                      <DropdownMenuItem className='flex items-center space-x-2 bg-purple-100 w-full h-full'>
+                        <FaRegCircle className='text-purple-700' />
+                        <p className='text-xs'>Pending</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className='flex items-center space-x-2 bg-blue-100 w-full h-full'>
+                        <div className="flex justify-center items-center border-2 border-blue-700 rounded-full w-4 h-4 hover:cursor-pointer">
+                          <div className="flex justify-center items-center rounded-full w-4 h-4">
+                            <BiSolidCircleQuarter className="text-blue-700" />
+                          </div>
+                        </div>
+                        <p className='text-xs'>In-progress</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className='flex items-center space-x-2 bg-emerald-100 w-full h-full'>
+                        <FaRegCircleCheck className='text-emerald-700' />
+                        <p className='text-xs'>Completed</p>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className='flex items-center space-x-2 bg-red-100 w-full h-full'>
+                        <FaRegCircleXmark className='text-red-700' />
+                        <p className='text-xs'>Cancelled</p>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  <p className="text-[10px] text-zinc-600 truncate">
+                    {task.title}
+                  </p>
+                  {/* <FaFlagCheckered className='top-1 right-4 absolute size-3'/> */}
+                </div>
+              ) : (
+                <div className={`flex flex-col py-0.5 space-x-1 space-y-0.5 justify-start h-full w-[96%] rounded-md shadow-md font-semibold bg-indigo-50 border-[1px] border-black/30`}>
+                  <div className='flex space-x-1'>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className='outline-none'>
+                        <div className='flex items-center space-x-1 w-full h-full'>
+                          <div className='hover:bg-slate-200 px-0.5 hover:cursor-pointer'>
+                            {task.status === 'pending' && (
+                              <FaRegCircle className='text-purple-700' />
+                            )}
+                            {task.status === 'in-progress' && (
+                              <div className="flex justify-center items-center border-2 border-blue-700 rounded-full w-4 h-4 hover:cursor-pointer">
+                                <div className="flex justify-center items-center rounded-full w-4 h-4">
+                                  <BiSolidCircleQuarter className="text-blue-700" />
+                                </div>
+                              </div>
+                            )}
+                            {task.status === 'completed' && (
+                              <FaRegCircleCheck className='text-emerald-700' />
+                            )}
+                            {task.status === 'expired' && (
+                              <FaRegCircleXmark className='text-red-700' />
+                            )}
+                          </div>
+                        </div>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className='space-y-1'>
+                        <DropdownMenuItem className='flex items-center space-x-2 bg-purple-100 w-full h-full'>
+                          <FaRegCircle className='text-purple-700' />
+                          <p className='text-xs'>Pending</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='flex items-center space-x-2 bg-blue-100 w-full h-full'>
+                          <div className="flex justify-center items-center border-2 border-blue-700 rounded-full w-4 h-4 hover:cursor-pointer">
+                            <div className="flex justify-center items-center rounded-full w-4 h-4">
+                              <BiSolidCircleQuarter className="text-blue-700" />
+                            </div>
+                          </div>
+                          <p className='text-xs'>In-progress</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='flex items-center space-x-2 bg-emerald-100 w-full h-full'>
+                          <FaRegCircleCheck className='text-emerald-700' />
+                          <p className='text-xs'>Completed</p>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='flex items-center space-x-2 bg-red-100 w-full h-full'>
+                          <FaRegCircleXmark className='text-red-700' />
+                          <p className='text-xs'>Cancelled</p>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <p className={`font-semibold text-[12px] text-zinc-600 leading-tight ${task.status === 'completed' && 'line-through'}`}>
+                      {task.title}
+                    </p>
+                  </div>
+                  <p className='text-[10px]'>{task.startTime} - {task.endTime}</p>
+                </div>
+              )}
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
@@ -392,40 +380,6 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
                     </Button>
                   </div>
                 </div>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
-          <Dialog
-            open={isDeleteDialogOpen}
-            onOpenChange={setIsDeleteDialogOpen}
-          >
-            <DialogTrigger asChild>
-              <div
-                className={`${rowSpan < 3 ? 'hidden' : 'group-hover:flex hidden'}  absolute bottom-0 right-0 w-6 h-6 bg-white items-center justify-center border-zinc-300 border-[1px] rounded-full hover:cursor-pointer`}
-              >
-                <GoTrash />
-              </div>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
-              <DialogHeader>
-                <DialogTitle className="font-semibold text-sm">
-                  Delete {task?.title} at{' '}
-                  {/* {formatTimeRange(task?.startTime || '', task?.endTime || '')},{' '} */}
-                  {date}
-                </DialogTitle>
-                <DialogDescription>
-                  You are about to delete this event in calendar. Are you sure?
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  variant="secondary"
-                  className="hover:bg-gray-50 border"
-                  onClick={() => setIsDeleteDialogOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <NotifyDeletion setIsDeleteDialogOpen={setIsDeleteDialogOpen} />
               </DialogFooter>
             </DialogContent>
           </Dialog>

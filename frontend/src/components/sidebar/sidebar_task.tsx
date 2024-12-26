@@ -13,27 +13,30 @@ import DraggableTask from '../draggable/DraggableTask.tsx';
 import { IoSearchSharp } from 'react-icons/io5';
 import { MdFilterAlt } from 'react-icons/md';
 import { MdSort } from 'react-icons/md';
-import { FiPlusCircle } from 'react-icons/fi';
 import { RiFireFill } from 'react-icons/ri';
 import { IoCalendarOutline } from 'react-icons/io5';
 import { ChevronsUpDown } from 'lucide-react';
 import { GiEmptyChessboard } from "react-icons/gi";
+import { FaTasks } from "react-icons/fa";
 
 //Import mock data
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { Link } from 'react-router-dom';
 
 const SideBarTask = () => {
     const [isOpenTask, setIsOpenTask] = useState(false);
     const { tasks } = useTaskContext();
 
-    const UserTasks = tasks.filter(task => task.status !== 'completed');
-
+    // Filter tasks where status is 'completed' or isOnCalendar is true
+    const filteredTasks = tasks.filter(
+        (task) => task.status !== 'completed' && task.isOnCalendar !== true
+    );
     return (
         <div className='flex flex-col space-y-2 bg-white p-2 border rounded-lg w-[16%] h-full'>
-            <button className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
-                <FiPlusCircle />
-                <p>Add a task</p>
-            </button>
+            <Link to={'/task'} className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
+                <FaTasks />
+                <p>Task List</p>
+            </Link>
             <hr className="border-[1px] my-2" />
             <div className='relative flex bg-gray-100 p-2 rounded-lg w-full'>
                 <IoSearchSharp className='top-1/2 left-2 absolute transform -translate-y-1/2' />
@@ -52,7 +55,7 @@ const SideBarTask = () => {
                 </div>
             </div>
             <div className='flex flex-col space-y-2 custom-scrollbar overflow-y-auto'>
-                <button className='flex items-center space-x-2 px-2 p-2 border rounded-md w-full text-red-500 text-sm'>
+                {/* <button className='flex items-center space-x-2 px-2 p-2 border rounded-md w-full text-red-500 text-sm'>
                     <RiFireFill />
                     <p>Overdue (10)</p>
                 </button>
@@ -80,18 +83,18 @@ const SideBarTask = () => {
                             Now empty
                         </div>
                     </CollapsibleContent>
-                </Collapsible>
+                </Collapsible> */}
                 <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
-                    {UserTasks.length === 0 && (
+                    {filteredTasks.length === 0 && (
                         <div className='flex flex-col items-center space-x-2 space-y-2 px-2 p-2 w-full text-sm text-zinc-500'>
                             <GiEmptyChessboard className='size-10'/>
                             <p className='text-xs'>No tasks available for you yet.</p>
                         </div>
                     )}
-                    {UserTasks.map(task => (
+                    {filteredTasks.map(task => (
                         <DraggableTask
                             key={task._id}
-                            id={task._id}
+                            _id={task._id}
                             title={task.title}
                             description={task?.description}
                             startTime={task.startTime || 'No Info'}
@@ -103,6 +106,7 @@ const SideBarTask = () => {
                             status={task.status || 'pending'}
                             priority={task.priority}
                             estimatedTime={task.estimatedTime}
+                            isOnCalendar={task.isOnCalendar}
                         />
                     ))}
                 </div>
