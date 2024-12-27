@@ -1,4 +1,4 @@
-import { SignIn } from '@clerk/clerk-react';
+import { SignUp } from '@clerk/clerk-react';
 import carrousel from '/carrousel.jpg';
 import illustrator_one from '/illustrator_one.png';
 import illustrator_two from '/illustrator_two.png';
@@ -14,8 +14,7 @@ import 'swiper/css/autoplay';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
-// Import style
-import './style.css';
+// Import frameworks
 import { useEffect, useRef } from 'react';
 
 const SignInPage = () => {
@@ -37,11 +36,11 @@ const SignInPage = () => {
   }, []);
 
   return (
-    <div className="relative flex flex-col justify-center items-center bg-indigo-50 w-full h-screen">
+    <div className="relative flex flex-col justify-center items-center bg-indigo-50 w-full h-screen overflow-hidden">
       {/* Header */}
       <div className="top-0 left-1/2 absolute flex flex-col items-center p-4 transform -translate-x-1/2">
         <div className="flex">
-          <img src={logo} className="mr-2 w-6 h-6" alt="Logo" />
+          <img src={logo} className="mr-2 w-6 h-6" />
           <h1 className="font-semibold text-lg">Focus Flow</h1>
         </div>
         <hr className="my-1 border w-64" />
@@ -50,21 +49,12 @@ const SignInPage = () => {
         </span>
       </div>
       {/* Main Container */}
-      <div className="flex justify-end space-x-3 bg-gradient-to-b from-white to-indigo-200 p-2 border rounded-lg w-[730px] h-[472px]">
-        <div className="flex flex-col w-[400px] h-full items-center">
-          <SignIn signUpUrl="/sign-up" />
-          {/* Forgot Password Link */}
-          <div className="mt-4">
-            <a
-              href="/forgot-password"
-              className="text-indigo-700 hover:text-indigo-900 underline text-sm"
-            >
-              Forgot Password?
-            </a>
-          </div>
+      <div className="flex justify-end space-x-3 bg-gradient-to-b from-white to-indigo-200 p-2 border rounded-lg w-[730px] min-h-[553px]">
+        <div className="flex w-[400px] h-full">
+          <SignUp signInUrl="/sign-in" />
         </div>
         {/* Carousel Section */}
-        <div className="relative flex flex-col flex-1 justify-center items-center shadow-xl rounded-lg h-auto overflow-hidden group">
+        <div className="relative flex flex-grow justify-center items-center shadow-xl rounded-lg w-[300px] overflow-hidden group">
           {/* Background Image Layer */}
           <div
             className="absolute inset-0 rounded-lg"
@@ -117,43 +107,43 @@ const SignInPage = () => {
             </button>
           </div>
         </div>
-      </div>
-      {/* Footer */}
-      <div className="bottom-1 left-1/2 absolute flex flex-col items-center space-y-1 p-4 transform -translate-x-1/2">
-        <span className="font-semibold text-muted-foreground text-sm">
-          &copy;{' '}
-          <a
-            href="https://github.com/huyk21"
-            target="_blank"
-            className="hover:text-indigo-700"
-          >
-            ldhuy
-          </a>
-          -
-          <a
-            href="https://github.com/quyhoaphantruong"
-            target="_blank"
-            className="hover:text-indigo-700"
-          >
-            ptqhoa
-          </a>
-          -
-          <a
-            href="https://github.com/nmthong226"
-            target="_blank"
-            className="hover:text-indigo-700"
-          >
-            nmthong
-          </a>
-        </span>
-        <hr className="my-1 border w-64" />
-        <p className="text-[12px] text-muted-foreground">
-          Legal Notice
-          <span className="mx-2">·</span>
-          Privacy Policy
-          <span className="mx-2">·</span>
-          Terms of Service
-        </p>
+        {/* Footer */}
+        <div className="bottom-1 left-1/2 absolute flex flex-col items-center space-y-1 p-4 transform -translate-x-1/2">
+          <span className="font-semibold text-muted-foreground text-sm">
+            &copy;{' '}
+            <a
+              href="https://github.com/huyk21"
+              target="_blank"
+              className="hover:text-indigo-700"
+            >
+              ldhuy
+            </a>
+            -
+            <a
+              href="https://github.com/quyhoaphantruong"
+              target="_blank"
+              className="hover:text-indigo-700"
+            >
+              ptqhoa
+            </a>
+            -
+            <a
+              href="https://github.com/nmthong226"
+              target="_blank"
+              className="hover:text-indigo-700"
+            >
+              nmthong
+            </a>
+          </span>
+          <hr className="my-1 border w-64" />
+          <p className="text-[12px] text-muted-foreground">
+            Legal Notice
+            <span className="mx-2">·</span>
+            Privacy Policy
+            <span className="mx-2">·</span>
+            Terms of Service
+          </p>
+        </div>
       </div>
     </div>
   );
