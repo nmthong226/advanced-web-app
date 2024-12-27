@@ -23,6 +23,11 @@ const Settings = () => {
         setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
     };
 
+    // Handle theme toggle specifically for themeLight
+    const handleThemeToggle = () => {
+        setSettings((prev) => ({ ...prev, themeLight: !prev.themeLight }));
+    };
+
     return (
         <Dialog>
             <DialogTrigger asChild>
@@ -61,16 +66,21 @@ const Settings = () => {
                             <h2 className="font-bold text-base">General Settings</h2>
                             <hr className='my-3' />
                             <p className='font-semibold text-gray-700 text-sm'>Theme</p>
-                            <div className='flex space-x-4 mt-4'>
-                                <div className='relative flex shadow-lg p-1 border rounded-md w-[40%] h-20'>
-                                    <p className='text-4xl'>☀️</p>
-                                    <p className='right-3 bottom-2 absolute font-bold text-xl'>Light</p>
-                                </div>
-                                <div className='relative flex bg-zinc-700 shadow-lg p-1 border rounded-md w-[40%] h-20'>
-                                    <p className='text-4xl'>🌙</p>
-                                    <p className='right-3 bottom-2 absolute font-bold text-white text-xl'>Dark</p>
+                            <span className='text-[12px] text-gray-500'>Click the button for theme changing.</span>
+                            <div className='flex mt-4'>
+                                <div
+                                    onClick={handleThemeToggle}
+                                    className={`relative flex shadow-lg p-1 border rounded-md w-[33%] h-20 cursor-pointer ${settings.themeLight ? 'bg-yellow-50/30' : 'bg-zinc-600'} transition-all duration-100 ease-in-out`}
+                                >
+                                    <p className='text-4xl'>{settings.themeLight ? '☀️' : '🌙'}</p>
+                                    <p className={`right-3 bottom-2 absolute font-semibold text-xl ${settings.themeLight ? 'text-zinc-900' : 'text-yellow-200'} transition-colors duration-100`}>
+                                        {settings.themeLight ? 'Light' : 'Dark'}
+                                    </p>
                                 </div>
                             </div>
+                            <hr className='my-5' />
+                            <p className='font-semibold text-gray-700 text-sm'>Language</p>
+                            <span className='text-[12px] text-gray-500'>Change the app's language.</span>
                         </div>
                     )}
                     {activeTab === 'UI' && (
