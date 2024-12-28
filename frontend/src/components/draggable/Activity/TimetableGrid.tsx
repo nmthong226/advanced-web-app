@@ -1,13 +1,12 @@
+//Import frameworks
 import { useEffect, useState } from 'react';
-import CalendarCell from './CalendarCell';
-import {
-  addMinutesToTime,
-  formatTime,
-  getCurrentWeek,
-  initialCurrentWeek,
-} from '@/lib/utils';
 
+//Import mockdata
+import { initialActivityData } from '@/mocks/MockData';
+
+//Import libs/packages
 import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
+import { addMinutesToTime, formatTime, getCurrentWeek } from '@/lib/utils';
 
 //Import icons
 import { RxCountdownTimer } from 'react-icons/rx';
@@ -21,107 +20,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../components/ui/dialog';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Label } from '../ui/label';
-
-//Import context
-import { useTaskContext } from '@/contexts/UserTaskContext';
-
-//Import types
-import { TaskSchedule } from '../../types/type';
-import { Task } from '../table/data/schema';
+} from '../../ui/dialog';
+import { Button } from '../../ui/button';
+import { Input } from '../../ui/input';
+import { Label } from '../../ui/label';
+import TimetableCell from './TimetableCell';
 
 // Define the type for the draggable item.
-const CalendarGrid = ({ date }: { date: string }) => {
+const TimeTableGrid = ({ date }: { date: string }) => {
   // Get current week
   const currentWeek = getCurrentWeek(date);
   // Calculate the current week based on the date prop
-  const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
-  const { tasks, setTasks } = useTaskContext();
-
+  const [calendarData, setCalendarData] = useState<any[]>([]);
+  console.log(calendarData);
   useEffect(() => {
-    const currentWeek = initialCurrentWeek(date);
-    const currentWeekDates = currentWeek.map((day) => day.date);
+    // Calculate the current week whenever `date` changes
+    const currentWeek = getCurrentWeek(date);
+    const currentWeekDates = currentWeek.map((day) => day.fullDate);
 
-    // Dynamically initialize the initial calendar data with all days of the week
-    const initialTaskData = currentWeek.map((day) => ({
-      date: day.date,
-      dayOfWeek: day.dayOfWeek,
-      userId: '', // Assuming a default user for simplicity
-      tasks: [], // Empty task list initially
-    }));
-
-    const filteredData = tasks.reduce((acc: TaskSchedule[], task) => {
-      if (!task.dueTime) return acc; // Ignore tasks without due time
-
-      // Format dueTime as "dd-mm-yyyy"
-      const formattedDueTime = new Date(task.dueTime).toLocaleDateString(
-        'en-GB',
-        {
-          day: '2-digit',
-          month: '2-digit',
-          year: 'numeric',
-        },
-      );
-      // Get the day of the week (e.g., 'Mon', 'Tue', 'Wed', etc.)
-      const dayOfWeek = new Date(task.dueTime).toLocaleDateString('en-GB', {
-        weekday: 'short',
-      });
-
-      // Check if the formatted dueTime matches any of the current week's dates
-      if (currentWeekDates.includes(formattedDueTime)) {
-        const existingGroup = acc.find(
-          (group) => group.date === formattedDueTime,
-        );
-
-        if (existingGroup) {
-          existingGroup.tasks.push(task); // Group the task
-        } else {
-          acc.push({
-            date: formattedDueTime,
-            dayOfWeek,
-            userId: task.userId,
-            tasks: [task],
-          });
-        }
-      }
-      return acc;
-    }, initialTaskData); // Use the dynamically initialized task data
+    // Filter the initial calendar data to include only the current week
+    const filteredData = initialActivityData.filter((data) =>
+      currentWeekDates.includes(data.date),
+    );
 
     setCalendarData(filteredData);
-  }, [date]); // Dependency array ensures this runs whenever date changes
-  console.log(calendarData);
+  }, [date]); // Dependency array ensures this runs whenever `date` changes
 
-  const handleDrop = (item: Task, time: string, date: string) => {
+  const handleDrop = (item: any, time: string, date: string) => {
     console.log(`Item dropped at ${time} on ${date}:`, item);
-
-    // Update the task in the context
-    updateTaskContext(item._id, { isOnCalendar: true }); // Function to update tasks in the context
-
-    // Add the task to the calendar list
     setCalendarData((prevData) => {
       const updatedData = prevData.map((day) => {
         if (day.date === date) {
-          // Ensure no duplicate tasks
-          const taskExists = day.tasks.some((task) => task._id === item._id);
-          if (taskExists) return day;
-
-          // Create a new task object with calendar-specific updates
           const newItem = {
             ...item,
-            id: item._id || uuidv4(),
+            id: item.id || uuidv4(), // Use provided ID or generate a new one
             startTime: time,
-            endTime: addMinutesToTime(time, 30),
-            estimatedTime: 30,
+            endTime: addMinutesToTime(time, 60), // Example end time (can be adjusted)
             date: date,
-            isOnCalendar: true,
           };
-
+          const updatedActivities = [...day.activities, newItem];
           return {
             ...day,
-            tasks: [...day.tasks, newItem],
+            activities: updatedActivities, // Update the activities within the day
           };
         }
         return day; // If the date doesn't match, return the day unchanged
@@ -130,35 +70,25 @@ const CalendarGrid = ({ date }: { date: string }) => {
     });
   };
 
-  console.log('123', tasks);
-
-  const updateTaskContext = (taskId: string, updates: Partial<Task>) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task._id === taskId ? { ...task, ...updates } : task
-      )
-    );
-  };
-
-  const handleResize = (id: string, date: string, newEstimatedTime: number) => {
+  const handleResize = (id: string, date: string, newDuration: number) => {
     // Find the activity in the data and adjust its duration
     setCalendarData((prevData) =>
       prevData.map((day) => {
         if (day.date === date) {
-          const updatedTasks = day.tasks.map((task) => {
-            if (task._id === id) {
+          const updatedActivities = day.activities.map((act: any) => {
+            if (act.id === id) {
               // Match by id
               return {
-                ...task,
-                estimatedTime: newEstimatedTime,
-                endTime: addMinutesToTime(task.startTime || '', newEstimatedTime), // Update the end time
+                ...act,
+                duration: newDuration,
+                endTime: addMinutesToTime(act.startTime, newDuration), // Update the end time
               };
             }
-            return task;
+            return act;
           });
           return {
             ...day,
-            tasks: updatedTasks, // Update the activities within the day
+            activities: updatedActivities, // Update the activities within the day
           };
         }
         return day;
@@ -173,11 +103,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
   const occupiedSlots = Array(7)
     .fill(null)
     .map(() => new Array(slotsPerDay).fill(false));
-
-  if (!calendarData) {
-    return <div>Loading...</div>; // Or any custom loading component
-  }
-
   return (
     <div className="flex flex-col bg-white w-full h-full overflow-hidden">
       <div className="flex">
@@ -293,10 +218,10 @@ const CalendarGrid = ({ date }: { date: string }) => {
             return (
               <div
                 key={index}
-                className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : ''}  flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500`}
+                className="flex flex-col justify-center items-center bg-indigo-50 rounded-md h-16 font-bold text-center text-zinc-500"
               >
                 <div
-                  className={`${isToday ? 'text-white' : ''} flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
+                  className={`flex ${isToday ? 'text-blue-700 bg-gradient-to-br from-indigo-100 via-indigo-200 to-indigo-100 rounded-xl' : ''} flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
                 >
                   <p className="text-[12px]">{date.dayOfWeek}</p>
                   <p>{date.dayOfMonth}</p>
@@ -315,7 +240,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
             return (
               <div
                 key={index}
-                className="flex justify-center items-start h-20 text-[11px]"
+                className="flex justify-center items-center h-20 text-[11px]"
               >
                 {/* Display the hour in 12-hour AM/PM format */}
                 {hour === 0 ? '12 AM' : hour} {period}
@@ -325,6 +250,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
         </div>
         <div className="grid grid-cols-7 grid-rows-[repeat(96,20px)] grid-flow-row-dense w-[95%] h-full">
           {Array.from({ length: slotsPerDay }, (_, index) => {
+            // const formattedTime = formatTime(index, interval);
             const formattedTime = formatTime(
               startHour * (60 / interval) + index,
               interval,
@@ -335,19 +261,21 @@ const CalendarGrid = ({ date }: { date: string }) => {
                   if (occupiedSlots[day][index]) {
                     return null;
                   }
-                  const task = calendarData[day]?.tasks.find(
-                    (task) => {
-                      return (task.startTime || '') === formattedTime;
-                    },
+
+                  // Find the activity that starts at the current formattedTime
+                  const activity = calendarData[day]?.activities.find(
+                    (activity: any) => activity.startTime === formattedTime,
                   );
 
-                  const shouldSpanRows = task && task.estimatedTime && task.estimatedTime > 0;
+                  const shouldSpanRows = activity && activity.duration > 0;
 
+                  // Dynamically calculate the row span based on activity duration
                   let spanRows = 1; // Default to 1 row
                   if (shouldSpanRows) {
-                    spanRows = Math.ceil((task.estimatedTime || 0) / interval);
+                    spanRows = Math.ceil(activity.duration / interval); // Calculate based on duration and interval
                   }
 
+                  // Mark subsequent rows as occupied if this cell spans rows
                   if (shouldSpanRows) {
                     for (let offset = 0; offset < spanRows; offset++) {
                       if (index + offset < slotsPerDay) {
@@ -356,6 +284,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
                     }
                   }
 
+                  // Manually calculate the grid row start and end
                   const gridRowStart = index + 1;
                   const gridRowEnd = shouldSpanRows
                     ? gridRowStart + spanRows
@@ -365,20 +294,20 @@ const CalendarGrid = ({ date }: { date: string }) => {
                   const isBorderRow = (index + 1) % 4 === 0;
 
                   return (
-                    <CalendarCell
+                    <TimetableCell
                       key={`${day}-${index}`}
                       time={formattedTime}
                       date={currentWeek[day].fullDate}
-                      task={task}
+                      activity={activity}
                       onResize={handleResize}
-                      onDrop={(item: Task) =>
+                      onDrop={(item: any) =>
                         handleDrop(
                           item,
                           formattedTime,
                           currentWeek[day].fullDate,
                         )
                       }
-                      className={`${task ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r` : 'col-span-1 row-span-1 h-5 text-[10px] border-r'} ${isBorderRow && !task ? 'border-b border-gray-300' : ''}`}
+                      className={`${activity ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r` : 'col-span-1 row-span-1 h-5 text-[10px] border-r'} ${isBorderRow ? 'border-b border-gray-300' : ''}`}
                       style={{
                         gridRow: `${gridRowStart} / ${gridRowEnd}`,
                       }}
@@ -395,4 +324,4 @@ const CalendarGrid = ({ date }: { date: string }) => {
   );
 };
 
-export default CalendarGrid;
+export default TimeTableGrid;

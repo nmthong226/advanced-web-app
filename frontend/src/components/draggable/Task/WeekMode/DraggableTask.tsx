@@ -8,10 +8,10 @@ import { GoArrowDown } from "react-icons/go";
 
 import {
     DropdownMenu,
-} from "../ui/dropdown-menu";
+} from "../../../ui/dropdown-menu";
 // import EditEventItemsDialog from '../dialogs/editEventItems';
 import { cn } from '@/lib/utils';
-import { Badge } from '../ui/badge';
+import { Badge } from '../../../ui/badge';
 
 type DraggableTaskProps = {
     _id: string;

@@ -14,17 +14,17 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '../ui/dropdown-menu';
+} from '../../ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from '../ui/dialog';
-import NotifyDeletion from '../toast/notifyDeletion';
-import { Button } from '../ui/button';
-import EditEventItemsDialog from '../dialogs/editEventItems';
+} from '../../ui/dialog';
+import NotifyDeletion from '../../toast/notifyDeletion';
+import { Button } from '../../ui/button';
+import EditEventItemsDialog from '../../dialogs/editEventItems';
 
 type DraggableActivityProps = {
   id: string;

@@ -14,7 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '../../components/ui/dialog';
+} from '../../../../components/ui/dialog';
 import {
   Select,
   SelectContent,
@@ -22,21 +22,21 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '../../components/ui/select';
+} from '../../../../components/ui/select';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu"
+} from "../../../../components/ui/dropdown-menu"
 
 //Import icons
-import { Button } from '../ui/button';
+import { Button } from '../../../ui/button';
 import { Label } from '@radix-ui/react-label';
-import { Input } from '../ui/input';
-import NotifyDeletion from '../toast/notifyDeletion';
+import { Input } from '../../../ui/input';
+import NotifyDeletion from '../../../toast/notifyDeletion';
 import { LuSave } from 'react-icons/lu';
-import { Task } from '../table/data/schema';
+import { Task } from '../../../table/data/schema';
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { FaRegCircle } from "react-icons/fa6";
 import { FaRegCircleXmark } from "react-icons/fa6";

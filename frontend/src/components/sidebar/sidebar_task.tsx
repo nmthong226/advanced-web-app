@@ -1,36 +1,40 @@
-import { useState } from 'react'
+//Import frameworks
+import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 
 //Import components
-import { Button } from '../../components/ui/button.tsx';
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from '../../components/ui/collapsible.tsx';
-import DraggableTask from '../draggable/DraggableTask.tsx';
+import DraggableTask from '../draggable/Task/WeekMode/DraggableTask.tsx';
 
 //Import icons
 import { IoSearchSharp } from 'react-icons/io5';
 import { MdFilterAlt } from 'react-icons/md';
 import { MdSort } from 'react-icons/md';
-import { RiFireFill } from 'react-icons/ri';
-import { IoCalendarOutline } from 'react-icons/io5';
-import { ChevronsUpDown } from 'lucide-react';
 import { GiEmptyChessboard } from "react-icons/gi";
 import { FaTasks } from "react-icons/fa";
 
-//Import mock data
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
-import { Link } from 'react-router-dom';
 
 const SideBarTask = () => {
-    const [isOpenTask, setIsOpenTask] = useState(false);
     const { tasks } = useTaskContext();
+    const [loading, setLoading] = useState(true);
 
     // Filter tasks where status is 'completed' or isOnCalendar is true
     const filteredTasks = tasks.filter(
         (task) => task.status !== 'completed' && task.isOnCalendar !== true
     );
+
+    // Simulate data fetching
+    useEffect(() => {
+        const fetchTasks = () => {
+            // Simulating a delay
+            setTimeout(() => {
+                setLoading(false);
+            }, 1000); // Adjust the delay as needed
+        };
+
+        fetchTasks();
+    }, []);
+
     return (
         <div className='flex flex-col space-y-2 bg-white p-2 border rounded-lg w-[16%] h-full'>
             <Link to={'/task'} className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
@@ -85,30 +89,39 @@ const SideBarTask = () => {
                     </CollapsibleContent>
                 </Collapsible> */}
                 <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
-                    {filteredTasks.length === 0 && (
-                        <div className='flex flex-col items-center space-x-2 space-y-2 px-2 p-2 w-full text-sm text-zinc-500'>
-                            <GiEmptyChessboard className='size-10'/>
-                            <p className='text-xs'>No tasks available for you yet.</p>
+                    {loading ? (
+                        <div className='flex justify-center items-center h-full'>
+                            <div className='loader'></div>
+                            <p className='ml-2 text-sm text-zinc-500'>Loading tasks...</p>
                         </div>
+                    ) : (
+                        <>
+                            {filteredTasks.length === 0 && (
+                                <div className='flex flex-col items-center space-x-2 space-y-2 px-2 p-2 w-full text-sm text-zinc-500'>
+                                    <GiEmptyChessboard className='size-10' />
+                                    <p className='text-xs'>No tasks available for you yet.</p>
+                                </div>
+                            )}
+                            {filteredTasks.map(task => (
+                                <DraggableTask
+                                    key={task._id}
+                                    _id={task._id}
+                                    title={task.title}
+                                    description={task?.description}
+                                    startTime={task.startTime || 'No Info'}
+                                    endTime={task.endTime || '15:00 PM'}
+                                    dueTime={task.dueTime}
+                                    backgroundColor={task.style.backgroundColor || ''}
+                                    textColor={task.style.textColor || ''}
+                                    activity={task.category}
+                                    status={task.status || 'pending'}
+                                    priority={task.priority}
+                                    estimatedTime={task.estimatedTime}
+                                    isOnCalendar={task.isOnCalendar}
+                                />
+                            ))}
+                        </>
                     )}
-                    {filteredTasks.map(task => (
-                        <DraggableTask
-                            key={task._id}
-                            _id={task._id}
-                            title={task.title}
-                            description={task?.description}
-                            startTime={task.startTime || 'No Info'}
-                            endTime={task.endTime || '15:00 PM'}
-                            dueTime={task.dueTime}
-                            backgroundColor={task.style.backgroundColor || ''}
-                            textColor={task.style.textColor || ''}
-                            activity={task.category}
-                            status={task.status || 'pending'}
-                            priority={task.priority}
-                            estimatedTime={task.estimatedTime}
-                            isOnCalendar={task.isOnCalendar}
-                        />
-                    ))}
                 </div>
             </div>
         </div>

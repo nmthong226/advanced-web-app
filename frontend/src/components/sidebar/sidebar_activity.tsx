@@ -12,7 +12,7 @@ import {
     CollapsibleContent,
     CollapsibleTrigger,
 } from "../ui/collapsible";
-import DraggableActivity from '../draggable/DraggableActivity';
+import DraggableActivity from '../draggable/Activity/DraggableActivity';
 import { mockUserEvents } from '@/mocks/MockData';
 import AddEventItemsDialog from '../dialogs/createEventItems';
 import AddEvent from '../dialogs/createEvent';

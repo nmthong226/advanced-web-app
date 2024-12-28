@@ -15,7 +15,7 @@ import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
 import { CalendarDaysIcon } from 'lucide-react';
-import TimeTableGrid from '../../components/draggable/TimetableGrid.tsx';
+import TimeTableGrid from '../../components/draggable/Activity/TimetableGrid.tsx';
 
 const TimeTable = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);

@@ -45,7 +45,7 @@ const SignInPage = () => {
           <img src={logo} className="mr-2 w-6 h-6" />
           <h1 className="font-semibold text-lg">Focus Flow</h1>
         </div>
-        <hr className="my-1 border w-64" />
+        <hr className="border-[1px] border-indigo-200 my-1 w-64" />
         <span className="font-normal text-[12px]">
           Planner App - Manage your time efficiently
         </span>
