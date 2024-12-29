@@ -8,6 +8,12 @@ import { DataTable } from '../../components/table/ui/data-table.tsx';
 import { TasksMutateDrawer } from '../../components/table/ui/tasks-mutate-drawer.tsx';
 import { Task } from '../../components/table/data/schema.ts';
 import { Calendar } from '../../components/ui/calendar.tsx';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu"
 
 // Import hooks
 import { useTasksContext } from 'src/components/table/context/task-context.tsx';
@@ -16,13 +22,17 @@ import axios from 'axios';
 
 //Import icons
 import { IoCalendarOutline } from 'react-icons/io5';
-import { Plus } from 'lucide-react';
+import { CalendarDays, Plus } from 'lucide-react';
 import { FaUndoAlt } from "react-icons/fa";
 
 //Import libs/packages
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { IoIosArrowDown } from 'react-icons/io';
+import { MdTaskAlt } from 'react-icons/md';
+import { GoTag } from 'react-icons/go';
+import { BsListTask } from 'react-icons/bs';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
@@ -147,11 +157,30 @@ const Tasks = () => {
 
   return (
     <div className="flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden">
-      <div className="flex flex-col items-center bg-white p-2 rounded-md w-[16%] h-full overflow-hidden">
-        <Link to={"/calendar"} className="flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white">
-          <IoCalendarOutline />
-          <p>Task Calendar</p>
-        </Link>
+      <div className="flex flex-col items-center bg-white p-2 border rounded-md w-[16%] h-full overflow-hidden">
+        <div className='flex justify-between items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 py-1.5 pl-2 border rounded-md w-full text-white'>
+          <button
+            className='flex justify-center items-center space-x-2 w-full text-center'
+            onClick={() => handleOpen('create')} >
+            <p className='text-center'>Add Task</p>
+          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger className='outline-none'>
+              <div className='flex justify-center items-center border-l w-8'>
+                <IoIosArrowDown className='size-5' />
+              </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className='mt-2 mr-[182px] w-[214px]'>
+              <DropdownMenuItem className='flex items-center'>
+                <MdTaskAlt />
+                Add Task
+              </DropdownMenuItem>
+              <DropdownMenuItem className='flex items-center'>
+                <GoTag /> Add Tag
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
         <hr className="my-2 border-t w-full" />
         <Calendar
           mode="single"
@@ -173,20 +202,23 @@ const Tasks = () => {
           ))}
         </ul>
       </div>
-      <div className="flex flex-col bg-white border rounded-md w-[84%] h-full">
+      <div className="flex flex-col bg-white p-1 border rounded-md w-[84%] h-full">
         {/* ===== Top Heading ===== */}
-        <div className="flex flex-wrap justify-between items-center gap-x-4 p-2">
-          <button className="px-2 font-semibold text-indigo-500 text-lg">
-            TaskList
-            <span className="ml-2 font-normal text-gray-500">|</span>
+        <div className="flex flex-wrap justify-between items-center p-2">
+          <button className="font-semibold text-indigo-500 text-lg">
+            Task Calendar
             <span className="ml-2 font-normal text-[12px] text-gray-500">
-              This section manages your daily activity calendar.
+              - This section manages your daily activity calendar.
             </span>
           </button>
-
-          <Button onClick={() => handleOpen('create')} className="">
-            Create <Plus size={12} />
-          </Button>
+          <Link
+            to="/calendar"
+            className="flex items-center border-[1px] border-gray-300 bg-indigo-800 hover:bg-indigo-800/80 px-2 py-1 rounded-md text-white transition duration-200"
+            title='Go to Task List'
+          >
+            <IoCalendarOutline className="mr-2" />
+            <span className="font-medium">Task Calendar</span>
+          </Link>
         </div>
         <hr className="mb-2 w-full" />
         {/* ===== Data Table ===== */}

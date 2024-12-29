@@ -65,12 +65,10 @@ const ChatAI = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button
-          className="flex items-center border-[1px] border-gray-300 hover:bg-gray-100 px-2 py-1 rounded-md transition duration-200"
-          title="Click to get AI-powered suggestions for optimizing your study plan"
-        >
-          <span className="text-base">💡</span>
-          <span className="font-medium">AI Insights</span>
+        <button className="right-3 bottom-3 absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-12 h-12">
+          <div className="flex justify-center items-center bg-white rounded-full w-11 h-11">
+            <p className="font-bold text-2xl text-center">🤖</p>
+          </div>
         </button>
       </SheetTrigger>
       <SheetContent className="flex flex-col bg-gradient-to-t from-indigo-50 to-white rounded-l-[26px] sm:max-w-[450px] md:max-w-[500px] h-full">

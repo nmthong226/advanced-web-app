@@ -1,17 +1,25 @@
 //Import frameworks
-import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 
 //Import components
 import DraggableTask from '../draggable/Task/WeekMode/DraggableTask.tsx';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "../../components/ui/dropdown-menu"
 
 //Import icons
 import { IoSearchSharp } from 'react-icons/io5';
 import { MdFilterAlt } from 'react-icons/md';
 import { MdSort } from 'react-icons/md';
 import { GiEmptyChessboard } from "react-icons/gi";
-import { FaTasks } from "react-icons/fa";
+import { MdTaskAlt } from "react-icons/md";
+import { IoIosArrowDown } from "react-icons/io";
+import { GoTag } from "react-icons/go";
 
+//Import context
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
 const SideBarTask = () => {
@@ -37,10 +45,27 @@ const SideBarTask = () => {
 
     return (
         <div className='flex flex-col space-y-2 bg-white p-2 border rounded-lg w-[16%] h-full'>
-            <Link to={'/task'} className='flex items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 px-2 p-1.5 border rounded-md w-full text-white'>
-                <FaTasks />
-                <p>Task List</p>
-            </Link>
+            <div className='flex justify-between items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 py-1.5 pl-2 border rounded-md w-full text-white'>
+                <div className='flex justify-center items-center space-x-2 w-full text-center'>
+                    <p className='text-center'>Add Task</p>
+                </div>
+                <DropdownMenu>
+                    <DropdownMenuTrigger className='outline-none'>
+                        <div className='flex justify-center items-center border-l w-8'>
+                            <IoIosArrowDown className='size-5' />
+                        </div>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className='mt-2 mr-[182px] w-[214px]'>
+                        <DropdownMenuItem className='flex items-center'>
+                            <MdTaskAlt />
+                            Add Task
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className='flex items-center'>
+                            <GoTag /> Add Tag
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </div>
             <hr className="border-[1px] my-2" />
             <div className='relative flex bg-gray-100 p-2 rounded-lg w-full'>
                 <IoSearchSharp className='top-1/2 left-2 absolute transform -translate-y-1/2' />

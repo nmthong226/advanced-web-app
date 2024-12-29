@@ -131,8 +131,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
     });
   };
 
-  console.log('123', tasks);
-
   const updateTaskContext = (taskId: string, updates: Partial<Task>) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
@@ -181,9 +179,9 @@ const CalendarGrid = ({ date }: { date: string }) => {
 
   return (
     <div className="flex flex-col bg-white w-full h-full overflow-hidden">
-      <div className="flex">
+      <div className="flex justify-end space-y-2">
         <TimeSettings />
-        <div className="gap-0.5 grid grid-cols-7 grid-rows-[auto] mr-1.5 w-[95%]">
+        <div className="gap-[1px] grid grid-cols-7 grid-rows-[auto] mr-1.5 w-[95%]">
           {/* Days of the week */}
           {currentWeek.map((date, index) => {
             const today = new Date();
@@ -191,7 +189,7 @@ const CalendarGrid = ({ date }: { date: string }) => {
             return (
               <div
                 key={index}
-                className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : ''}  flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500`}
+                className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : ''}  flex flex-col justify-center items-center bg-indigo-100 rounded-xl h-16 font-bold text-center text-zinc-500`}
               >
                 <div
                   className={`${isToday ? 'text-white' : ''} flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
