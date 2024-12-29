@@ -18,6 +18,7 @@ import { SeedModule } from './seed/seed.module';
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseProvider } from './database.provider';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { DatabaseProvider } from './database.provider';
     DailyAnalyticsModule,
     ActivityModule,
     SeedModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseProvider],
