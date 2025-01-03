@@ -7,11 +7,11 @@ type MonthCellProps = {
     index: number;
     isToday: boolean;
     formatFullDate: (date: Date) => string;
-    children: ReactNode;
+    children?: ReactNode;
     className?: string;
 };
 
-export const MonthCell: React.FC<MonthCellProps> = ({
+export const OnlyShownMonthCell: React.FC<MonthCellProps> = ({
     day,
     month,
     index,
@@ -31,7 +31,7 @@ export const MonthCell: React.FC<MonthCellProps> = ({
         <div
             key={index}
             className={cn(
-                `relative flex flex-col border border-t-0 dark:border-gray-500 
+                `relative flex flex-col border dark:border-gray-500  
                 ${index % 7 === 6 ? '' : 'border-r-0'} 
                 ${
                     day.getMonth() === month
@@ -42,7 +42,7 @@ export const MonthCell: React.FC<MonthCellProps> = ({
             )}
             onClick={() => setIsClicked(!isClicked)} // Toggle click state on click
         >
-            <div className="flex rounded-sm font-semibold text-gray-700 text-nowrap dark:text-gray-200">
+            <div className="flex rounded-sm font-semibold text-gray-700 text-nowrap dark:text-gray-300">
                 <p
                     className={`${
                         isToday ? 'bg-indigo-600 text-white' : ''

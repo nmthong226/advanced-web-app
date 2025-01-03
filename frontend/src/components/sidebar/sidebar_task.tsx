@@ -1,5 +1,5 @@
 //Import frameworks
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 //Import components
 import DraggableTask from '../draggable/Task/WeekMode/DraggableTask.tsx';
@@ -9,6 +9,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
+import { TasksMutateDrawer } from '../../components/table/ui/tasks-mutate-drawer.tsx';
 
 //Import icons
 import { IoSearchSharp } from 'react-icons/io5';
@@ -21,10 +22,15 @@ import { GoTag } from "react-icons/go";
 
 //Import context
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { useTasksContext } from '../table/context/task-context.tsx';
+
+
+const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 
 const SideBarTask = () => {
     const { tasks } = useTaskContext();
     const [loading, setLoading] = useState(true);
+    const { handleOpen } = useTasksContext();
 
     // Filter tasks where status is 'completed' or isOnCalendar is true
     const filteredTasks = tasks.filter(
@@ -44,11 +50,13 @@ const SideBarTask = () => {
     }, []);
 
     return (
-        <div className='flex flex-col space-y-2 bg-white p-2 border rounded-lg w-[16%] h-full'>
+        <div className='flex flex-col space-y-2 bg-white dark:bg-slate-700 p-2 border rounded-lg w-[16%] h-full'>
             <div className='flex justify-between items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 py-1.5 pl-2 border rounded-md w-full text-white'>
-                <div className='flex justify-center items-center space-x-2 w-full text-center'>
+                <button
+                    className='flex justify-center items-center space-x-2 w-full text-center'
+                    onClick={() => handleOpen('create')} >
                     <p className='text-center'>Add Task</p>
-                </div>
+                </button>
                 <DropdownMenu>
                     <DropdownMenuTrigger className='outline-none'>
                         <div className='flex justify-center items-center border-l w-8'>
@@ -66,12 +74,13 @@ const SideBarTask = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
+            <MemoizedTasksMutateDrawer />
             <hr className="border-[1px] my-2" />
-            <div className='relative flex bg-gray-100 p-2 rounded-lg w-full'>
+            <div className='relative flex bg-gray-100 dark:bg-slate-600 p-2 rounded-lg w-full'>
                 <IoSearchSharp className='top-1/2 left-2 absolute transform -translate-y-1/2' />
                 <input
                     type='text'
-                    className='bg-gray-100 pl-8 rounded-lg w-[70%] h-full text-sm focus:outline-none'
+                    className='bg-gray-100 dark:bg-slate-600 pl-8 rounded-lg w-[70%] h-full text-sm focus:outline-none'
                     placeholder='Search...'
                 />
                 <div className='top-1/2 right-2 absolute flex space-x-2 transform -translate-y-1/2'>
@@ -113,7 +122,7 @@ const SideBarTask = () => {
                         </div>
                     </CollapsibleContent>
                 </Collapsible> */}
-                <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
+                <div className='flex flex-col space-y-3 w-full max-h-full'>
                     {loading ? (
                         <div className='flex justify-center items-center h-full'>
                             <div className='loader'></div>

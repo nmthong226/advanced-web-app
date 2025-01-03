@@ -11,9 +11,9 @@ const TimeSettings = () => {
     return (
         <Dialog>
             <DialogTrigger asChild>
-                <div className="flex justify-end items-center space-y-2 mt-2 w-[5%] hover:cursor-pointer group">
-                    <div className='flex flex-col justify-center items-center bg-zinc-50 hover:bg-zinc-100 w-[53px] h-full'>
-                        <RxCountdownTimer className='mr-[2px]'/>
+                <div className="flex justify-end items-center space-y-2 w-[5%] hover:cursor-pointer group">
+                    <div className='flex flex-col justify-center items-center bg-zinc-50 hover:bg-zinc-100 dark:hover:bg-slate-600 dark:bg-slate-700 w-[53px] h-full'>
+                        <RxCountdownTimer className='mr-[2px]' />
                         <div className="flex mr-[2px] text-center">
                             <p className="text-[10px] text-gray-400">Time</p>
                         </div>

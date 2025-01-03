@@ -48,15 +48,15 @@ const MonthCalendar: React.FC<MonthCalendarProps> = ({ month, year }) => {
     };
 
     return (
-        <div className="flex flex-col bg-white mt-2 px-2 pb-2 w-full h-full overflow-hidden">
+        <div className="flex flex-col bg-white dark:bg-slate-700 px-2 pb-2 w-full h-full overflow-hidden">
             <div className="gap-0.5 grid grid-cols-7 w-full">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day, index) => (
                     <div
                         key={index}
-                        className={`flex flex-col justify-center items-center bg-indigo-100 rounded-md h-16 font-bold text-center text-zinc-500`}
+                        className={`flex flex-col justify-center items-center bg-indigo-100 dark:bg-indigo-800 rounded-md h-16 font-bold text-center text-zinc-500`}
                     >
                         <div
-                            className={`flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
+                            className={`flex flex-col justify-center items-center px-2 h-12 w-12 text-center dark:text-gray-300 leading-tight`}
                         >
                             <p className="text-[12px]">{day}</p>
                         </div>
@@ -82,7 +82,7 @@ const MonthCalendar: React.FC<MonthCalendarProps> = ({ month, year }) => {
                                 index={index}
                                 isToday={isToday}
                                 formatFullDate={formatFullDate}
-                                className={`h-[116px] ${isLastRow && index % 7 === 0 ? "rounded-l-sm" : ""
+                                className={`h-full ${isLastRow && index % 7 === 0 ? "rounded-l-sm" : ""
                                     } ${isLastRow && index % 7 === 6 ? "rounded-r-sm" : ""
                                     }`}
                             >
@@ -93,24 +93,24 @@ const MonthCalendar: React.FC<MonthCalendarProps> = ({ month, year }) => {
                                     time=''
                                     style={{}}
                                     rowSpan={1}
-                                    // task={{
-                                    //     _id: "1",
-                                    //     title: "test",
-                                    //     description: "abc",
-                                    //     startTime: "6:00",
-                                    //     endTime: "9:00",
-                                    //     dueTime: "8:00",
-                                    //     estimatedTime: 30,
-                                    //     status: "pending",
-                                    //     priority: "low",
-                                    //     style: {
-                                    //         backgroundColor: "bg-indigo-600",
-                                    //         textColor: "text-white",
-                                    //     },
-                                    //     category: "Web Development",
-                                    //     userId: "user-1",
-                                    //     isOnCalendar: true,
-                                    // }}
+                                // task={{
+                                //     _id: "1",
+                                //     title: "test",
+                                //     description: "abc",
+                                //     startTime: "6:00",
+                                //     endTime: "9:00",
+                                //     dueTime: "8:00",
+                                //     estimatedTime: 30,
+                                //     status: "pending",
+                                //     priority: "low",
+                                //     style: {
+                                //         backgroundColor: "bg-indigo-600",
+                                //         textColor: "text-white",
+                                //     },
+                                //     category: "Web Development",
+                                //     userId: "user-1",
+                                //     isOnCalendar: true,
+                                // }}
                                 />
                                 {/* <div className='flex justify-between pr-1 rounded-r-sm w-[96%] text-[12px]'>
                                     <p className='border-indigo-600 pl-0.5 border-l-[3px] w-[80%] truncate'>this is my task for thursday</p>

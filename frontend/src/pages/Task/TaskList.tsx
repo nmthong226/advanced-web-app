@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react';
 
 // Import components
-import { Button } from '../../components/ui/button.tsx';
 import { ConfirmDialog } from '../../components/ui/confirm-dialog.tsx';
 import { columns } from '../../components/table/ui/columns.tsx';
 import { DataTable } from '../../components/table/ui/data-table.tsx';
@@ -14,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
+import ChatAI from '../../components/AI/chatHistory.tsx';
 
 // Import hooks
 import { useTasksContext } from 'src/components/table/context/task-context.tsx';
@@ -22,17 +22,15 @@ import axios from 'axios';
 
 //Import icons
 import { IoCalendarOutline } from 'react-icons/io5';
-import { CalendarDays, Plus } from 'lucide-react';
 import { FaUndoAlt } from "react-icons/fa";
+import { IoIosArrowDown } from 'react-icons/io';
+import { MdTaskAlt } from 'react-icons/md';
+import { GoTag } from 'react-icons/go';
 
 //Import libs/packages
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
-import { IoIosArrowDown } from 'react-icons/io';
-import { MdTaskAlt } from 'react-icons/md';
-import { GoTag } from 'react-icons/go';
-import { BsListTask } from 'react-icons/bs';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
@@ -156,8 +154,8 @@ const Tasks = () => {
 
 
   return (
-    <div className="flex space-x-2 bg-indigo-50 p-2 w-full h-full overflow-x-hidden">
-      <div className="flex flex-col items-center bg-white p-2 border rounded-md w-[16%] h-full overflow-hidden">
+    <div className="flex space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full overflow-x-hidden">
+      <div className="flex flex-col items-center bg-white dark:bg-slate-700 p-2 border rounded-md w-[16%] h-full overflow-hidden">
         <div className='flex justify-between items-center space-x-2 bg-gradient-to-t from-indigo-500 to-blue-400 py-1.5 pl-2 border rounded-md w-full text-white'>
           <button
             className='flex justify-center items-center space-x-2 w-full text-center'
@@ -181,7 +179,7 @@ const Tasks = () => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <hr className="my-2 border-t w-full" />
+        <hr className="mt-2 border-t w-full" />
         <Calendar
           mode="single"
           selected={date}
@@ -189,38 +187,38 @@ const Tasks = () => {
           className="p-1 border rounded-md scale-95"
         />
         <hr className="my-2 border-t w-full" />
-        <p className="text-gray-600 text-xs">Your current tasks category</p>
+        <p className="text-gray-600 text-xs dark:text-gray-200">Your current tasks category</p>
         <ul className="mt-4 w-full list-disc">
           {currentCategories.map(([category, count]) => (
             <li
               key={category}
               className="flex justify-between items-center py-2"
             >
-              <span className="text-gray-700 text-sm">{category}</span>
-              <span className="text-gray-500 text-xs">{count} tasks</span>
+              <span className="text-[12px] text-gray-700 dark:text-gray-200">{category}</span>
+              <span className="text-[12px] text-gray-500 dark:text-gray-300">{count} tasks</span>
             </li>
           ))}
         </ul>
       </div>
-      <div className="flex flex-col bg-white p-1 border rounded-md w-[84%] h-full">
+      <div className="relative flex flex-col bg-white dark:bg-slate-700 p-1 border rounded-md w-[84%] h-full">
         {/* ===== Top Heading ===== */}
         <div className="flex flex-wrap justify-between items-center p-2">
-          <button className="font-semibold text-indigo-500 text-lg">
-            Task Calendar
-            <span className="ml-2 font-normal text-[12px] text-gray-500">
+          <button className="font-semibold text-indigo-400 text-lg">
+            Task List
+            <span className="ml-2 font-normal text-[12px] text-gray-500 dark:text-gray-200">
               - This section manages your daily activity calendar.
             </span>
           </button>
           <Link
             to="/calendar"
-            className="flex items-center border-[1px] border-gray-300 bg-indigo-800 hover:bg-indigo-800/80 px-2 py-1 rounded-md text-white transition duration-200"
+            className="flex items-center border-[1px] border-gray-300 hover:bg-indigo-100/80 px-2 py-1 dark:border-black rounded-md text-gray-800 dark:text-gray-200 transition duration-200"
             title='Go to Task List'
           >
             <IoCalendarOutline className="mr-2" />
             <span className="font-medium">Task Calendar</span>
           </Link>
         </div>
-        <hr className="mb-2 w-full" />
+        <hr className="w-full" />
         {/* ===== Data Table ===== */}
         <DataTable data={tasks} columns={columns} />
 
@@ -245,6 +243,7 @@ const Tasks = () => {
             />
           </>
         )}
+      <ChatAI />
       </div>
     </div>
   );

@@ -129,7 +129,7 @@ const CalendarCell: React.FC<CalendarCellProps> = ({
     <div
       ref={drop}
       className={cn(
-        `relative flex h-full w-full bg-gray-50 ${isOver ? 'bg-indigo-100' : ''}`,
+        `relative flex h-full w-full bg-gray-50 dark:bg-slate-800  ${isOver ? 'bg-indigo-100 dark:bg-slate-500' : ''}`,
         className,
       )}
     >

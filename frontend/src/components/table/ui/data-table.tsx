@@ -64,12 +64,12 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="flex flex-col justify-between p-2 h-full">
+    <div className="relative flex flex-col justify-between p-2 h-full">
       <div className='space-y-2'>
         <DataTableToolbar table={table} />
-        <div className="border rounded-md min-h-[calc(100vh-200px)]">
+        <div className="dark:border-gray-600 border rounded-md min-h-[calc(100vh-200px)]">
           <Table>
-            <TableHeader>
+            <TableHeader className='dark:bg-slate-600'>
               {table.getHeaderGroups().map((headerGroup) => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map((header) => {
@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
                     data-state={row.getIsSelected() && 'selected'}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className='border-b'>
+                      <TableCell key={cell.id} className='dark:border-gray-600 border-b'>
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext(),

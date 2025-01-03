@@ -48,7 +48,7 @@ export function DataTableToolbar<TData>({
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="w-[150px] lg:w-[250px] h-8"
+          className="dark:bg-slate-600 w-[150px] lg:w-[250px] h-8"
         />
         {/* Faceted Filters */}
         <div className="flex gap-x-2">

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 
 //Import icons
@@ -30,7 +30,7 @@ type DraggableTaskProps = {
 };
 
 const DraggableTask: React.FC<DraggableTaskProps> =
-    ({  
+    ({
         _id,
         title,
         status,
@@ -45,7 +45,7 @@ const DraggableTask: React.FC<DraggableTaskProps> =
         dueTime,
         isOnCalendar
     }) => {
-        const [{ isDragging }, drag] = useDrag(() => ({
+        const [{ isDragging }, drag, preview] = useDrag(() => ({
             type: 'ITEM',
             item: {
                 _id,
@@ -81,13 +81,22 @@ const DraggableTask: React.FC<DraggableTaskProps> =
             return `${hours}:${minutes.toString().padStart(2, '0')}, ${month} ${day}`;
         }
 
+        // Suppress the default drag preview
+        useEffect(() => {
+            preview(new Image()); // Use a transparent or empty image
+        }, [preview]);
+
         return (
             <DropdownMenu>
-                <div className={cn('relative flex flex-col px-2 py-1.5 space-y-1 border rounded-md text-sm hover:cursor-grab shadow-md')} ref={drag} style={{ opacity: isDragging ? 0.5 : 1 }}>
+                <div
+                    className={cn('relative flex flex-col px-2 py-1.5 space-y-1 dark:bg-slate-600 border rounded-md text-sm hover:cursor-grab shadow-md',)}
+                    ref={drag}
+                    style={{ opacity: isDragging ? 0.5 : 1 }}
+                >
                     {/* Task Header */}
                     <div className='flex text-[11px] truncate'>
-                        <p className={cn(`flex items-center font-semibold truncate`, textColor)}>
-                            <Badge className={`text-white ${backgroundColor}`}>{activity}</Badge>
+                        <p className={cn(`flex items-center font-semibold truncate`)}>
+                            <Badge className={`text-white dark:text-black`}>{activity}</Badge>
                         </p>
                         <p className='mx-1'>|</p>
                         {priority === 'high' && <p className='flex items-center truncate'><GoArrowUp className='mr-1' /> High</p>}

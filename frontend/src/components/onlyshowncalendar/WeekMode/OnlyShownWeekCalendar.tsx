@@ -1,33 +1,29 @@
 import { useEffect, useState } from 'react';
-import CalendarCell from './CalendarCell';
 import {
-  addMinutesToTime,
   formatTime,
   getCurrentWeek,
   initialCurrentWeek,
 } from '@/lib/utils';
 
-import { v4 as uuidv4 } from 'uuid'; // Import uuid for generating unique IDs
-
 //Import icons
 
 //Import components
-import TimeSettings from '../../../../components/settings/TimeSettings';
+import TimeSettings from '../../settings/TimeSettings';
 
 //Import context
 import { useTaskContext } from '@/contexts/UserTaskContext';
 
 //Import types
-import { TaskSchedule } from '../../../../types/type';
-import { Task } from '../../../table/data/schema';
+import { TaskSchedule } from '../../../types/type';
+import OnlyShownCalendarCell from './OnlyShownWeekCell';
 
 // Define the type for the draggable item.
 const CalendarGrid = ({ date }: { date: string }) => {
   // Get current week
-  const currentWeek = getCurrentWeek(date);
+  const currentWeek = getCurrentWeek(date);  
   // Calculate the current week based on the date prop
   const [calendarData, setCalendarData] = useState<TaskSchedule[]>([]);
-  const { tasks, setTasks } = useTaskContext();
+  const { tasks } = useTaskContext();
 
   useEffect(() => {
     const currentWeek = initialCurrentWeek(date);
@@ -82,76 +78,6 @@ const CalendarGrid = ({ date }: { date: string }) => {
   }, [date]); // Dependency array ensures this runs whenever date changes
   console.log(calendarData);
 
-  const handleDrop = (item: Task, time: string, date: string) => {
-    console.log(`Item dropped at ${time} on ${date}:`, item);
-
-    // Update the task in the context
-    updateTaskContext(item._id, { isOnCalendar: true }); // Function to update tasks in the context
-
-    // Add the task to the calendar list
-    setCalendarData((prevData) => {
-      const updatedData = prevData.map((day) => {
-        if (day.date === date) {
-          // Ensure no duplicate tasks
-          const taskExists = day.tasks.some((task) => task._id === item._id);
-          if (taskExists) return day;
-
-          // Create a new task object with calendar-specific updates
-          const newItem = {
-            ...item,
-            id: item._id || uuidv4(),
-            startTime: time,
-            endTime: addMinutesToTime(time, 30),
-            estimatedTime: 30,
-            date: date,
-            isOnCalendar: true,
-          };
-
-          return {
-            ...day,
-            tasks: [...day.tasks, newItem],
-          };
-        }
-        return day; // If the date doesn't match, return the day unchanged
-      });
-      return updatedData;
-    });
-  };
-
-  const updateTaskContext = (taskId: string, updates: Partial<Task>) => {
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task._id === taskId ? { ...task, ...updates } : task
-      )
-    );
-  };
-
-  const handleResize = (id: string, date: string, newEstimatedTime: number) => {
-    // Find the activity in the data and adjust its duration
-    setCalendarData((prevData) =>
-      prevData.map((day) => {
-        if (day.date === date) {
-          const updatedTasks = day.tasks.map((task) => {
-            if (task._id === id) {
-              // Match by id
-              return {
-                ...task,
-                estimatedTime: newEstimatedTime,
-                endTime: addMinutesToTime(task.startTime || '', newEstimatedTime), // Update the end time
-              };
-            }
-            return task;
-          });
-          return {
-            ...day,
-            tasks: updatedTasks, // Update the activities within the day
-          };
-        }
-        return day;
-      }),
-    );
-  };
-
   const interval = 15; // 15-minute intervals
   const startHour = 6; // Start from 6 AM
   const endHour = 24; // End at 12 PM
@@ -176,10 +102,10 @@ const CalendarGrid = ({ date }: { date: string }) => {
             return (
               <div
                 key={index}
-                className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : 'dark:text-gray-300'}  flex flex-col justify-center items-center bg-indigo-100 dark:bg-indigo-800 rounded-xl rounded-b-none h-16 font-bold text-center text-zinc-500`}
+                className={`${isToday ? ' text-blue-700 bg-gradient-to-br from-indigo-500 via-indigo-400 to-indigo-100 rounded-xl' : ''}  flex flex-col justify-center items-center dark:bg-indigo-800 bg-indigo-100 rounded-xl rounded-b-none h-16 font-bold text-center text-zinc-500`}
               >
                 <div
-                  className={`${isToday ? 'text-white' : ''} flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
+                  className={`${isToday ? 'text-white dark:text-black' : 'dark:text-gray-300'} flex flex-col justify-center items-center px-2 h-12 w-12 text-center leading-tight`}
                 >
                   <p className="text-[12px]">{date.dayOfWeek}</p>
                   <p>{date.dayOfMonth}</p>
@@ -248,20 +174,12 @@ const CalendarGrid = ({ date }: { date: string }) => {
                   const isBorderRow = (index + 1) % 4 === 0;
 
                   return (
-                    <CalendarCell
+                    <OnlyShownCalendarCell
                       key={`${day}-${index}`}
                       time={formattedTime}
                       date={currentWeek[day].fullDate}
                       task={task}
-                      onResize={handleResize}
-                      onDrop={(item: Task) =>
-                        handleDrop(
-                          item,
-                          formattedTime,
-                          currentWeek[day].fullDate,
-                        )
-                      }
-                      className={`${task ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r dark:border-r-gray-500` : 'col-span-1 row-span-1 h-5 text-[10px] border-r dark:border-r-gray-500'} ${isBorderRow && !task ? 'border-b border-gray-200 dark:border-gray-500' : ''}`}
+                      className={`${task ? `row-span-${spanRows} col-span-1 w-full h-full shadow-md border-r dark:border-r-gray-500` : 'col-span-1 row-span-1 h-5 text-[10px] border-r dark:border-r-gray-500'} ${isBorderRow && !task ? 'border-b border-gray-300 dark:border-r-gray-500' : ''}`}
                       style={{
                         gridRow: `${gridRowStart} / ${gridRowEnd}`,
                       }}

@@ -25,7 +25,17 @@ const Settings = () => {
 
     // Handle theme toggle specifically for themeLight
     const handleThemeToggle = () => {
-        setSettings((prev) => ({ ...prev, themeLight: !prev.themeLight }));
+        setSettings((prev) => {
+            const newThemeLight = !prev.themeLight;
+            // Add/remove the 'dark' class on the root element
+            const root = document.documentElement;
+            if (newThemeLight) {
+                root.classList.remove('dark');
+            } else {
+                root.classList.add('dark');
+            }
+            return { ...prev, themeLight: newThemeLight };
+        });
     };
 
     return (
@@ -35,42 +45,42 @@ const Settings = () => {
                     <HiOutlineCog6Tooth className="w-6 h-6" />
                 </div>
             </DialogTrigger>
-            <DialogContent className="flex gap-0 bg-[#F7F7F7] p-0 sm:rounded-xl max-w-[880px] h-[700px]" bgOverlay='bg-black/40' >
+            <DialogContent className="flex gap-0 bg-[#F7F7F7] dark:bg-slate-700 p-0 sm:rounded-xl max-w-[880px] h-[700px]" bgOverlay='bg-black/40 dark:bg-black/80' >
                 {/* Sidebar */}
-                <div className="flex flex-col bg-white rounded-r-none rounded-xl w-[25%]">
+                <div className="flex flex-col bg-white dark:bg-slate-800 rounded-r-none rounded-xl w-[25%]">
                     <div className='flex flex-col p-6 pb-0'>
-                        <p className="font-semibold text-2xl">Settings</p>
-                        <p className="text-sm">Manage your application.</p>
+                        <p className="font-semibold text-2xl dark:text-white">Settings</p>
+                        <p className="text-sm dark:text-white">Manage your application.</p>
                     </div>
                     <div className="flex flex-col space-y-1 p-3">
                         <button
                             onClick={() => setActiveTab('General')}
-                            className={`flex items-center text-left space-x-2 px-2 h-8 rounded-md outline-none ${activeTab === 'General' ? 'bg-[#E6E6E6]' : 'hover:bg-gray-100'}`}
+                            className={`flex items-center text-left space-x-2 px-2 h-8 rounded-md outline-none ${activeTab === 'General' ? 'dark:text-white dark:bg-indigo-800 bg-gray-100' : 'hover:bg-gray-100 dark:text-white text-black'} dark:hover:bg-slate-600`}
                         >
-                            <GrLanguage className='size-3' />
-                            <p className='font-medium text-[12px]'>General</p>
+                            <GrLanguage className="size-3" />
+                            <p className={`font-medium text-[12px] text-left`}>General</p>
                         </button>
                         <button
                             onClick={() => setActiveTab('UI')}
-                            className={`flex items-center text-left space-x-2 px-2 h-8 rounded-md ${activeTab === 'UI' ? 'bg-[#E6E6E6]' : 'hover:bg-gray-100'}`}
+                            className={`flex items-center text-left space-x-2 px-2 h-8 rounded-md ${activeTab === 'UI' ? 'dark:text-white dark:bg-indigo-800 bg-gray-100' : 'hover:bg-gray-100 dark:text-white text-black dark:hover:bg-slate-600'} `}
                         >
                             <MdViewQuilt className='size-3' />
-                            <p className='font-medium text-[12px]'>Personal Config</p>
+                            <p className={`font-medium text-[12px] text-left`}>Personal Config</p>
                         </button>
                     </div>
                 </div>
                 {/* Content Area */}
-                <div className="flex flex-col bg-white shadow-lg p-6 rounded-xl w-[75%]">
+                <div className="flex flex-col shadow-lg p-6 rounded-xl w-[75%]">
                     {activeTab === 'General' && (
                         <div className='flex flex-col p-1'>
                             <h2 className="font-bold text-base">General Settings</h2>
                             <hr className='my-3' />
-                            <p className='font-semibold text-gray-700 text-sm'>Theme</p>
+                            <p className='font-semibold text-gray-700 text-sm dark:text-white'>Theme</p>
                             <span className='text-[12px] text-gray-500'>Click the button for theme changing.</span>
                             <div className='flex mt-4'>
                                 <div
                                     onClick={handleThemeToggle}
-                                    className={`relative flex shadow-lg p-1 border rounded-md w-[33%] h-20 cursor-pointer ${settings.themeLight ? 'bg-yellow-50/30' : 'bg-zinc-600'} transition-all duration-100 ease-in-out`}
+                                    className={`relative flex shadow-lg p-1 border rounded-md w-[33%] h-20 cursor-pointer ${settings.themeLight ? 'bg-yellow-50/30' : 'bg-indigo-900'} transition-all duration-100 ease-in-out`}
                                 >
                                     <p className='text-4xl'>{settings.themeLight ? '☀️' : '🌙'}</p>
                                     <p className={`right-3 bottom-2 absolute font-semibold text-xl ${settings.themeLight ? 'text-zinc-900' : 'text-yellow-200'} transition-colors duration-100`}>
@@ -79,7 +89,7 @@ const Settings = () => {
                                 </div>
                             </div>
                             <hr className='my-5' />
-                            <p className='font-semibold text-gray-700 text-sm'>Language</p>
+                            <p className='font-semibold text-gray-700 text-sm dark:text-white'>Language</p>
                             <span className='text-[12px] text-gray-500'>Change the app's language.</span>
                         </div>
                     )}
