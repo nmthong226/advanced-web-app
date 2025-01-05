@@ -40,6 +40,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
 
   useEffect(() => {
     if (userId) {
+      console.log(userId);
       fetchTasks();
     }
   }, [userId]);

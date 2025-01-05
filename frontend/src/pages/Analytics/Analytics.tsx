@@ -29,14 +29,43 @@ import AIFeedback from "../../components/AI/analytics";
 
 //Import libs/packages
 import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CalendarDaysIcon } from "lucide-react";
 import TimeVsTaskCompletionChart from "../../components/charts/DoubleBarChart";
 import { FaExclamationCircle } from "react-icons/fa";
+import { useAuth } from "@clerk/clerk-react";
+import { getAISummary } from "@/components/api/analytics";
 
 const Analytics = () => {
     const [isCalendarVisible, setIsCalendarVisible] = useState(false);
     const [startDate, setStartDate] = useState("2024-12-01"); // Default date
+    const {userId} = useAuth();
+    const [aiSummaryInsights, setAiSummaryInsights] = useState(() => {
+        const cachedSummary = localStorage.getItem("aiSummaryInsights");
+        return cachedSummary ? JSON.parse(cachedSummary) : null;
+    });
+
+    useEffect(() => {
+        const getAiSummaryInsights = async () => {
+            if (userId) {
+                try {
+                    const response = await getAISummary(userId);
+                    if (response?.data) {
+                        setAiSummaryInsights(response.data);
+                        localStorage.setItem("aiSummaryInsights", JSON.stringify(response.data));
+                    } else {
+                        alert("Something went wrong while fetching AI summary insights.");
+                    }
+                } catch (error) {
+                    console.error("Error fetching AI summary insights:", error);
+                }
+            }
+        };
+
+        if (!aiSummaryInsights) {
+            getAiSummaryInsights();
+        }
+    }, [userId, aiSummaryInsights]);
 
     const toggleCalendar = () => {
         setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
@@ -223,7 +252,7 @@ const Analytics = () => {
                 </div>
                 <div className="flex bg-white rounded-md w-full h-[60%]">
                     {/* - showing the top categories */}
-                    <AIFeedback />
+                    <AIFeedback summary={aiSummaryInsights} />
                 </div>
             </div>
         </div>

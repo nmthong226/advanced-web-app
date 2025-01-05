@@ -2,15 +2,21 @@
 import { FaThumbsUp, FaExclamationCircle, FaLightbulb } from "react-icons/fa";
 import { MdOutlineAutorenew } from "react-icons/md";
 import { CiExport } from "react-icons/ci";
+import { useEffect, useState } from "react";
 
-const AIFeedback = () => {
-    // Mock data for AI feedback
-    const feedbackData = {
-        strengths: ["Study (Consistent Focus)", "Work (Efficient Task Completion)"],
-        improvementAreas: ["Exercise (Low Activity)", "Leisure (Overtime)"],
-        motivationalMessage:
-            "Great job on your focus this week! Keep balancing work and relaxation for sustainable progress.",
-    };
+const AIFeedback = (summary: any) => {
+    // const feedbackData = {
+    //     strengths: ["Study (Consistent Focus)", "Work (Efficient Task Completion)"],
+    //     improvements: ["Exercise (Low Activity)", "Leisure (Overtime)"],
+    //     motivation:
+    //     "Great job on your focus this week! Keep balancing work and relaxation for sustainable progress.",
+    // };
+    const [aiFeedback, setAiFeedback] = useState(null);
+    useEffect(() => {
+        if (summary) {
+            setAiFeedback(summary);
+        }
+    }, [summary])
 
     return (
         <div className="flex flex-col gap-2 bg-white shadow-md p-2 h-full">
@@ -23,11 +29,7 @@ const AIFeedback = () => {
                         Strengths
                     </h4>
                     <ul className="pl-5 list-disc">
-                        {feedbackData.strengths.map((item, index) => (
-                            <li key={index} className="text-[12px]">
-                                {item}
-                            </li>
-                        ))}
+                        {aiFeedback?.summary?.strengths}
                     </ul>
                 </div>
                 <hr className="border-gray-300 border-t" />
@@ -36,20 +38,14 @@ const AIFeedback = () => {
                         <FaExclamationCircle className="text-orange-500" /> 
                         Areas for Improvement
                     </h4>
-                    <ul className="pl-5 list-disc">
-                        {feedbackData.improvementAreas.map((item, index) => (
-                            <li key={index} className="text-[12px]">
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
+                    {aiFeedback?.summary?.improvements}
                 </div>
                 <hr className="border-gray-300 border-t" />
                 <div className="flex flex-col gap-2">
                     <h4 className="flex items-center gap-2 font-semibold text-sm text-zinc-900">
                         <FaLightbulb className="text-blue-500" /> Motivational Message
                     </h4>
-                    <p className="text-[12px] italic">{feedbackData.motivationalMessage}</p>
+                    <p className="text-[12px] italic">{aiFeedback?.summary?.motivation}</p>
                 </div>
             </div>
             <div className="flex justify-between space-x-2 h-[8%]">
