@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
@@ -13,11 +13,12 @@ import { TaskStatisticsModule } from './task-statistics/task-statistics.module';
 import { DailyAnalyticsModule } from './daily-analytics/daily-analytics.module';
 import { ActivityModule } from './activity/activity.module';
 import { SeedModule } from './seed/seed.module';
-
+import { AuthMiddleware } from './auth/auth.middleware';
 // Database & Config
 import { ConfigModule } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { DatabaseProvider } from './database.provider';
+import { WebhooksModule } from './webhooks/webhooks.module';
 
 @Module({
   imports: [
@@ -41,8 +42,20 @@ import { DatabaseProvider } from './database.provider';
     DailyAnalyticsModule,
     ActivityModule,
     SeedModule,
+    WebhooksModule,
   ],
   controllers: [AppController],
   providers: [AppService, DatabaseProvider],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(AuthMiddleware)
+      .exclude(
+        { path: 'auth/login', method: RequestMethod.POST },
+        { path: 'auth/register', method: RequestMethod.POST },
+        // Add any other public routes you want to exclude
+      )
+      .forRoutes('ai-feedbacks]'); // Apply to all routes except excluded
+  }
+}

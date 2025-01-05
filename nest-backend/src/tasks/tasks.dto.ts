@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
   IsString,
   IsDateString,
@@ -19,6 +20,18 @@ export enum TaskPriority {
   MEDIUM = 'medium',
   HIGH = 'high',
 }
+export class UpdateTaskStatusDto {
+  @ApiProperty({
+    description: 'New status of the task',
+    enum: TaskStatus,
+    example: TaskStatus.IN_PROGRESS,
+  })
+  @IsEnum(TaskStatus, {
+    message: 'Status must be one of: pending, in-progress, completed, expired',
+  })
+  status: TaskStatus;
+}
+
 
 export class CreateTaskDto {
   @IsString()
