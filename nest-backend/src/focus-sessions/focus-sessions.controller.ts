@@ -1,6 +1,5 @@
 import { Controller, Get, Post, Put, Body, Param } from '@nestjs/common';
 import { SessionSettingsService } from './session-settings.service';
-import { PomodoroDetailsService } from './pomodoro-details.service';
 import { CurrentPomodoroService } from './current-pomodoro.service';
 import { TasksService } from '../tasks/tasks.service';
 import { PomodoroLogService } from './pomodoro-log.service';
@@ -9,7 +8,6 @@ import { PomodoroLogService } from './pomodoro-log.service';
 export class FocusSessionsController {
   constructor(
     private readonly sessionSettingsService: SessionSettingsService,
-    private readonly pomodoroDetailsService: PomodoroDetailsService,
     private readonly currentPomodoroService: CurrentPomodoroService,
     private readonly pomodoroLogService: PomodoroLogService,
     private readonly taskService: TasksService,

@@ -94,8 +94,10 @@ export const PomodoroDetailsSchema = new mongoose.Schema({
   },
 });
 
-const PomodoroLog = mongoose.model('PomodoroLog', PomodoroLogSchema);
-const SessionSettings = mongoose.model(
+const PomodoroLog = mongoose.model(
+  'PomodoroLog',
+  PomodoroLogSchema,
+);const SessionSettings = mongoose.model(
   'SessionSettings',
   SessionSettingsSchema,
 );
