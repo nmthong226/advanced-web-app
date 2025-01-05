@@ -133,7 +133,6 @@ ${JSON.stringify(tasks, null, 2)}
 
       const result = await this.model.generateContent(prompt);
       const textResponse = result.response.text();
-      console.log(textResponse);
       return textResponse;
     } catch (error) {
       console.error('Error in getSummaryInsights:', error); // Log the error
