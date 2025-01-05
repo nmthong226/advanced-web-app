@@ -8,29 +8,31 @@ import {
   Delete,
   Param,
   Body,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
-import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
-import { UpdateTaskStatusDto } from './tasks.dto'; // Import the new DTO
+import { CreateTaskDto, UpdateTaskDto, UpdateTaskStatusDto } from './tasks.dto';
 import { Task } from './tasks.schema';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard'; // Ensure AuthGuard is implemented
+import { Request } from 'express';
 
 @ApiTags('tasks') // Groups routes under 'tasks' in Swagger UI
 @Controller('tasks')
+
 export class TasksController {
   constructor(private readonly tasksService: TasksService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Retrieve all tasks' })
-  @ApiResponse({ status: 200, description: 'List of tasks retrieved successfully.', type: [Task] })
-  async getAllTasks(): Promise<Task[]> {
-    return await this.tasksService.findAll();
-  }
-
-  @Get('user/:userId')
-  @ApiOperation({ summary: 'Retrieve tasks for a specific user' })
-  @ApiResponse({ status: 200, description: 'List of user tasks retrieved successfully.', type: [Task] })
-  async getTasksByUserId(@Param('userId') userId: string): Promise<Task[]> {
+  @ApiOperation({ summary: 'Retrieve tasks for the authenticated user' })
+  @ApiResponse({
+    status: 200,
+    description: 'List of tasks retrieved successfully.',
+    type: [Task],
+  })
+  async getTasksForAuthenticatedUser(@Req() req: Request): Promise<Task[]> {
+    const userId = req['user']?.userId; // Retrieve userId from the request
     return await this.tasksService.findByUserId(userId);
   }
 
@@ -42,10 +44,11 @@ export class TasksController {
   }
 
   @Post()
-  @ApiOperation({ summary: 'Create a new task' })
+  @ApiOperation({ summary: 'Create a new task for the authenticated user' })
   @ApiResponse({ status: 201, description: 'Task created successfully.', type: Task })
-  async createTask(@Body() createTaskDto: CreateTaskDto): Promise<Task> {
-    return await this.tasksService.createTask(createTaskDto);
+  async createTask(@Req() req: Request, @Body() createTaskDto: CreateTaskDto): Promise<Task> {
+    const userId = req['user']?.userId; // Retrieve userId from the request
+    return await this.tasksService.createTask({ ...createTaskDto, userId });
   }
 
   @Patch(':id')
@@ -59,7 +62,6 @@ export class TasksController {
   @ApiOperation({ summary: 'Update the status of a task' })
   @ApiBody({ type: UpdateTaskStatusDto })
   @ApiResponse({ status: 200, description: 'Task status updated successfully.', type: Task })
-  @ApiResponse({ status: 404, description: 'Task not found.' })
   async updateTaskStatus(
     @Param('id') id: string,
     @Body() updateTaskStatusDto: UpdateTaskStatusDto,

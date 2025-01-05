@@ -3,21 +3,14 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
-import { UpdateTaskStatusDto } from './tasks.dto'; // Import the new DTO
+import { CreateTaskDto, UpdateTaskDto, UpdateTaskStatusDto } from './tasks.dto';
 import { Task, TaskDocument } from './tasks.schema';
-
 
 @Injectable()
 export class TasksService {
   constructor(
     @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
   ) {}
-
-  // Get all tasks
-  async findAll(): Promise<Task[]> {
-    return await this.taskModel.find().exec();
-  }
 
   // Get tasks by User ID
   async findByUserId(userId: string): Promise<Task[]> {
@@ -38,7 +31,7 @@ export class TasksService {
   }
 
   // Create a new task
-  async createTask(createTaskDto: CreateTaskDto): Promise<Task> {
+  async createTask(createTaskDto: CreateTaskDto & { userId: string }): Promise<Task> {
     const newTask = new this.taskModel({
       ...createTaskDto,
     });
@@ -64,7 +57,7 @@ export class TasksService {
       .findByIdAndUpdate(
         id,
         { status },
-        { new: true, runValidators: true }, // runValidators ensures enum validation at the DB level
+        { new: true, runValidators: true },
       )
       .exec();
 
@@ -82,9 +75,6 @@ export class TasksService {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
   }
-
-
-
   async incrementPomodoroNumber(id: string): Promise<Task> {
     const task = await this.taskModel.findById(id).exec();
 

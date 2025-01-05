@@ -6,7 +6,7 @@ import React, {
   useEffect,
 } from 'react';
 import axios from 'axios';
-import { useAuth } from '@clerk/clerk-react';
+import { useAuth, useClerk } from '@clerk/clerk-react';
 import { Task } from '../types/task';
 
 interface TaskContextValue {
@@ -21,18 +21,26 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const [tasks, setTasks] = useState<Task[]>([]);
-  const { userId } = useAuth();
+  const { userId, getToken } = useAuth();
 
   const fetchTasks = async () => {
-    if (!userId) {
-      console.warn('User ID is not available.');
-      return;
-    }
     try {
+      const token = await getToken(); // Get the authentication token
+      if (!token) {
+        console.warn('Token is not available.');
+        return;
+      }
+
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND}/tasks/user/${userId}`,
+        `${import.meta.env.VITE_BACKEND}/tasks`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Include the Bearer token in the Authorization header
+          },
+        },
       );
-      setTasks(response.data);
+
+      setTasks(response.data); // Update the state with the retrieved tasks
     } catch (error) {
       console.error('Error fetching tasks:', error);
     }
