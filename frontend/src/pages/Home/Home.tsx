@@ -1,9 +1,11 @@
 //Import frameworks
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 //Import libs/packages
-import { DayPilot, DayPilotNavigator } from "@daypilot/daypilot-lite-react";
 import dayjs from 'dayjs';
+import moment from "moment";
+import { Calendar, momentLocalizer, Views, EventPropGetter } from "react-big-calendar";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 
 //Import components
 import Chart from "../../components/charts/BarChart";
@@ -15,28 +17,46 @@ import {
   SelectValue,
 } from "../../components/ui/select"
 import ProgressBar from "../../components/ProgressBar/ProgressBar";
-import OnlyShownWeekTask from "../../components/onlyshowncalendar/WeekMode/OnlyShownWeekCalendar";
-import OnlyShownMonthCalendar from "../../components/onlyshowncalendar/MonthMode/OnlyShownMonthCalendar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
 import ChatAI from "../../components/AI/chatHistory";
 
 //Import icons
-import { CalendarDaysIcon } from "lucide-react";
 import { BsListTask } from "react-icons/bs";
 import { GiTomato } from "react-icons/gi";
-import { FaAngleLeft, FaAngleRight, FaCheck } from "react-icons/fa6";
+import { FaCheck } from "react-icons/fa6";
 import { RiRestTimeLine } from "react-icons/ri";
-import { IoMdSettings } from "react-icons/io";
 
 //Import contexts
 import { useSettings } from "../../contexts/SettingsContext";
 import { useUser } from "@clerk/clerk-react";
-import { MdOutlineViewWeek } from "react-icons/md";
+import { useTaskContext } from "@/contexts/UserTaskContext.tsx";
+
+//Types
+interface Event {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  status: string;
+}
+import { Task as TaskSchema } from "../../types/task.ts";
+import CustomEvent from "../Calendar/Event.tsx";
+
+const localizer = momentLocalizer(moment);
+const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
+
+const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
+  return tasks
+    .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
+    .map((task) => ({
+      id: task._id, // Generate unique IDs
+      title: task.title,
+      status: task.status,
+      start: new Date(task.startTime!), // Convert ISO 8601 string to Date
+      end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
+      allDay: false, // Assuming tasks are not all-day by default
+    }));
+};
 
 const Home = () => {
   const { user } = useUser();
@@ -45,21 +65,15 @@ const Home = () => {
   const [isMorning, setIsMorning] = useState<boolean>(true);
   const [greeting, setGreeting] = useState<string>("Good Morning");
 
-  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const [startDate, setStartDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // Week's starting date (YYYY-MM-DD)
-  });
-  const [month, setMonth] = useState(new Date().getMonth()); // 0-based index (0 = January)
-  const [year, setYear] = useState(new Date().getFullYear());
+  //Task Calendar
+  const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const { tasks, setTasks } = useTaskContext(); // Access tasks from context
+  const defaultDate = useMemo(() => new Date(), [])
 
-  const [calendarView, setCalendarView] = useState<'Week' | 'Month'>('Week'); // State for calendar view
-  const handleViewChange = (view: 'Week' | 'Month') => {
-    setCalendarView(view);
-  };
-  const toggleCalendar = () => {
-    setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
-  };
+  useEffect(() => {
+    const events = convertTasksToEvents(tasks);
+    setMyEvents(events);
+  }, [tasks, setTasks]);
 
   // Function to update the current time
   const updateTime = () => {
@@ -88,64 +102,14 @@ const Home = () => {
     return () => clearInterval(timer); // Clear the interval when the component is unmounted
   }, []);
 
-  // Week navigation
-  const handlePreviousWeek = () => {
-    const current = new Date(startDate);
-    current.setDate(current.getDate() - 7); // Subtract 7 days
-    setStartDate(current.toISOString().split('T')[0]);
-  };
-
-  const handleNextWeek = () => {
-    const current = new Date(startDate);
-    current.setDate(current.getDate() + 7); // Add 7 days
-    setStartDate(current.toISOString().split('T')[0]);
-  };
-
-  // Month navigation
-  const handlePreviousMonth = () => {
-    if (month === 0) {
-      setMonth(11); // December
-      setYear((prevYear) => prevYear - 1);
-    } else {
-      setMonth((prevMonth) => prevMonth - 1);
-    }
-  };
-
-  const handleNextMonth = () => {
-    if (month === 11) {
-      setMonth(0); // January
-      setYear((prevYear) => prevYear + 1);
-    } else {
-      setMonth((prevMonth) => prevMonth + 1);
-    }
-  };
-
-  // Reset to "Today"
-  const handleToday = () => {
-    const today = new Date();
-    if (calendarView === 'Week') {
-      setStartDate(today.toISOString().split('T')[0]);
-    } else {
-      setMonth(today.getMonth());
-      setYear(today.getFullYear());
-    }
-  };
-
-  // Conditional navigation
-  const handlePrevious = () => {
-    if (calendarView === 'Week') {
-      handlePreviousWeek();
-    } else {
-      handlePreviousMonth();
-    }
-  };
-
-  const handleNext = () => {
-    if (calendarView === 'Week') {
-      handleNextWeek();
-    } else {
-      handleNextMonth();
-    }
+  const eventPropGetter: EventPropGetter<Event> = () => {
+    return {
+      className: "bg-indigo-50 shadow-lg border-0 text-xs",
+      style: {
+        borderRadius: "4px",
+        color: "black",
+      },
+    };
   };
 
   return (
@@ -260,91 +224,21 @@ const Home = () => {
         </div>
       )}
       <div className={`relative flex flex-col bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg ${showLeftBar ? 'w-[75%]' : 'w-full'} h-full`}>
-        <div className="flex flex-row justify-between p-1">
-          <div className="flex items-center space-x-2 text-sm">
-            <div className="flex">
-              <div
-                className="flex items-center border-2 px-1 py-0.5 rounded-l-md cursor-pointer"
-                onClick={handlePrevious}
-              >
-                <FaAngleLeft />
-              </div>
-              <div
-                className="border-2 border-x-0 px-2 py-0.5 cursor-pointer"
-                onClick={handleToday}
-              >
-                Today
-              </div>
-              <div
-                className="flex items-center border-2 px-1 py-0.5 rounded-r-md cursor-pointer"
-                onClick={handleNext}
-              >
-                <FaAngleRight />
-              </div>
-            </div>
-            <button
-              className='flex items-center border-2 px-2 py-0.5 rounded-md'
-              onClick={toggleCalendar}
-            >
-              <CalendarDaysIcon className='mr-2 w-4 h-4' />
-              <p>
-                {new DayPilot.Date(startDate).toString('dd')} -{' '}
-                {new DayPilot.Date(startDate)
-                  .addDays(6)
-                  .toString('dd MMM yy')}
-              </p>
-            </button>
-            {isCalendarVisible && (
-              <div className='top-9 left-4 z-50 absolute bg-gray-50 dark:bg-slate-700 shadow-md p-2 border rounded-md'>
-                <DayPilotNavigator
-                  selectMode={'Week'}
-                  showMonths={1}
-                  skipMonths={1}
-                  selectionDay={new DayPilot.Date(startDate)}
-                  onTimeRangeSelected={args => {
-                    setStartDate(
-                      new DayPilot.Date(args.day).toString('yyyy-MM-dd'),
-                    );
-                    setIsCalendarVisible(false);
-                  }}
-                />
-              </div>
-            )}
-          </div>
-          <div className="relative flex justify-end items-center space-x-2 text-sm">
-            <DropdownMenu>
-              <DropdownMenuTrigger className='outline-none'>
-                <button className='flex items-center border-2 px-2 py-0.5 rounded-md w-[90px] outline-none'>
-                  <MdOutlineViewWeek className='mr-2 w-4 h-4' />
-                  <p>{calendarView === 'Week' ? '7 days' : 'Month'}</p>
-                </button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className='ml-10 w-[120px]'>
-                <DropdownMenuItem
-                  className='text-[12px]'
-                  onClick={() => handleViewChange('Week')}
-                >
-                  7 days
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className='text-[12px]'
-                  onClick={() => handleViewChange('Month')}
-                >
-                  Month
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <a className="flex items-center border-2 px-2 rounded-md h-7">
-              <IoMdSettings />
-            </a>
-          </div>
-        </div>
-        <hr className="mt-1 mb-2 w-ful" />
-        {calendarView === 'Week' ? (
-          <OnlyShownWeekTask date={startDate} />
-        ) : (
-          <OnlyShownMonthCalendar month={month} year={year} />
-        )}
+        <DragAndDropCalendar
+          defaultDate={defaultDate}
+          defaultView={Views.WEEK}
+          draggableAccessor={() => false}
+          eventPropGetter={eventPropGetter}
+          events={myEvents}
+          components={{
+            event: CustomEvent, // Use your custom component
+          }}
+          localizer={localizer}
+          selectable
+          popup
+          style={{ height: '100%' }}
+          className="p-2"
+        />
         <ChatAI />
       </div>
       {/* <button className="right-6 bottom-4 z-[100] absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 p-[2px] rounded-full w-10 h-10">

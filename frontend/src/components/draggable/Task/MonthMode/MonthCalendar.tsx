@@ -82,7 +82,7 @@ const MonthCalendar: React.FC<MonthCalendarProps> = ({ month, year }) => {
                                 index={index}
                                 isToday={isToday}
                                 formatFullDate={formatFullDate}
-                                className={`h-full ${isLastRow && index % 7 === 0 ? "rounded-l-sm" : ""
+                                className={`h-28 ${isLastRow && index % 7 === 0 ? "rounded-l-sm" : ""
                                     } ${isLastRow && index % 7 === 6 ? "rounded-r-sm" : ""
                                     }`}
                             >
@@ -93,24 +93,7 @@ const MonthCalendar: React.FC<MonthCalendarProps> = ({ month, year }) => {
                                     time=''
                                     style={{}}
                                     rowSpan={1}
-                                // task={{
-                                //     _id: "1",
-                                //     title: "test",
-                                //     description: "abc",
-                                //     startTime: "6:00",
-                                //     endTime: "9:00",
-                                //     dueTime: "8:00",
-                                //     estimatedTime: 30,
-                                //     status: "pending",
-                                //     priority: "low",
-                                //     style: {
-                                //         backgroundColor: "bg-indigo-600",
-                                //         textColor: "text-white",
-                                //     },
-                                //     category: "Web Development",
-                                //     userId: "user-1",
-                                //     isOnCalendar: true,
-                                // }}
+                                    task={undefined}
                                 />
                                 {/* <div className='flex justify-between pr-1 rounded-r-sm w-[96%] text-[12px]'>
                                     <p className='border-indigo-600 pl-0.5 border-l-[3px] w-[80%] truncate'>this is my task for thursday</p>

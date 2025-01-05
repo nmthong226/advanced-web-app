@@ -12,11 +12,8 @@ export const taskSchema = z.object({
   endTime: z.string().datetime().optional(),   // Optional ISO 8601 date string
   dueTime: z.string().datetime().optional(),  // Optional ISO 8601 date string
   estimatedTime: z.number().optional(), // Time in minutes (optional)
-  style: z.object({ // Object for task styles
-    backgroundColor: z.string(), // Background color
-    textColor: z.string() // Text color
-  }),
-  isOnCalendar: z.boolean()
+  color: z.string().optional(),
+  // isOnCalendar: z.boolean()
 });
 
 export type Task = z.infer<typeof taskSchema>

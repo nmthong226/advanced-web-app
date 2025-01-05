@@ -48,7 +48,7 @@ const RndCalendarCell: React.FC<RndCalendarCellProps> = ({
     <div
       ref={drop}
       className={cn(
-        `relative flex h-5 justify-between w-[96%] text-[12px] pr-1 ${isOver ? 'bg-indigo-200' : ''
+        `relative flex h-5 justify-between w-[96%] text-[12px] pr-1 ${isOver ? 'bg-indigo-200/20' : ''
         }`
       )}
       style={{

@@ -26,6 +26,9 @@ import { FaUndoAlt } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
 import { MdTaskAlt } from 'react-icons/md';
 import { GoTag } from 'react-icons/go';
+import { IoTrashBinOutline } from "react-icons/io5";
+import { FaSortAmountDownAlt } from "react-icons/fa";
+import { FaSortAmountUp } from "react-icons/fa";
 
 //Import libs/packages
 import { toast } from 'react-toastify';
@@ -187,18 +190,30 @@ const Tasks = () => {
           className="p-1 border rounded-md scale-95"
         />
         <hr className="my-2 border-t w-full" />
-        <p className="text-gray-600 text-xs dark:text-gray-200">Your current tasks category</p>
-        <ul className="mt-4 w-full list-disc">
+        <p className="my-2 text-gray-600 text-xs dark:text-gray-200">Your current tasks category</p>
+        {/* <div className='flex justify-between items-center space-x-2 my-2 w-full'>
+          <div className='flex items-center space-x-1 px-2 p-1 border rounded-md text-zinc-500'>
+            <p className='text-[12px]'>Sort:</p>
+            <FaSortAmountUp className='size-3' />
+          </div>
+          <div className='flex p-1 border rounded-md'>
+            <IoTrashBinOutline className='text-zinc-500 size-4' />
+          </div>
+        </div> */}
+        <ul className="w-full list-disc">
           {currentCategories.map(([category, count]) => (
             <li
               key={category}
-              className="flex justify-between items-center py-2"
+              className="flex justify-between items-center py-1"
             >
               <span className="text-[12px] text-gray-700 dark:text-gray-200">{category}</span>
               <span className="text-[12px] text-gray-500 dark:text-gray-300">{count} tasks</span>
             </li>
           ))}
         </ul>
+        <button className='mt-2 py-0.5 p-2 border border-dotted rounded-md w-full text-[12px] text-muted-foreground'>
+          Add category
+        </button>
       </div>
       <div className="relative flex flex-col bg-white dark:bg-slate-700 p-1 border rounded-md w-[84%] h-full">
         {/* ===== Top Heading ===== */}
@@ -243,7 +258,7 @@ const Tasks = () => {
             />
           </>
         )}
-      <ChatAI />
+        <ChatAI />
       </div>
     </div>
   );

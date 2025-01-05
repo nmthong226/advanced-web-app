@@ -1,224 +1,317 @@
-import { useState } from 'react';
+// Import frameworks
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // Import icons
-import { MdOutlineViewWeek } from "react-icons/md";
-import { HiOutlineCog6Tooth } from "react-icons/hi2";
 import { BsListTask } from "react-icons/bs";
-import { FaAngleLeft, FaAngleRight } from "react-icons/fa6";
 
 // Import styles
-import './style.css';
+import "./style.css";
 
 // Import components
-import SideBarTask from '../../components/sidebar/sidebar_task.tsx';
-import CalendarGrid from '../../components/draggable/Task/WeekMode/CalendarGrid.tsx';
-import MonthCalendar from '../../components/draggable/Task/MonthMode/MonthCalendar.tsx';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+import SideBarTask from "../../components/sidebar/sidebar_task.tsx";
+import "react-big-calendar/lib/css/react-big-calendar.css";
+import { Calendar, momentLocalizer, Views, EventPropGetter } from "react-big-calendar";
+import moment from "moment";
+import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 
 // Import libs/packages
-import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
-import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
-import { CalendarDaysIcon } from 'lucide-react';
-import ChatAI from '../../components/AI/chatHistory.tsx';
-import { Link } from 'react-router-dom';
+import ChatAI from "../../components/AI/chatHistory.tsx";
+import { Link } from "react-router-dom";
+import CustomEvent from "./Event.tsx";
 
-const Calendar = () => {
-  const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const toggleCalendar = () => {
-    setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
+// Import contexts
+import { useTaskContext } from "@/contexts/UserTaskContext.tsx";
+
+// Types
+interface Event {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  allDay?: boolean;
+  status: string;
+}
+
+interface DraggedEvent {
+  _id: string;
+  title: string;
+  status: string;
+}
+
+interface Task {
+  _id: string;
+  title: string;
+  category: string;
+  status: string;
+}
+
+import { Task as TaskSchema } from "../../types/task.ts";
+
+const localizer = momentLocalizer(moment);
+const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
+
+const formatName = (name: string) => `${name}`;
+
+//Task Schema
+const mockTasks = [
+  {
+    _id: "1",
+    userId: "123",
+    title: "Complete Report",
+    description: "Finalize the quarterly report",
+    status: "in-progress",
+    priority: "high",
+    category: "Work",
+    startTime: "2025-01-05T09:00:00Z",
+    endTime: "2025-01-05T11:00:00Z",
+    dueTime: "2025-01-05T23:59:59Z",
+    estimatedTime: 120,
+    color: "#FFDDC1",
+    isOnCalendar: true,
+  },
+  {
+    _id: "2",
+    userId: "123",
+    title: "Team Meeting",
+    status: "pending",
+    priority: "medium",
+    category: "Work",
+    startTime: "2025-01-06T10:00:00Z",
+    endTime: "2025-01-06T11:00:00Z",
+    color: "#C1E1FF",
+    isOnCalendar: true,
+  },
+];
+
+const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
+  return tasks
+    .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
+    .map((task) => ({
+      id: task._id, // Generate unique IDs
+      title: task.title,
+      status: task.status,
+      start: new Date(task.startTime!), // Convert ISO 8601 string to Date
+      end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
+      allDay: false, // Assuming tasks are not all-day by default
+    }));
+};
+
+const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
+  return tasks
+    .filter(task => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
+    .map((task) => ({
+      _id: task._id, // Generate unique IDs
+      category: task.category,
+      title: task.title,
+      status: task.status,
+      allDay: false, // Assuming tasks are not all-day by default
+    }));
+};
+
+const MyCalendar: React.FC = () => {
+  const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const [draggedEvent, setDraggedEvent] = useState<DraggedEvent | null>(null);
+  const [draggableTasks, setDraggableTasks] = useState<Task[]>(mockTasks);
+  const [displayDragItemInCell,] = useState<boolean>(true);
+
+  const { tasks, setTasks } = useTaskContext(); // Access tasks from context
+
+  useEffect(() => {
+    const events = convertTasksToEvents(tasks);
+    const draggableTask = convertTasksToDraggedEvents(tasks);
+    setMyEvents(events);
+    setDraggableTasks(draggableTask);
+  }, [tasks, setTasks]);
+
+  console.log(myEvents);
+
+  const eventPropGetter: EventPropGetter<Event> = () => {
+    return {
+      className: "bg-indigo-50 shadow-lg border-0 text-xs",
+      style: {
+        borderRadius: "4px",
+        color: "black",
+      },
+    };
   };
 
-  const [calendarView, setCalendarView] = useState<'Week' | 'Month'>('Week'); // State for calendar view
-  const handleViewChange = (view: 'Week' | 'Month') => {
-    setCalendarView(view);
-  };
+  const handleDragStart = useCallback((event: DraggedEvent) => setDraggedEvent(event), []);
 
-  const [startDate, setStartDate] = useState(() => {
-    const today = new Date();
-    return today.toISOString().split('T')[0]; // Week's starting date (YYYY-MM-DD)
-  });
-  const [month, setMonth] = useState(new Date().getMonth()); // 0-based index (0 = January)
-  const [year, setYear] = useState(new Date().getFullYear());
+  const dragFromOutsideItem = useCallback(
+    () => {
+      return (event: Event) => event.start;  // Or another Date field, such as `event.end`
+    },
+    [draggedEvent]
+  );
 
-  // Week navigation
-  const handlePreviousWeek = () => {
-    const current = new Date(startDate);
-    current.setDate(current.getDate() - 7); // Subtract 7 days
-    setStartDate(current.toISOString().split('T')[0]);
-  };
+  const moveEvent = useCallback(
+    ({
+      event,
+      start,
+      end,
+      isAllDay: droppedOnAllDaySlot = false,
+    }: {
+      event: Event;
+      start: Date;
+      end: Date;
+      isAllDay?: boolean;
+    }) => {
+      // Update the task context with new start and end times
+      const updatedTasks = tasks.map((task) =>
+        task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+      );
+  
+      // Update the task context
+      setTasks(updatedTasks);
+  
+      // Update the event in the `myEvents` list
+      setMyEvents((prev) => {
+        const existing = prev.find((ev) => ev.id === event.id) ?? {};
+        const filtered = prev.filter((ev) => ev.id !== event.id);
+  
+        return [
+          ...filtered,
+          {
+            ...existing,
+            start,
+            end,
+            allDay: droppedOnAllDaySlot || event.allDay,
+            id: event.id,
+            title: event.title,
+            status: event.status || "default", // Ensure status has a value
+          },
+        ];
+      });
+    },
+    [tasks, setMyEvents, setTasks] // Adding `tasks` here to access the latest context value
+  );
+  
 
-  const handleNextWeek = () => {
-    const current = new Date(startDate);
-    current.setDate(current.getDate() + 7); // Add 7 days
-    setStartDate(current.toISOString().split('T')[0]);
-  };
+  const newEvent = useCallback(
+    (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
+      setMyEvents((prev) => {
+        return [...prev, { ...event }];
+      });
+    },
+    [setMyEvents]
+  );
 
-  // Month navigation
-  const handlePreviousMonth = () => {
-    if (month === 0) {
-      setMonth(11); // December
-      setYear((prevYear) => prevYear - 1);
-    } else {
-      setMonth((prevMonth) => prevMonth - 1);
-    }
-  };
+  const onDropFromOutside = useCallback(
+    ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
+      if (draggedEvent) {
+        const { title, status, _id } = draggedEvent;
 
-  const handleNextMonth = () => {
-    if (month === 11) {
-      setMonth(0); // January
-      setYear((prevYear) => prevYear + 1);
-    } else {
-      setMonth((prevMonth) => prevMonth + 1);
-    }
-  };
+        // Pass the task ID directly when creating the event
+        const newEvent: Omit<Event, "id"> & { id: string } = {
+          title: formatName(title),
+          start,
+          end,
+          allDay: isAllDay,
+          status: status || "default", // Ensure status has a value
+          id: _id,  // Use the draggedEvent id directly
+        };
 
-  // Reset to "Today"
-  const handleToday = () => {
-    const today = new Date();
-    if (calendarView === 'Week') {
-      setStartDate(today.toISOString().split('T')[0]);
-    } else {
-      setMonth(today.getMonth());
-      setYear(today.getFullYear());
-    }
-  };
+        // Update the task context with new start and end time
+        const updatedTasks = tasks.map((task) =>
+          task._id === _id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+        );
 
-  // Conditional navigation
-  const handlePrevious = () => {
-    if (calendarView === 'Week') {
-      handlePreviousWeek();
-    } else {
-      handlePreviousMonth();
-    }
-  };
+        setTasks(updatedTasks);
 
-  const handleNext = () => {
-    if (calendarView === 'Week') {
-      handleNextWeek();
-    } else {
-      handleNextMonth();
-    }
-  };
+        // Reset draggedEvent to null
+        setDraggedEvent(null);
+
+        // Update events list
+        setMyEvents((prev) => [...prev, newEvent]);
+      }
+    },
+    [draggedEvent, setDraggedEvent, setMyEvents]
+  );
+
+  const resizeEvent = useCallback(
+    ({ event, start, end }: { event: Event; start: Date; end: Date }) => {
+      setMyEvents((prev) => {
+        const existing = prev.find((ev) => ev.id === event.id) ?? {
+          allDay: false,
+          id: event.id,
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          status: event.status
+        };
+
+        const updatedTasks = tasks.map((task) =>
+          task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+        );
+        // Update the task context
+        setTasks(updatedTasks);
+
+        const filtered = prev.filter((ev) => ev.id !== event.id);
+
+        return [
+          ...filtered,
+          {
+            ...existing,
+            start,
+            end,
+          },
+        ];
+      });
+    },
+    [setMyEvents]
+  );
+
+  const defaultDate = useMemo(() => new Date(), [])
 
   return (
-    <DndProvider backend={HTML5Backend}>
-      <div className='relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full'>
-        <SideBarTask />
-        <div className='relative flex flex-col justify-center bg-white dark:bg-slate-700 p-1 border rounded-lg w-[84%] h-full'>
-          <div className='flex flex-wrap justify-between items-center p-2'>
-            <div className='flex items-center'>
-              <button className='font-semibold text-indigo-500 text-lg dark:text-indigo-400'>
-                Task Calendar
-                <span className='ml-2 font-normal text-[12px] text-gray-500 dark:text-gray-200'>- This section manages your tasks on track.</span>
-              </button>
-            </div>
-            <Link
-              to="/task"
-              className="flex items-center border-[1px] hover:bg-indigo-100/80 px-2 py-1 rounded-md text-gray-800 dark:text-white transition duration-200"
-              title='Go to Task List'
-            >
-              <BsListTask className="mr-2" />
-              <span className="font-medium">Task List</span>
-            </Link>
+    <div className="relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full">
+      <SideBarTask draggableTasks={draggableTasks} handleDragStart={handleDragStart} />
+      <div className="relative flex flex-col justify-center bg-white dark:bg-slate-700 p-1 border rounded-lg w-[84%] h-full">
+        <div className="flex flex-wrap justify-between items-center p-2">
+          <div className="flex items-center">
+            <button className="font-semibold text-indigo-500 text-lg dark:text-indigo-400">
+              Task Calendar
+              <span className="ml-2 font-normal text-[12px] text-gray-500 dark:text-gray-200">
+                - This section manages your tasks on track.
+              </span>
+            </button>
           </div>
-          <hr className="w-full" />
-          <div className='relative flex justify-between items-center my-3 px-2 text-[12px]'>
-            <div className="flex items-center space-x-2">
-              <div className="flex">
-                <div
-                  className="flex items-center border-[1px] p-1 rounded-l-md cursor-pointer"
-                  onClick={handlePrevious}
-                >
-                  <FaAngleLeft />
-                </div>
-                <div
-                  className="border-[1px] border-x-0 px-3 p-1 cursor-pointer"
-                  onClick={handleToday}
-                >
-                  Today
-                </div>
-                <div
-                  className="flex items-center border-[1px] p-1 rounded-r-md cursor-pointer"
-                  onClick={handleNext}
-                >
-                  <FaAngleRight />
-                </div>
-              </div>
-              <button
-                className='flex items-center border-[1px] px-2 py-1 rounded-md'
-                onClick={toggleCalendar}
-              >
-                <CalendarDaysIcon className='mr-2 w-4 h-4' />
-                <p>
-                  {new DayPilot.Date(startDate).toString('dd')} -{' '}
-                  {new DayPilot.Date(startDate)
-                    .addDays(6)
-                    .toString('dd MMM yy')}
-                </p>
-              </button>
-              {isCalendarVisible && (
-                <div className='top-9 left-4 z-50 absolute bg-gray-50 shadow-md p-2 border rounded-md'>
-                  <DayPilotNavigator
-                    selectMode={'Week'}
-                    showMonths={1}
-                    skipMonths={1}
-                    selectionDay={new DayPilot.Date(startDate)}
-                    onTimeRangeSelected={args => {
-                      setStartDate(
-                        new DayPilot.Date(args.day).toString('yyyy-MM-dd'),
-                      );
-                      setIsCalendarVisible(false);
-                    }}
-                  />
-                </div>
-              )}
-            </div>
-            <div className='flex space-x-3'>
-              <DropdownMenu>
-                <DropdownMenuTrigger className='outline-none'>
-                  <button className='flex items-center border-[1px] px-2 py-1 rounded-md w-[80px] outline-none'>
-                    <MdOutlineViewWeek className='mr-2 w-4 h-4' />
-                    <p>{calendarView === 'Week' ? '7 days' : 'Month'}</p>
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className='ml-10 w-[120px]'>
-                  <DropdownMenuItem
-                    className='text-[12px]'
-                    onClick={() => handleViewChange('Week')}
-                  >
-                    7 days
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className='text-[12px]'
-                    onClick={() => handleViewChange('Month')}
-                  >
-                    Month
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-
-              <button className='flex items-center border-[1px] px-2 py-1 rounded-md'>
-                <HiOutlineCog6Tooth className='w-4 h-4' />
-              </button>
-            </div>
-          </div>
-          {/* Render calendar based on selected view */}
-          {calendarView === 'Week' ? (
-            <CalendarGrid date={startDate} />
-          ) : (
-            <MonthCalendar month={month} year={year} />
-          )}
-          <ChatAI />
+          <Link
+            to="/task"
+            className="flex items-center border-[1px] hover:bg-indigo-100/80 px-2 py-1 rounded-md text-gray-800 dark:text-white transition duration-200"
+            title="Go to Task List"
+          >
+            <BsListTask className="mr-2" />
+            <span className="font-medium">Task List</span>
+          </Link>
         </div>
+        <hr className="mb-2 w-full" />
+        <DragAndDropCalendar
+          defaultDate={defaultDate}
+          defaultView={Views.WEEK}
+          dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : undefined}
+          draggableAccessor={() => true}
+          eventPropGetter={eventPropGetter}
+          events={myEvents}
+          components={{
+            event: CustomEvent, // Use your custom component
+          }}
+          localizer={localizer}
+          onDropFromOutside={onDropFromOutside}
+          onEventDrop={moveEvent}
+          onEventResize={resizeEvent}
+          onSelectSlot={newEvent}
+          resizable
+          selectable
+          popup
+          style={{ height: 690 }}
+          className="px-2"
+        />
+        <ChatAI />
       </div>
-    </DndProvider>
+    </div>
   );
 };
 
-export default Calendar;
+export default MyCalendar;
