@@ -6,6 +6,8 @@ import { initialActivityData } from '@/mocks/MockData';
 //Import icons
 import { CiClock1 } from "react-icons/ci";
 
+import { ActivitySchedule } from '../../types/type';
+
 type Props = {
     className: string,
     tableClassName: string,

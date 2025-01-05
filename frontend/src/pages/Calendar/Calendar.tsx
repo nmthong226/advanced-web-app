@@ -18,11 +18,16 @@ import { HTML5Backend } from 'react-dnd-html5-backend';
 import { DayPilot, DayPilotNavigator } from '@daypilot/daypilot-lite-react';
 import { CalendarDaysIcon } from 'lucide-react';
 import ChatAI from '../../components/AI/chatHistory.tsx';
-import TasksContextProvider from '../../components/table/context/task-context.tsx';
+// import TasksContextProvider from '../../components/table/context/task-context.tsx';
 
 const Calendar = () => {
   const [isCalendarVisible, setIsCalendarVisible] = useState(false);
-  const [startDate, setStartDate] = useState('2024-12-08'); // Default date
+
+  const [startDate, setStartDate] = useState(() => {
+    const today = new Date();
+    // Format the date as 'YYYY-MM-DD'
+    return today.toISOString().split('T')[0];
+  });
 
   const toggleCalendar = () => {
     setIsCalendarVisible(!isCalendarVisible); // Toggle visibility

@@ -26,12 +26,12 @@ import { LuSave } from "react-icons/lu";
 
 type CalendarCellProps = {
     time: string;
-    activity?: Activity;
+    activity?: any;
     date: string;
     className: string;
     style: React.CSSProperties;
     rowSpan: number;
-    onDrop: (item: Activity, time: string, date: string) => void;
+    onDrop: (item: any, time: string, date: string) => void;
     onResize: (id: string, date: string, newDuration: number) => void;
 };
 
@@ -44,7 +44,7 @@ const TimetableCell: React.FC<CalendarCellProps> = ({
     onResize,
     rowSpan
 }) => {
-    const [{ isOver }, drop] = useDrop<Activity, void, { isOver: boolean }>({
+    const [{ isOver }, drop] = useDrop<any, void, { isOver: boolean }>({
         accept: 'ITEM',
         drop: (item) => {
             // Ensure the dropped item matches the current activity

@@ -1,5 +1,5 @@
 // ai-feedbacks.controller.ts
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Get } from '@nestjs/common';
 import { AiFeedbacksService } from './ai-feedbacks.service';
 // import { IsString, IsArray, ValidateNested } from 'class-validator';
 // import { Type } from 'class-transformer';
@@ -51,7 +51,7 @@ export class AiFeedbacksController {
         throw new BadRequestException('UserId is required.');
       }
 
-      if (!tasks || tasks.length === 0) {
+      if (!tasks) {
         throw new BadRequestException('Tasks array cannot be empty.');
       }
 
@@ -65,5 +65,10 @@ export class AiFeedbacksController {
       }
       throw new BadRequestException('Failed to analyze the schedule. Please ensure the input is correct.');
     }
+  }
+
+  @Get('summary-insights')
+  async getSummaryInsights() {
+    return this.aiFeedbacksService.getSummaryInsights();
   }
 }

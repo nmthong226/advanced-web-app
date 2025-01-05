@@ -4,6 +4,6 @@ import { TaskStatisticsService } from './task-statistics.service';
 
 @Module({
   controllers: [TaskStatisticsController],
-  providers: [TaskStatisticsService]
+  providers: [TaskStatisticsService],
 })
 export class TaskStatisticsModule {}

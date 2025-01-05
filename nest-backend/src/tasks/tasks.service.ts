@@ -1,189 +1,147 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
-import { Task } from './tasks.model';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
+import { Task, TaskDocument } from './tasks.schema';
+import { TaskStatistics } from '../task-statistics/task-statistics.schema';
+import { faker } from '@faker-js/faker';
+
 
 @Injectable()
 export class TasksService {
-  private tasks: Task[] = [
-    // Tasks for USER-1234
-    {
-      id: 'TASK-8782',
-      userId: 'USER-1234',
-      title: "Co len bro",
-      status: 'in-progress',
-      label: 'documentation',
-      priority: 'medium',
-      description: 'This task involves optimizing the SSD compression method.',
-      startDate: '2024-01-01',
-      endDate: '2024-02-01',
-      dueTime: '2024-02-01',
-      estimatedTime: 40,
-    },
-    {
-      id: 'TASK-7878',
-      userId: 'USER-1234',
-      title: 'Try to calculate the EXE feed, maybe it will index the multi-byte pixel!',
-      status: 'pending',
-      label: 'documentation',
-      priority: 'medium',
-      description: 'Work on indexing the EXE feed with multi-byte pixel support.',
-      startDate: '2024-02-01',
-      endDate: '2024-02-10',
-      dueTime: '2024-02-10',
-      estimatedTime: 30,
-    },
-    {
-      id: 'TASK-1280',
-      userId: 'USER-1234',
-      title: 'Use the digital TLS panel, then you can transmit the haptic system!',
-      status: 'completed',
-      label: 'bug',
-      priority: 'high',
-      description: 'Resolved bug related to digital TLS panel and haptic system transmission.',
-      startDate: '2024-01-10',
-      endDate: '2024-01-12',
-      dueTime: '2024-01-12',
-      estimatedTime: 10,
-    },
-    {
-      id: 'TASK-7262',
-      userId: 'USER-1234',
-      title: 'The UTF8 application is down, parse the neural bandwidth so we can back up the PNG firewall!',
-      status: 'pending',
-      label: 'feature',
-      priority: 'high',
-      description: 'Fix UTF8 application down by parsing neural bandwidth for firewall support.',
-      startDate: '2024-01-05',
-      endDate: '2024-01-08',
-      dueTime: '2024-01-08',
-      estimatedTime: 35,
-    },
-    {
-      id: 'TASK-7184',
-      userId: 'USER-1234',
-      title: 'We need to program the back-end THX pixel!',
-      status: 'pending',
-      label: 'feature',
-      priority: 'low',
-      description: 'Back-end programming for THX pixel required.',
-      startDate: '2024-02-10',
-      endDate: '2024-02-15',
-      dueTime: '2024-02-15',
-      estimatedTime: 20,
-    },
-  
-    // Tasks for USER-5678
-    {
-      id: 'TASK-7839',
-      userId: 'USER-5678',
-      title: 'We need to bypass the neural TCP card!',
-      status: 'pending',
-      label: 'bug',
-      priority: 'high',
-      description: 'Fix the issue with the neural TCP card communication.',
-      startDate: '2024-01-15',
-      endDate: '2024-01-20',
-      dueTime: '2024-01-20',
-      estimatedTime: 20,
-    },
-    {
-      id: 'TASK-5562',
-      userId: 'USER-5678',
-      title: 'The SAS interface is down, bypass the open-source pixel so we can back up the PNG bandwidth!',
-      status: 'pending',
-      label: 'feature',
-      priority: 'medium',
-      description: 'Resolve issues with the SAS interface to ensure proper PNG bandwidth backup.',
-      startDate: '2024-02-05',
-      endDate: '2024-02-15',
-      dueTime: '2024-02-15',
-      estimatedTime: 25,
-    },
-    {
-      id: 'TASK-8686',
-      userId: 'USER-5678',
-      title: "I'll parse the wireless SSL protocol, that should driver the API panel!",
-      status: 'completed',
-      label: 'feature',
-      priority: 'medium',
-      description: 'Attempted parsing of SSL protocols for API integration, but canceled due to incompatibility.',
-      startDate: '2024-01-01',
-      endDate: '2024-01-10',
-      dueTime: '2024-01-10',
-      estimatedTime: 15,
-    },
-    {
-      id: 'TASK-1138',
-      userId: 'USER-5678',
-      title: "Generating the driver won't do anything, we need to quantify the 1080p SMTP bandwidth!",
-      status: 'in-progress',
-      label: 'feature',
-      priority: 'medium',
-      description: 'Currently quantifying 1080p SMTP bandwidth for driver development.',
-      startDate: '2024-01-20',
-      endDate: '2024-02-01',
-      dueTime: '2024-02-01',
-      estimatedTime: 50,
-    },
-    {
-      id: 'TASK-5160',
-      userId: 'USER-5678',
-      title: "Calculating the bus won't do anything, we need to navigate the back-end JSON protocol!",
-      status: 'in-progress',
-      label: 'documentation',
-      priority: 'high',
-      description: 'Working on the back-end JSON protocol navigation and data handling.',
-      startDate: '2024-01-18',
-      endDate: '2024-02-05',
-      dueTime: '2024-02-05',
-      estimatedTime: 45,
-    },
-  ];
-  
+  constructor(
+    @InjectModel(Task.name) private readonly taskModel: Model<TaskDocument>,
+    @InjectModel(TaskStatistics.name)
+    private taskStatisticsModel: Model<TaskStatistics>,
+  ) {}
 
-  findAll(): Task[] {
-    return this.tasks;
+  async generateMockTasks(count: number = 10) {
+    const mockTasks: Partial<Task>[] = [];
+    for (let i = 0; i < count; i++) {
+        const statusOptions = ['pending', 'in-progress', 'completed', 'expired'];
+        const priorityOptions = ['low', 'medium', 'high'];
+      mockTasks.push({
+        id: faker.string.uuid(), // Generate unique IDs
+        userId: faker.string.uuid(),
+        title: faker.lorem.sentence(),
+        description: faker.lorem.paragraph(),
+        status: statusOptions[Math.floor(Math.random()*statusOptions.length)],
+        priority: priorityOptions[Math.floor(Math.random()*priorityOptions.length)],
+        category: faker.word.noun(),
+        startTime: faker.date.past(),
+        endTime: faker.date.future(),
+        dueTime: faker.date.future(),
+        estimatedTime: faker.number.int({ min: 15, max: 120 }), // Random time in minutes
+        pomodoro_number: faker.number.int({ min: 0, max: 5 }),
+        pomodoro_required_number: faker.number.int({ min: 1, max: 10 }),
+        is_on_calendar: faker.datatype.boolean(),
+        is_on_pomodoro_list: faker.datatype.boolean(),
+        style: {
+            backgroundColor: faker.color.rgb(),
+            textColor: faker.color.rgb()
+        }
+      });
+    }
+
+    try {
+      await this.taskModel.insertMany(mockTasks);
+      console.log(`${count} mock tasks inserted successfully.`);
+    } catch (error) {
+      console.error('Error inserting mock tasks:', error);
+    }
   }
 
-  findByUserId(userId: string): Task[] {
-    const userTasks = this.tasks.filter((task) => task.userId === userId);
-    if (!userTasks.length) {
+  // Get all tasks
+  async findAll(): Promise<Task[]> {
+    return await this.taskModel.find().exec();
+  }
+
+  // Get tasks by User ID
+  async findByUserId(userId: string): Promise<Task[]> {
+    const tasks = await this.taskModel.find({ userId }).exec();
+    if (!tasks.length) {
       throw new NotFoundException(`No tasks found for user ID ${userId}`);
     }
-    return userTasks;
+    return tasks;
   }
 
-  findOne(id: string): Task {
-    const task = this.tasks.find((task) => task.id === id);
+  // Get a single task by ID
+  async findOne(id: string): Promise<Task> {
+    const task = await this.taskModel.findById(id).exec();
     if (!task) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
     return task;
   }
 
-  createTask(createTaskDto: CreateTaskDto): Task {
-    const newTask: Task = {
+  // Create a new task
+  async createTask(createTaskDto: any): Promise<Task> {
+    const newTask = new this.taskModel({
       ...createTaskDto,
-      id: `TASK-${Date.now()}`, // Generate unique ID
-    };
-    this.tasks.push(newTask);
-    return newTask;
+    });
+    return await newTask.save();
   }
 
-  updateTask(id: string, updateTaskDto: UpdateTaskDto): Task {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) {
+  // Update an existing task
+  async updateTask(id: string, updateTaskDto: any): Promise<Task> {
+    const updatedTask = await this.taskModel
+      .findByIdAndUpdate(id, updateTaskDto, { new: true })
+      .exec();
+    if (!updatedTask) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
-    this.tasks[taskIndex] = { ...this.tasks[taskIndex], ...updateTaskDto };
-    return this.tasks[taskIndex];
+    return updatedTask;
   }
 
-  deleteTask(id: string): void {
-    const taskIndex = this.tasks.findIndex((task) => task.id === id);
-    if (taskIndex === -1) {
+  async updateTaskStatus(taskId: string, newStatus: string) {
+    const task = await this.taskModel.findById(taskId);
+    if (!task) {
+      throw new Error('Task not found');
+    }
+
+    const userId = task.userId;
+    const oldStatus = task.status;
+    const today = new Date().toISOString().split('T')[0]; // Get today's date in YYYY-MM-DD format
+
+    this.taskStatisticsModel.findOneAndUpdate(
+      { userId, day: today, taskStatus: oldStatus },
+      { $inc: { taskCount: -1 } },
+      { upsert: true }, // Important: creates the document if it doesn't exist
+    );
+
+    // Increment count for the new status
+    this.taskStatisticsModel.findOneAndUpdate(
+      { userId, day: today, taskStatus: newStatus },
+      { $inc: { taskCount: 1 } },
+      { upsert: true },
+    );
+
+    task.status = newStatus;
+    await task.save();
+
+    return task;
+  }
+
+  // Delete a task
+  async deleteTask(id: string): Promise<void> {
+    const result = await this.taskModel.findByIdAndDelete(id).exec();
+    if (!result) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
-    this.tasks.splice(taskIndex, 1);
+  }
+
+  async incrementPomodoroNumber(id: string): Promise<Task> {
+    const task = await this.taskModel.findById(id).exec();
+
+    if (!task) {
+      throw new NotFoundException(`Task with ID "${id}" not found`);
+    }
+
+    task.pomodoro_number += 1;
+
+    if (task.pomodoro_number >= task.pomodoro_required_number) {
+      task.status = 'completed';
+    }
+
+    return task.save();
   }
 }

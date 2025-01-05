@@ -55,7 +55,7 @@ export const getCurrentWeek = (dateProp?: string) => {
     const newDate = new Date(startOfWeek);
     newDate.setDate(startOfWeek.getDate() + i); // Set the date to the current week day (Sunday + i)
 
-    const fullDateString = `${String(newDate.getDate()).padStart(2, '0')}-${String(newDate.getMonth() + 1).padStart(2, '0')}-${newDate.getFullYear()}`;
+    const fullDateString = `${String(newDate.getDate()).padStart(2, '0')}/${String(newDate.getMonth() + 1).padStart(2, '0')}/${newDate.getFullYear()}`;
 
     currentWeekDate.push({
       dayOfWeek: daysOfWeek[newDate.getDay()],
@@ -169,10 +169,10 @@ export const transformBgColorToTextColor = (bgColor: string): string => {
   });
 };
 
-export const generateStylesFromParent = (gradient: string): string => {
+export const generateStylesFromParent = (color: string): string => {
   // Extract the color from the gradient string
-  const match = gradient.match(/to-([a-z]+)-\d+/); // Matches the color like 'purple', 'blue', etc.
-  const color = match?.[1]; // Extract the color key
+  const match = color.match(/bg-([a-z]+)-\d+/); // Matches the color like 'purple', 'blue', etc.
+  const foundColor = match?.[1]; // Extract the color key
 
   // Map of colors to styles
   const colorStyles: { [key: string]: string } = {
@@ -181,9 +181,42 @@ export const generateStylesFromParent = (gradient: string): string => {
     green: "bg-green-100 border-l-[5px] border-l-green-600",
     red: "bg-red-100 border-l-[5px] border-l-red-600",
     yellow: "bg-yellow-100 border-l-[5px] border-l-yellow-600",
+    emerald: "bg-emerald-100 border-l-[5px] border-l-emerald-600",
+    pink: "bg-pink-100 border-l-[5px] border-l-pink-600",
+    lime: "bg-lime-100 border-l-[5px] border-l-lime-600",
     // Add more colors as needed
   };
 
   // Return the matched styles or a default style
-  return colorStyles[color || ""] || "bg-gray-100 border-l-[5px] border-l-gray-600";
+  return colorStyles[foundColor || ""] || "bg-gray-100 border-l-[5px] border-l-gray-600";
+};
+
+export const convertToPeriodTime = (dueTime: string): string => {
+  const date = new Date(dueTime);
+  const options: Intl.DateTimeFormatOptions = {
+    hour: 'numeric',   // No leading zeros for hours
+    minute: '2-digit', // Always show two digits for minutes
+    hour12: true       // Use AM/PM notation
+  };
+  return date.toLocaleTimeString('en-US', options);
+};
+
+// Function to get the current week from a given date
+export const initialCurrentWeek = (date: any) => {
+  const currentDate = new Date(date);
+  const startOfWeek = currentDate.getDate() - currentDate.getDay();
+  const week = Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(currentDate.setDate(startOfWeek + i));
+    return {
+      date: day.toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }), // dd/mm/yyyy format
+      dayOfWeek: day.toLocaleDateString('en-GB', { weekday: 'short' }),
+      userId: 'user-1', // Assuming a default user for simplicity
+      tasks: [],
+    };
+  });
+  return week;
 };

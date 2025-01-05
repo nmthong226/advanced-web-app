@@ -19,10 +19,13 @@ import { IoCalendarOutline } from 'react-icons/io5';
 import { ChevronsUpDown } from 'lucide-react';
 
 //Import mock data
-import { userTask } from '@/mocks/MockData.ts';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
 const SideBarTask = () => {
     const [isOpenTask, setIsOpenTask] = useState(false);
+    const { tasks } = useTaskContext();
+
+    const UserTasks = tasks.filter(task => task.status !== 'completed');
 
     return (
         <div className='flex flex-col space-y-2 bg-white p-2 border rounded-lg w-[16%] h-full'>
@@ -77,23 +80,25 @@ const SideBarTask = () => {
                         </div>
                     </CollapsibleContent>
                 </Collapsible>
-                {userTask.map(task => (
-                    <DraggableTask
-                        key={task.id}
-                        id={task.id}
-                        title={task.title}
-                        description={task.description}
-                        startTime={task.startTime || 'No Info'}
-                        endTime={task.endTime || '15:00 PM'}
-                        dueTime={task.dueTime}
-                        backgroundColor={task.style.backgroundColor}
-                        textColor={task.style.textColor}
-                        activity={task.category}
-                        status={task.status || 'pending'}
-                        priority={task.priority}
-                        estimatedTime={task.estimatedTime}
-                    />
-                ))}
+                <div className='flex flex-col space-y-3 pr-1 w-full max-h-full'>
+                    {UserTasks.map(task => (
+                        <DraggableTask
+                            key={task._id}
+                            id={task._id}
+                            title={task.title}
+                            description={task?.description}
+                            startTime={task.startTime || 'No Info'}
+                            endTime={task.endTime || '15:00 PM'}
+                            dueTime={task.dueTime}
+                            backgroundColor={task.style.backgroundColor || ''}
+                            textColor={task.style.textColor || ''}
+                            activity={task.category}
+                            status={task.status || 'pending'}
+                            priority={task.priority}
+                            estimatedTime={task.estimatedTime}
+                        />
+                    ))}
+                </div>
             </div>
         </div>
     )

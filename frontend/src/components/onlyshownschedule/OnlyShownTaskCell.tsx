@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 import { FaCheck } from "react-icons/fa6";
 import { FcCancel } from "react-icons/fc";
 import { RiProgress5Line } from "react-icons/ri";
+import { Task } from '../../types/task';
 
 type CalendarCellProps = {
     time: string;

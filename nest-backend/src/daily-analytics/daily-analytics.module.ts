@@ -4,6 +4,6 @@ import { DailyAnalyticsService } from './daily-analytics.service';
 
 @Module({
   controllers: [DailyAnalyticsController],
-  providers: [DailyAnalyticsService]
+  providers: [DailyAnalyticsService],
 })
 export class DailyAnalyticsModule {}
