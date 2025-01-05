@@ -3,8 +3,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Task, TaskDocument } from './tasks.schema';
 import { TaskStatistics } from '../task-statistics/task-statistics.schema';
-import { faker } from '@faker-js/faker';
-
 
 @Injectable()
 export class TasksService {
@@ -13,42 +11,6 @@ export class TasksService {
     @InjectModel(TaskStatistics.name)
     private taskStatisticsModel: Model<TaskStatistics>,
   ) {}
-
-  async generateMockTasks(count: number = 10) {
-    const mockTasks: Partial<Task>[] = [];
-    for (let i = 0; i < count; i++) {
-        const statusOptions = ['pending', 'in-progress', 'completed', 'expired'];
-        const priorityOptions = ['low', 'medium', 'high'];
-      mockTasks.push({
-        id: faker.string.uuid(), // Generate unique IDs
-        userId: faker.string.uuid(),
-        title: faker.lorem.sentence(),
-        description: faker.lorem.paragraph(),
-        status: statusOptions[Math.floor(Math.random()*statusOptions.length)],
-        priority: priorityOptions[Math.floor(Math.random()*priorityOptions.length)],
-        category: faker.word.noun(),
-        startTime: faker.date.past(),
-        endTime: faker.date.future(),
-        dueTime: faker.date.future(),
-        estimatedTime: faker.number.int({ min: 15, max: 120 }), // Random time in minutes
-        pomodoro_number: faker.number.int({ min: 0, max: 5 }),
-        pomodoro_required_number: faker.number.int({ min: 1, max: 10 }),
-        is_on_calendar: faker.datatype.boolean(),
-        is_on_pomodoro_list: faker.datatype.boolean(),
-        style: {
-            backgroundColor: faker.color.rgb(),
-            textColor: faker.color.rgb()
-        }
-      });
-    }
-
-    try {
-      await this.taskModel.insertMany(mockTasks);
-      console.log(`${count} mock tasks inserted successfully.`);
-    } catch (error) {
-      console.error('Error inserting mock tasks:', error);
-    }
-  }
 
   // Get all tasks
   async findAll(): Promise<Task[]> {

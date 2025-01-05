@@ -32,9 +32,6 @@ export class Task {
   @Prop()
   endTime?: Date;
 
-  @Prop()
-  dueTime?: Date;
-
   // time needed to do this task, in minutes
   @Prop()
   estimatedTime?: number;
@@ -47,9 +44,6 @@ export class Task {
 
   @Prop()
   is_on_pomodoro_list: boolean;
-
-  @Prop()
-  is_on_calendar: boolean;
 
   @Prop({
     type: {
