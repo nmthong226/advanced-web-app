@@ -30,7 +30,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
     }
     try {
       const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND}tasks/user/${userId}`
+        `${import.meta.env.VITE_BACKEND}/tasks/user/${userId}`,
       );
       setTasks(response.data);
     } catch (error) {

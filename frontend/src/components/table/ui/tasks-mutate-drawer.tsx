@@ -39,43 +39,46 @@ import { useUser } from '@clerk/clerk-react';
 // Validation Schema
 // New Validation Schema
 const formSchema = z.object({
-  _id: z.string().optional(),
-  userId: z.string().min(1, 'UserId is required.'),
-  title: z.string().min(1, 'Title is required.'),
-  description: z.string().optional(),
+  _id: z.string().optional(), // Optional _id for updates
+  userId: z.string().min(1, 'UserId is required.'), // User ID is required
+  title: z.string().min(1, 'Title is required.'), // Title is required
+  description: z.string().optional(), // Optional description
   status: z.enum(['pending', 'in-progress', 'completed', 'expired'], {
-    errorMap: () => ({ message: 'Select a valid status.' }),
+    errorMap: () => ({ message: 'Select a valid status.' }), // Enum for status
   }),
   priority: z.enum(['high', 'medium', 'low'], {
-    errorMap: () => ({ message: 'Select a valid priority.' }),
+    errorMap: () => ({ message: 'Select a valid priority.' }), // Enum for priority
   }),
-
-  category: z.string().min(1, 'Category is required.'),
+  category: z.string().min(1, 'Category is required.'), // Category is required
   startTime: z
     .string()
     .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional start time
   endTime: z
     .string()
     .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
-  dueTime: z
-    .string()
-    .datetime()
-    .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
-  estimatedTime: z.number().optional(),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional end time
+  estimatedTime: z.number().optional(), // Optional estimated time
+  pomodoro_required_number: z
+    .number()
+    .min(0, 'Pomodoro required number should be 0 or greater')
+    .optional(), // Optional but can be used for pomodoro number
+  pomodoro_number: z
+    .number()
+    .min(0, 'Pomodoro number should be 0 or greater')
+    .optional(), // Optional pomodoro number
+  is_on_pomodoro_list: z.boolean().optional(), // Optional but boolean indicating whether it's on the Pomodoro list
   style: z
     .object({
       backgroundColor: z.string(),
       textColor: z.string(),
     })
-    .optional(),
+    .optional(), // Optional style for background and text color
 });
 
-type TasksForm = z.infer<typeof formSchema>;
+type TasksForm = z.infer<typeof formSchema>; // Extract the TypeScript type from the schema
 
 export function TasksMutateDrawer() {
   const { open, currentRow, handleOpen } = useTasksContext();
@@ -83,6 +86,7 @@ export function TasksMutateDrawer() {
   const isUpdate = open === 'update';
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const user = useUser();
+  // Setup form with React Hook Form and Zod validation
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -94,8 +98,10 @@ export function TasksMutateDrawer() {
       category: '',
       startTime: '',
       endTime: '',
-      dueTime: '',
-      estimatedTime: 30,
+      estimatedTime: 30, // Default value for estimated time
+      pomodoro_required_number: 0,
+      pomodoro_number: 0,
+      is_on_pomodoro_list: false,
       style: {
         backgroundColor: '#ffffff',
         textColor: '#000000',
@@ -103,10 +109,9 @@ export function TasksMutateDrawer() {
     },
   });
 
-  // Load currentRow data into the form when updating
+  // Reset form with currentRow data when updating
   useEffect(() => {
     if (isUpdate && currentRow) {
-      // Populate form with currentRow data in update mode
       form.reset({
         _id: currentRow._id,
         userId: currentRow.userId,
@@ -117,8 +122,10 @@ export function TasksMutateDrawer() {
         category: currentRow.category,
         startTime: currentRow.startTime || '',
         endTime: currentRow.endTime || '',
-        dueTime: currentRow.dueTime || '',
         estimatedTime: currentRow.estimatedTime,
+        pomodoro_required_number: currentRow.pomodoro_required_number || 0,
+        pomodoro_number: currentRow.pomodoro_number || 0,
+        is_on_pomodoro_list: currentRow.is_on_pomodoro_list || false,
         style: currentRow.style || {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -127,7 +134,7 @@ export function TasksMutateDrawer() {
     } else {
       // Reset form to default values in create mode
       form.reset({
-        userId: user.user?.id, // Default userId
+        userId: user.user?.id,
         title: '',
         description: '',
         status: 'pending',
@@ -135,8 +142,10 @@ export function TasksMutateDrawer() {
         category: '',
         startTime: '',
         endTime: '',
-        dueTime: '',
         estimatedTime: undefined,
+        pomodoro_required_number: 0,
+        pomodoro_number: 0,
+        is_on_pomodoro_list: false,
         style: {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -162,7 +171,6 @@ export function TasksMutateDrawer() {
         setTasks((prev) =>
           prev.map((task) =>
             task._id === data._id ? { ...task, ...payload } : task,
-
           ),
         );
         setToastMessage(`Task "${data.title}" has been successfully updated.`);
@@ -337,33 +345,6 @@ export function TasksMutateDrawer() {
                 )}
               />
 
-              {/* Due Date Field */}
-              <FormField
-                control={form.control}
-                name="dueTime"
-                render={({ field }) => (
-                  <FormItem className="space-y-1">
-                    <FormLabel>Due Time</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="datetime-local"
-                        value={
-                          field.value
-                            ? field.value.replace('Z', '').slice(0, 16)
-                            : ''
-                        } // Trim to fit "YYYY-MM-DDTHH:MM"
-                        onChange={(e) => {
-                          const inputValue = e.target.value;
-                          const isoValue = new Date(inputValue).toISOString();
-                          field.onChange(isoValue);
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="startTime"
