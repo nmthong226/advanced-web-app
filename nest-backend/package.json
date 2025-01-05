@@ -31,6 +31,7 @@
     "@nestjs/swagger": "^8.1.0",
     "@vendia/serverless-express": "^4.12.6",
     "class-validator": "^0.14.1",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "jsonwebtoken": "^9.0.2",
