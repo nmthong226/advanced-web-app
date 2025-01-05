@@ -1,8 +1,12 @@
+// src/tasks/tasks.service.ts
+
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateTaskDto, UpdateTaskDto } from './tasks.dto';
+import { UpdateTaskStatusDto } from './tasks.dto'; // Import the new DTO
 import { Task, TaskDocument } from './tasks.schema';
+
 
 @Injectable()
 export class TasksService {
@@ -44,11 +48,30 @@ export class TasksService {
   // Update an existing task
   async updateTask(id: string, updateTaskDto: UpdateTaskDto): Promise<Task> {
     const updatedTask = await this.taskModel
-      .findByIdAndUpdate(id, updateTaskDto, { new: true })
+      .findByIdAndUpdate(id, updateTaskDto, { new: true, runValidators: true })
       .exec();
     if (!updatedTask) {
       throw new NotFoundException(`Task with ID ${id} not found`);
     }
+    return updatedTask;
+  }
+
+  // Update the status of a task
+  async updateTaskStatus(id: string, updateTaskStatusDto: UpdateTaskStatusDto): Promise<Task> {
+    const { status } = updateTaskStatusDto;
+
+    const updatedTask = await this.taskModel
+      .findByIdAndUpdate(
+        id,
+        { status },
+        { new: true, runValidators: true }, // runValidators ensures enum validation at the DB level
+      )
+      .exec();
+
+    if (!updatedTask) {
+      throw new NotFoundException(`Task with ID ${id} not found`);
+    }
+
     return updatedTask;
   }
 

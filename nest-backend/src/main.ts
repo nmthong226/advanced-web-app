@@ -1,9 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-
+import cookieParser from 'cookie-parser';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.use(cookieParser());
   // Enable CORS
   app.enableCors({
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow specific HTTP methods
@@ -16,3 +16,4 @@ async function bootstrap() {
   console.log('Backend is running on http://localhost:3000');
 }
 bootstrap();
+

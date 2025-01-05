@@ -17,149 +17,45 @@ import { IoMdMore } from 'react-icons/io';
 import { Trash, Trash2 } from 'lucide-react';
 import { BsFillSkipEndFill } from 'react-icons/bs';
 import { FaRegChartBar } from 'react-icons/fa';
+import { Task, mockTasks } from './tasks'; // Import Task and mockTasks
 
-// Define the Task type
-interface Task {
-  _id: string;
-  userId: string;
-  title: string;
-  description?: string;
-  status: 'pending' | 'in-progress' | 'completed';
-  priority: 'low' | 'medium' | 'high';
-  category: string;
-  startTime?: string;
-  endTime?: string;
-  dueTime?: string;
-  estimatedTime: number; // Estimated Pomodoros
-  pomodorosCompleted: number; // Pomodoros Completed
-  style: {
-    backgroundColor: string;
-    textColor: string;
-  };
-  isOnCalendar: boolean;
-}
+// Function to handle mode title
+const handleModeTitle = (
+  mode: 'pomodoro' | 'shortBreak' | 'longBreak',
+): string => {
+  switch (mode) {
+    case 'pomodoro':
+      return 'Time to Focus!';
+    case 'shortBreak':
+      return 'Short Break';
+    case 'longBreak':
+      return 'Long Break';
+    default:
+      return 'Time to Focus!';
+  }
+};
 
 const Timer = () => {
+  // Settings State
+  const [pomodoroDuration, setPomodoroDuration] = useState<number>(25); // in minutes
+  const [shortBreakDuration, setShortBreakDuration] = useState<number>(5); // in minutes
+  const [longBreakDuration, setLongBreakDuration] = useState<number>(15); // in minutes
+  const [longBreakInterval, setLongBreakInterval] = useState<number>(4); // number of Pomodoros before a long break
+
+  // Sound Settings
+  const [soundAlarm, setSoundAlarm] = useState<string>('bell');
+  const [soundBreak, setSoundBreak] = useState<string>('bird');
+
   // Timer States
   const [mode, setMode] = useState<'pomodoro' | 'shortBreak' | 'longBreak'>(
     'pomodoro',
   );
-  const [time, setTime] = useState<number>(1500); // 25 minutes in seconds
+  const [time, setTime] = useState<number>(pomodoroDuration * 60); // in seconds
   const [isActive, setIsActive] = useState<boolean>(false);
-
-  // Interval Tracking for Long Breaks
   const [pomodoroCount, setPomodoroCount] = useState<number>(0);
-  const longBreakInterval = 4; // After 4 Pomodoros, take a Long Break
-  const handlePomodoroCompletion = () => {
-    if (!selectedTask) return;
 
-    // Update task's completed Pomodoros
-    setTasks((prevTasks) =>
-      prevTasks.map((task) =>
-        task._id === selectedTask._id
-          ? { ...task, pomodorosCompleted: task.pomodorosCompleted + 1 }
-          : task,
-      ),
-    );
-
-    // Update global pomodoro count
-    setPomodoroCount((prevCount) => prevCount + 1);
-
-    // Handle task status and mode
-    if (
-      selectedTask.pomodorosCompleted + 1 >= selectedTask.estimatedTime &&
-      selectedTask.status !== 'completed'
-    ) {
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === selectedTask._id
-            ? { ...task, status: 'completed' }
-            : task,
-        ),
-      );
-    }
-
-    // Recalculate time and update mode
-    if ((pomodoroCount + 1) % longBreakInterval === 0) {
-      handleModeChange('longBreak');
-    } else {
-      handleModeChange('shortBreak');
-    }
-
-    // Update estimated finish time
-    setTime(getDefaultTime(mode));
-  };
-
-  // Function to calculate total estimated time
-  const calculateTotalEstimatedTime = (): string => {
-    let totalSeconds = 0;
-
-    tasks.forEach((task) => {
-      const pomoCount = task.estimatedTime;
-      const fullCycles = Math.floor(pomoCount / 4); // Number of full cycles (4 Pomos each)
-      const remainingPomos = pomoCount % 4; // Remaining Pomos outside of full cycles
-
-      // Time for full cycles
-      totalSeconds += fullCycles * (4 * 1500 + 900); // 4 Pomos + 1 Long Break per cycle
-
-      // Time for remaining Pomodoros
-      totalSeconds += remainingPomos * 1500; // Remaining Pomodoros
-      totalSeconds += (remainingPomos > 0 ? remainingPomos - 1 : 0) * 300; // Short breaks for remaining Pomodoros
-    });
-
-    // Format total time as hh:mm
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-
-    return `${hours}h ${minutes}m`;
-  };
-
-  // Task States with Mock Data
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      _id: '1',
-      userId: 'user123',
-      title: 'Write blog post',
-      description: 'Draft the new blog post on React hooks.',
-      status: 'in-progress',
-      priority: 'high',
-      category: 'Work',
-      startTime: new Date().toISOString(),
-      endTime: new Date(new Date().getTime() + 1500 * 1000).toISOString(),
-      dueTime: new Date(new Date().getTime() + 3600 * 1000).toISOString(),
-      estimatedTime: 1, // 1 Pomodoro
-      pomodorosCompleted: 0, // Initially 0
-      style: {
-        backgroundColor: '#FFCDD2',
-        textColor: '#B71C1C',
-      },
-      isOnCalendar: true,
-    },
-    {
-      _id: '2',
-      userId: 'user123',
-      title: 'Read a book',
-      description: 'Finish reading "Clean Code" by Robert C. Martin.',
-      status: 'pending',
-      priority: 'medium',
-      category: 'Personal',
-      startTime: '',
-      endTime: '',
-      dueTime: new Date(new Date().getTime() + 7200 * 1000).toISOString(),
-      estimatedTime: 2, // 2 Pomodoros
-      pomodorosCompleted: 0, // Initially 0
-      style: {
-        backgroundColor: '#C8E6C9',
-        textColor: '#1B5E20',
-      },
-      isOnCalendar: false,
-    },
-    // You can add more mock tasks here
-  ]);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  // Selected Task State
+  // Task States
+  const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Edit Task Inline States
@@ -170,6 +66,9 @@ const Timer = () => {
 
   // Modal State for Adding Task
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
+
+  // State for form errors
+  const [error, setError] = useState<string | null>(null);
 
   // Function to handle background color based on the mode
   const getBackgroundColor = () => {
@@ -209,58 +108,124 @@ const Timer = () => {
   ): number => {
     switch (currentMode) {
       case 'pomodoro':
-        return 1500; // 25 minutes
+        return pomodoroDuration * 60; // Convert minutes to seconds
       case 'shortBreak':
-        return 300; // 5 minutes
+        return shortBreakDuration * 60;
       case 'longBreak':
-        return 900; // 15 minutes
+        return longBreakDuration * 60;
       default:
-        return 1500;
+        return pomodoroDuration * 60;
     }
   };
 
-  // Handle mode change
+  // Function to handle mode change
   const handleModeChange = (
     newMode: 'pomodoro' | 'shortBreak' | 'longBreak',
   ) => {
     setMode(newMode);
     setIsActive(false); // Pause timer
     setTime(getDefaultTime(newMode)); // Reset time
-    // Note: Do not deselect the task here to maintain selection
   };
-  const handleFinishTask = (taskId: string) => {
+
+  // Function to play alarm sound
+  const playAlarmSoundFunction = () => {
+    let soundUrl = '';
+    if (soundAlarm === 'bell') {
+      soundUrl =
+        'https://firebasestorage.googleapis.com/v0/b/yolo-web-app.appspot.com/o/music%2Fbell.MP3?alt=media&token=bfd3eaa1-235e-4dea-948b-87610db24f1e';
+    } else if (soundAlarm === 'kitchen') {
+      soundUrl =
+        'https://firebasestorage.googleapis.com/v0/b/yolo-web-app.appspot.com/o/music%2Fchime.MP3?alt=media&token=9f9c0d0a-2b0b-4e9a-8f9f-4d6c0d9d5f8d';
+    }
+
+    if (soundUrl) {
+      const soundInstance = new Howl({
+        src: [soundUrl],
+        html5: true,
+      });
+      soundInstance.play();
+    }
+  };
+
+  // Function to play break sound
+  const playBreakSoundFunction = () => {
+    let soundUrl = '';
+    if (soundBreak === 'bird') {
+      soundUrl =
+        'https://firebasestorage.googleapis.com/v0/b/yolo-web-app.appspot.com/o/music%2Fbreak.MP3?alt=media&token=210cff3d-b006-4947-b290-9bb5efbd3336';
+    }
+
+    if (soundUrl) {
+      const soundInstance = new Howl({
+        src: [soundUrl],
+        html5: true,
+      });
+      soundInstance.play();
+    }
+  };
+
+  // Function to handle Pomodoro Completion
+  const handlePomodoroCompletion = () => {
+    if (!selectedTask) return;
+
+    // Update task's completed Pomodoros
     setTasks((prevTasks) =>
       prevTasks.map((task) =>
-        task._id === taskId
-          ? {
-              ...task,
-              status: 'completed',
-              pomodorosCompleted: task.estimatedTime, // Mark all Pomodoros as completed
-            }
+        task._id === selectedTask._id
+          ? { ...task, pomodorosCompleted: task.pomodorosCompleted + 1 }
           : task,
       ),
     );
 
-    // If the selected task is finished, deselect it and reset the timer
-    if (selectedTask && selectedTask._id === taskId) {
-      setSelectedTask(null);
-      setIsActive(false);
-      setTime(getDefaultTime(mode));
-    }
-  };
+    // Update global pomodoro count
+    setPomodoroCount((prevCount) => prevCount + 1);
 
-  const handleModeTitle = (
-    currentMode: 'pomodoro' | 'shortBreak' | 'longBreak',
-  ): string => {
-    switch (currentMode) {
-      case 'pomodoro':
-        return 'Time to Focus!';
-      case 'shortBreak':
-        return 'Short Break';
-      case 'longBreak':
-        return 'Long Break';
-      default:
-        return 'Time to Focus!';
+    // Find the updated task
+    const updatedTask = tasks.find((t) => t._id === selectedTask._id);
+
+    if (updatedTask) {
+      const newPomodorosCompleted = updatedTask.pomodorosCompleted + 1;
+
+      if (
+        newPomodorosCompleted >= updatedTask.estimatedTime &&
+        updatedTask.status !== 'completed'
+      ) {
+        // Update task status to 'completed' and synchronize pomodorosCompleted
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task._id === updatedTask._id
+              ? {
+                  ...task,
+                  status: 'completed',
+                  pomodorosCompleted: updatedTask.estimatedTime,
+                }
+              : task,
+          ),
+        );
+
+        // Play alarm sound
+        playAlarmSoundFunction();
+
+        // If the completed task is the selected task, reset timer
+        if (selectedTask._id === updatedTask._id) {
+          setIsActive(false);
+          setTime(getDefaultTime(mode));
+          setSelectedTask(null);
+        }
+      } else {
+        // Recalculate mode
+        if ((pomodoroCount + 1) % longBreakInterval === 0) {
+          handleModeChange('longBreak');
+        } else {
+          handleModeChange('shortBreak');
+        }
+
+        // Play break sound
+        playBreakSoundFunction();
+
+        // Reset timer
+        setTime(getDefaultTime(mode));
+      }
     }
   };
 
@@ -271,43 +236,37 @@ const Timer = () => {
       interval = setInterval(() => {
         setTime((prevTime) => prevTime - 1);
       }, 1000);
-    } else if (time === 0) {
+    } else if (isActive && time === 0) {
       setIsActive(false); // Stop timer
       if (selectedTask) {
         handlePomodoroCompletion(); // Update completed Pomodoros for the task
-
-        // Increment global pomodoro count
-        setPomodoroCount((prevCount) => prevCount + 1);
-
-        // Mark task as completed if pomodorosCompleted >= estimatedTime
-        setTasks((prevTasks) =>
-          prevTasks.map((task) =>
-            task._id === selectedTask._id &&
-            task.pomodorosCompleted + 1 >= task.estimatedTime
-              ? { ...task, status: 'completed' }
-              : task,
-          ),
-        );
-
-        // Determine next mode after updating pomodoroCount and task status
-        if ((pomodoroCount + 1) % longBreakInterval === 0) {
-          handleModeChange('longBreak');
-        } else {
-          handleModeChange('shortBreak');
-        }
       }
     }
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, time, selectedTask, pomodoroCount, longBreakInterval]);
+  }, [isActive, time, selectedTask, pomodoroCount]);
 
   // Update document title with time and mode
   useEffect(() => {
     document.title = `${formatTime(time)} - ${handleModeTitle(mode)}`;
   }, [time, mode]);
 
-  // Handle deleting a task
+  // Update timer time when settings change and no task is selected
+  useEffect(() => {
+    if (!selectedTask) {
+      setTime(getDefaultTime(mode));
+    }
+    // If a task is selected, keep the current timer running
+  }, [
+    pomodoroDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    mode,
+    selectedTask,
+  ]);
+
+  // Function to handle deleting a task
   const handleDeleteTask = (taskId: string) => {
     // If the task being deleted is the selected task, stop the timer
     if (selectedTask && selectedTask._id === taskId) {
@@ -319,8 +278,10 @@ const Timer = () => {
     setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
   };
 
-  // Handle selecting a task
+  // Function to handle selecting a task
   const handleSelectTask = (task: Task) => {
+    if (task.status === 'completed') return; // Do not allow selecting completed tasks
+
     if (isActive && selectedTask && selectedTask._id !== task._id) {
       // If a different task is already active, confirm switch
       if (
@@ -331,14 +292,26 @@ const Timer = () => {
         setIsActive(false);
         setSelectedTask(task);
         setTime(getDefaultTime(mode));
+        // Update the newly selected task's status to 'in-progress'
+        setTasks((prevTasks) =>
+          prevTasks.map((t) =>
+            t._id === task._id ? { ...t, status: 'in-progress' } : t,
+          ),
+        );
       }
     } else {
       setSelectedTask(task);
       setTime(getDefaultTime(mode));
+      // Update task status to 'in-progress' upon selection
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t._id === task._id ? { ...t, status: 'in-progress' } : t,
+        ),
+      );
     }
   };
 
-  // Handle skipping a Pomodoro or Break
+  // Function to handle skipping a Pomodoro or Break
   const handleSkip = () => {
     if (!selectedTask) {
       alert('Please select a task to skip Pomodoro.');
@@ -358,21 +331,52 @@ const Timer = () => {
       // Increment global pomodoro count
       setPomodoroCount((prevCount) => prevCount + 1);
 
-      // Mark task as completed if pomodorosCompleted >= estimatedTime
-      setTasks((prevTasks) =>
-        prevTasks.map((task) =>
-          task._id === selectedTask._id &&
-          task.pomodorosCompleted + 1 >= task.estimatedTime
-            ? { ...task, status: 'completed' }
-            : task,
-        ),
-      );
+      // Find the updated task
+      const updatedTask = tasks.find((t) => t._id === selectedTask._id);
 
-      // Determine next mode
-      if ((pomodoroCount + 1) % longBreakInterval === 0) {
-        handleModeChange('longBreak');
-      } else {
-        handleModeChange('shortBreak');
+      if (updatedTask) {
+        const newPomodorosCompleted = updatedTask.pomodorosCompleted + 1;
+
+        if (
+          newPomodorosCompleted >= updatedTask.estimatedTime &&
+          updatedTask.status !== 'completed'
+        ) {
+          // Update task status to 'completed' and synchronize pomodorosCompleted
+          setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task._id === updatedTask._id
+                ? {
+                    ...task,
+                    status: 'completed',
+                    pomodorosCompleted: updatedTask.estimatedTime,
+                  }
+                : task,
+            ),
+          );
+
+          // Play alarm sound
+          playAlarmSoundFunction();
+
+          // If the completed task is the selected task, reset timer
+          if (selectedTask._id === updatedTask._id) {
+            setIsActive(false);
+            setTime(getDefaultTime(mode));
+            setSelectedTask(null);
+          }
+        } else {
+          // Determine next mode
+          if ((pomodoroCount + 1) % longBreakInterval === 0) {
+            handleModeChange('longBreak');
+          } else {
+            handleModeChange('shortBreak');
+          }
+
+          // Play break sound
+          playBreakSoundFunction();
+
+          // Reset timer
+          setTime(getDefaultTime(mode));
+        }
       }
     } else if (mode === 'shortBreak' || mode === 'longBreak') {
       // Transition back to Pomodoro mode
@@ -380,37 +384,9 @@ const Timer = () => {
     }
 
     setIsActive(false); // Stop the timer
-    setTime(
-      getDefaultTime(
-        mode === 'pomodoro'
-          ? (pomodoroCount + 1) % longBreakInterval === 0
-            ? 'longBreak'
-            : 'shortBreak'
-          : 'pomodoro',
-      ),
-    );
-    // Do not deselect the task to keep it selected
   };
 
-  // Calculate total Pomodoros planned and completed
-  const totalPomodorosPlanned = tasks.reduce(
-    (acc, task) => acc + task.estimatedTime,
-    0,
-  );
-  const totalPomodorosCompleted = tasks.reduce(
-    (acc, task) => acc + task.pomodorosCompleted,
-    0,
-  );
-
-  // Calculate estimated finish time based on selected task and Pomodoros
-  const estimatedFinishTime = selectedTask
-    ? new Date(new Date().getTime() + time * 1000).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-      })
-    : '--:--';
-
-  // Handle initiating edit for a task
+  // Function to initiate editing a task
   const initiateEditTask = (task: Task) => {
     setEditingTaskId(task._id);
     setEditingTaskTitle(task.title);
@@ -418,7 +394,7 @@ const Timer = () => {
     setError(null);
   };
 
-  // Handle saving edited task
+  // Function to save edited task
   const saveEditedTask = (taskId: string) => {
     if (!editingTaskTitle.trim()) {
       setError('Task title is required.');
@@ -433,12 +409,24 @@ const Timer = () => {
               ...task,
               title: editingTaskTitle,
               estimatedTime: editingEstimatedPomodoros,
+              // Reset pomodorosCompleted if estimatedTime is reduced below
+              pomodorosCompleted:
+                editingEstimatedPomodoros < task.pomodorosCompleted
+                  ? editingEstimatedPomodoros
+                  : task.pomodorosCompleted,
+              // Update status if necessary
+              status:
+                editingEstimatedPomodoros <= task.pomodorosCompleted
+                  ? 'completed'
+                  : task.status === 'completed'
+                    ? 'in-progress'
+                    : task.status,
             }
           : task,
       ),
     );
 
-    // If the edited task is the selected task, update its estimatedTime
+    // If the edited task is the selected task, update its estimatedTime and status
     if (selectedTask && selectedTask._id === taskId) {
       setSelectedTask((prevSelected) =>
         prevSelected
@@ -446,6 +434,16 @@ const Timer = () => {
               ...prevSelected,
               title: editingTaskTitle,
               estimatedTime: editingEstimatedPomodoros,
+              pomodorosCompleted:
+                editingEstimatedPomodoros < prevSelected.pomodorosCompleted
+                  ? editingEstimatedPomodoros
+                  : prevSelected.pomodorosCompleted,
+              status:
+                editingEstimatedPomodoros <= prevSelected.pomodorosCompleted
+                  ? 'completed'
+                  : prevSelected.status === 'completed'
+                    ? 'in-progress'
+                    : prevSelected.status,
             }
           : null,
       );
@@ -455,7 +453,7 @@ const Timer = () => {
     setError(null);
   };
 
-  // Handle canceling edit
+  // Function to cancel editing a task
   const cancelEditTask = () => {
     setEditingTaskId(null);
     setError(null);
@@ -473,43 +471,31 @@ const Timer = () => {
 
   // Function to handle selecting a task from the modal
   const handleAddTaskFromModal = (task: Task) => {
-    setSelectedTask(task);
-    setTime(getDefaultTime(mode));
-    setIsAddModalOpen(false);
+    if (task.status !== 'completed') {
+      // Ensure only incomplete tasks are selected
+      setSelectedTask(task);
+      // Update task status to 'in-progress' upon selection
+      setTasks((prevTasks) =>
+        prevTasks.map((t) =>
+          t._id === task._id ? { ...t, status: 'in-progress' } : t,
+        ),
+      );
+      setTime(getDefaultTime(mode));
+      setIsAddModalOpen(false);
+    }
   };
 
-  // Function to calculate real completion time
-  const calculateCompletionTime = (): string => {
-    let totalSeconds = 0;
+  // Calculate total Pomodoros planned and completed
+  const totalPomodorosPlanned = tasks.reduce(
+    (acc, task) => acc + task.estimatedTime,
+    0,
+  );
+  const totalPomodorosCompleted = tasks.reduce(
+    (acc, task) => acc + task.pomodorosCompleted,
+    0,
+  );
 
-    tasks.forEach((task) => {
-      const pomoCount = task.estimatedTime;
-      const fullCycles = Math.floor(pomoCount / 4); // Number of full cycles (4 Pomos each)
-      const remainingPomos = pomoCount % 4; // Remaining Pomos outside of full cycles
-
-      // Time for full cycles
-      totalSeconds += fullCycles * (4 * 1500 + 900); // 4 Pomos + 1 Long Break per cycle
-
-      // Time for remaining Pomodoros
-      totalSeconds += remainingPomos * 1500; // Remaining Pomodoros
-      totalSeconds += (remainingPomos > 0 ? remainingPomos - 1 : 0) * 300; // Short breaks for remaining Pomodoros
-    });
-
-    // Get the current time
-    const currentTime = new Date();
-
-    // Calculate completion time by adding totalSeconds
-    const completionTime = new Date(
-      currentTime.getTime() + totalSeconds * 1000,
-    );
-
-    // Format the time as hh:mm AM/PM
-    return completionTime.toLocaleTimeString([], {
-      hour: '2-digit',
-      minute: '2-digit',
-    });
-  };
-
+  // Calculate estimated finish time based on selected task and Pomodoros
   const calculateCompletionTimeWithRemaining = (): string => {
     let totalSeconds = 0;
 
@@ -521,11 +507,13 @@ const Timer = () => {
       const leftoverPomos = remainingPomos % 4; // Remaining Pomodoros
 
       // Full cycle time
-      totalSeconds += fullCycles * (4 * 1500 + 900); // 4 Pomos + 1 Long Break
+      totalSeconds +=
+        fullCycles * (4 * pomodoroDuration * 60 + longBreakDuration * 60); // 4 Pomos + 1 Long Break
 
       // Remaining Pomodoro time
-      totalSeconds += leftoverPomos * 1500; // Pomodoro durations
-      totalSeconds += (leftoverPomos > 0 ? leftoverPomos - 1 : 0) * 300; // Short breaks
+      totalSeconds += leftoverPomos * pomodoroDuration * 60; // Pomodoro durations
+      totalSeconds +=
+        (leftoverPomos > 0 ? leftoverPomos - 1 : 0) * shortBreakDuration * 60; // Short breaks
     });
 
     const currentTime = new Date();
@@ -563,7 +551,21 @@ const Timer = () => {
                 <FaRegChartBar className="mr-2" />
                 Report
               </button>
-              <PomoSettings /> {/* Settings Button */}
+              <PomoSettings
+                pomodoroDuration={pomodoroDuration}
+                setPomodoroDuration={setPomodoroDuration}
+                shortBreakDuration={shortBreakDuration}
+                setShortBreakDuration={setShortBreakDuration}
+                longBreakDuration={longBreakDuration}
+                setLongBreakDuration={setLongBreakDuration}
+                longBreakInterval={longBreakInterval}
+                setLongBreakInterval={setLongBreakInterval}
+                soundAlarm={soundAlarm}
+                setSoundAlarm={setSoundAlarm}
+                soundBreak={soundBreak}
+                setSoundBreak={setSoundBreak}
+              />{' '}
+              {/* Settings Button */}
             </div>
           </div>
         </div>
@@ -697,13 +699,38 @@ const Timer = () => {
                 <DropdownMenuContent className="w-48">
                   <DropdownMenuGroup>
                     <DropdownMenuItem
-                      onSelect={() => alert('Delete all tasks')}
+                      onSelect={() => {
+                        // Delete all tasks logic
+                        if (
+                          window.confirm(
+                            'Are you sure you want to delete all tasks?',
+                          )
+                        ) {
+                          setTasks([]);
+                          setSelectedTask(null);
+                          setIsActive(false);
+                          setTime(getDefaultTime(mode));
+                        }
+                      }}
                     >
                       <Trash className="mr-2" />
                       <span>Delete all tasks</span>
                     </DropdownMenuItem>
                     <DropdownMenuItem
-                      onSelect={() => alert('Clear finished tasks')}
+                      onSelect={() => {
+                        // Clear finished tasks logic
+                        if (
+                          window.confirm(
+                            'Are you sure you want to clear all completed tasks?',
+                          )
+                        ) {
+                          setTasks((prevTasks) =>
+                            prevTasks.filter(
+                              (task) => task.status !== 'completed',
+                            ),
+                          );
+                        }
+                      }}
                     >
                       <Trash2 className="mr-2" />
                       <span>Clear finished tasks</span>
@@ -716,10 +743,8 @@ const Timer = () => {
 
           {/* Display Tasks */}
           <div className="flex flex-col w-full max-w-md mt-4">
-            {isLoading && <p>Loading tasks...</p>}
-            {error && <p className="text-red-500">{error}</p>}
-            {!isLoading && tasks.length === 0 && <p>No tasks available.</p>}
-            {!isLoading && tasks.length > 0 && (
+            {tasks.length === 0 && <p>No tasks available.</p>}
+            {tasks.length > 0 && (
               <ul className="space-y-2 overflow-auto max-h-64">
                 {tasks.map((task) => (
                   <li
@@ -729,7 +754,7 @@ const Timer = () => {
                         ? 'border-2 border-blue-500'
                         : ''
                     } hover:bg-gray-50 transition-colors`}
-                    onClick={() => handleSelectTask(task)} // Added onClick handler for task selection
+                    onClick={() => handleSelectTask(task)} // Task selection
                   >
                     {/* If this task is being edited, show the edit card */}
                     {editingTaskId === task._id ? (
@@ -879,20 +904,46 @@ const Timer = () => {
                             type="checkbox"
                             checked={task.status === 'completed'}
                             onChange={() => {
-                              // Toggle the status between 'completed' and 'pending'
-                              setTasks((prevTasks) =>
-                                prevTasks.map((t) =>
-                                  t._id === task._id
-                                    ? {
-                                        ...t,
-                                        status:
-                                          t.status === 'completed'
-                                            ? 'pending'
-                                            : 'completed',
-                                      }
-                                    : t,
-                                ),
-                              );
+                              if (task.status !== 'completed') {
+                                // Mark as completed
+                                setTasks((prevTasks) =>
+                                  prevTasks.map((t) =>
+                                    t._id === task._id
+                                      ? {
+                                          ...t,
+                                          status: 'completed',
+                                          pomodorosCompleted: t.estimatedTime,
+                                        }
+                                      : t,
+                                  ),
+                                );
+
+                                // Play alarm sound
+                                playAlarmSoundFunction();
+
+                                // If the completed task is the selected task, reset timer
+                                if (
+                                  selectedTask &&
+                                  selectedTask._id === task._id
+                                ) {
+                                  setIsActive(false);
+                                  setTime(getDefaultTime(mode));
+                                  setSelectedTask(null);
+                                }
+                              } else {
+                                // Mark as pending
+                                setTasks((prevTasks) =>
+                                  prevTasks.map((t) =>
+                                    t._id === task._id
+                                      ? {
+                                          ...t,
+                                          status: 'pending',
+                                          pomodorosCompleted: 0,
+                                        }
+                                      : t,
+                                  ),
+                                );
+                              }
                             }}
                             className="form-checkbox h-5 w-5 text-red-600"
                             onClick={(e) => e.stopPropagation()} // Prevent triggering task selection
@@ -986,22 +1037,24 @@ const Timer = () => {
                 Select a Task
               </h2>
               <ul className="space-y-2 max-h-60 overflow-auto">
-                {tasks.map((task) => (
-                  <li
-                    key={task._id}
-                    className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
-                    onClick={() => handleAddTaskFromModal(task)}
-                  >
-                    <input
-                      type="radio"
-                      name="selectedTask"
-                      checked={selectedTask?._id === task._id}
-                      readOnly
-                      className="form-radio h-5 w-5 text-[#5f341f]"
-                    />
-                    <span className="text-gray-800">{task.title}</span>
-                  </li>
-                ))}
+                {tasks
+                  .filter((task) => task.status !== 'completed') // Show only incomplete tasks
+                  .map((task) => (
+                    <li
+                      key={task._id}
+                      className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded cursor-pointer transition-colors"
+                      onClick={() => handleAddTaskFromModal(task)}
+                    >
+                      <input
+                        type="radio"
+                        name="selectedTask"
+                        checked={selectedTask?._id === task._id}
+                        readOnly
+                        className="form-radio h-5 w-5 text-[#5f341f]"
+                      />
+                      <span className="text-gray-800">{task.title}</span>
+                    </li>
+                  ))}
               </ul>
               <div className="flex justify-end mt-6 space-x-2">
                 <button
