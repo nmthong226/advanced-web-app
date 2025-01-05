@@ -118,9 +118,9 @@ export class AiFeedbacksService {
     }
   }
 
-  async getSummaryInsights(): Promise<string | { message: string }> {
+  async getSummaryInsights(userId: any): Promise<string | { message: string }> {
     try {
-      const tasks = await this.tasksService.findAll();
+      const tasks = await this.tasksService.findByUserId(userId);
       if (!tasks || tasks.length === 0) {
         return { message: 'No tasks found to analyze' };
       }

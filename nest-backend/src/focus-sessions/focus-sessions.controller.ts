@@ -78,7 +78,6 @@ export class FocusSessionsController {
     if (session_status == 'pomodoro') {
       // Update pomodoro_number and check status in Task table
       await this.taskService.incrementPomodoroNumber(task_id);
-      current_pomodoro_number += 1;
       if (current_pomodoro_number == required_cyle_number) {
         session_status = 'long-break';
       } else {

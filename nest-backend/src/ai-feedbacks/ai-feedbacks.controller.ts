@@ -1,5 +1,5 @@
 // ai-feedbacks.controller.ts
-import { Controller, Post, Body, BadRequestException, Get } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, Get, Param } from '@nestjs/common';
 import { AiFeedbacksService } from './ai-feedbacks.service';
 // import { IsString, IsArray, ValidateNested } from 'class-validator';
 // import { Type } from 'class-transformer';
@@ -67,8 +67,8 @@ export class AiFeedbacksController {
     }
   }
 
-  @Get('summary-insights')
-  async getSummaryInsights() {
-    return this.aiFeedbacksService.getSummaryInsights();
+  @Get('summary-insights/:userId')
+  async getSummaryInsights(@Param('userId') userId: string) {
+    return this.aiFeedbacksService.getSummaryInsights(userId);
   }
 }
