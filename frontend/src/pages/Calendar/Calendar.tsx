@@ -86,7 +86,10 @@ const mockTasks = [
   },
 ];
 
-const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
+const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
+  if (!tasks || tasks.length === 0) {
+    return []; // Return an empty array if tasks is null, undefined, or empty
+  }
   return tasks
     .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
@@ -100,6 +103,9 @@ const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
 };
 
 const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
+  if (!tasks || tasks.length === 0) {
+    return []; // Return an empty array if tasks is null, undefined, or empty
+  }
   return tasks
     .filter(task => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
