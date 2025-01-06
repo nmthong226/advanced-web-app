@@ -148,34 +148,34 @@ export const columns: ColumnDef<Task>[] = [
       return rowDate >= fromDate && rowDate <= toDate;
     },
   },
-  {
-    accessorKey: 'estimatedTime',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Es.Time" />
-    ),
-    cell: ({ row }) => {
-      const estimatedTime = parseInt(row.getValue('estimatedTime'), 10);
-      if (isNaN(estimatedTime)) {
-        return <div className="flex justify-center items-center w-[40px]">-</div>;
-      }
+  // {
+  //   accessorKey: 'estimatedTime',
+  //   header: ({ column }) => (
+  //     <DataTableColumnHeader column={column} title="Es.Time" />
+  //   ),
+  //   cell: ({ row }) => {
+  //     const estimatedTime = parseInt(row.getValue('estimatedTime'), 10);
+  //     if (isNaN(estimatedTime)) {
+  //       return <div className="flex justify-center items-center w-[40px]">-</div>;
+  //     }
   
-      let displayValue;
-      if (estimatedTime < 24) {
-        displayValue = `${estimatedTime}h`; // Less than 1 day in hours
-      } else if (estimatedTime < 168) {
-        displayValue = `${Math.ceil(estimatedTime / 24)}d`; // Between 1 day and 1 week
-      } else {
-        displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than 1 week
-      }
-      return (
-        <div className="flex justify-center items-center w-[40px]">
-          {displayValue === '0h' ? '-' : displayValue}
-        </div>
-      );
-    },
-    enableSorting: true,
-    enableHiding: false,
-  },
+  //     let displayValue;
+  //     if (estimatedTime < 24) {
+  //       displayValue = `${estimatedTime}h`; // Less than 1 day in hours
+  //     } else if (estimatedTime < 168) {
+  //       displayValue = `${Math.ceil(estimatedTime / 24)}d`; // Between 1 day and 1 week
+  //     } else {
+  //       displayValue = `${Math.ceil(estimatedTime / 168)}w`; // More than 1 week
+  //     }
+  //     return (
+  //       <div className="flex justify-center items-center w-[40px]">
+  //         {displayValue === '0h' ? '-' : displayValue}
+  //       </div>
+  //     );
+  //   },
+  //   enableSorting: true,
+  //   enableHiding: false,
+  // },
   {
     id: 'actions',
     cell: ({ row }) => <DataTableRowActions row={row} />,

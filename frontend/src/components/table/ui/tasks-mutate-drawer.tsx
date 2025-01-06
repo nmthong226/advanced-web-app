@@ -18,9 +18,7 @@ import { Input } from 'src/components/ui/input';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
 } from "../../ui/dialog";
 import {
@@ -30,11 +28,9 @@ import {
   TooltipTrigger,
 } from "../../ui/tooltip";
 import { SelectDropdown } from 'src/components/ui/select-dropdown';
-import { Switch } from '../../ui/switch';
 import ReactQuill from 'react-quill';
 
 //Import icons
-import { LuInfo } from "react-icons/lu";
 import { FaCirclePlus } from "react-icons/fa6";
 
 //Import context
@@ -48,52 +44,60 @@ import { toast } from "react-toastify";
 
 //Import types
 import 'react-quill/dist/quill.snow.css'; // For snow theme
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 // Validation Schema
 const formSchema = z.object({
-  _id: z.string().optional(),
-  userId: z.string().min(1, 'UserId is required.'),
-  title: z.string().min(1, 'Title is required.'),
-  description: z.string().optional(),
+  _id: z.string().optional(), // Optional _id for updates
+  userId: z.string().min(1, 'UserId is required.'), // User ID is required
+  title: z.string().min(1, 'Title is required.'), // Title is required
+  description: z.string().optional(), // Optional description
   status: z.enum(['pending', 'in-progress', 'completed', 'expired'], {
-    errorMap: () => ({ message: 'Select a valid status.' }),
+    errorMap: () => ({ message: 'Select a valid status.' }), // Enum for status
   }),
   priority: z.enum(['high', 'medium', 'low'], {
-    errorMap: () => ({ message: 'Select a valid priority.' }),
+    errorMap: () => ({ message: 'Select a valid priority.' }), // Enum for priority
   }),
-  category: z.string().min(1, 'Category is required.'),
+  category: z.string().min(1, 'Category is required.'), // Category is required
   startTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional start time
   endTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional end time
   dueTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
-  estimatedTime: z.number().optional(),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional end time
+  estimatedTime: z.number().optional(), // Optional estimated time
+  pomodoro_required_number: z
+    .number()
+    .min(0, 'Pomodoro required number should be 0 or greater')
+    .optional(), // Optional but can be used for pomodoro number
+  pomodoro_number: z
+    .number()
+    .min(0, 'Pomodoro number should be 0 or greater')
+    .optional(), // Optional pomodoro number
+  is_on_pomodoro_list: z.boolean().optional(), // Optional but boolean indicating whether it's on the Pomodoro list
   style: z
     .object({
       backgroundColor: z.string(),
       textColor: z.string(),
     })
-    .optional(),
+    .optional(), // Optional style for background and text color
 });
+
 
 type TasksForm = z.infer<typeof formSchema>;
 
-export function TasksMutateDrawer() {
+export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Date | null }) {
   const { open, currentRow, handleOpen } = useTasksContext();
-  const [isDisabled, setIsDisabled] = useState(true);
   const { setTasks } = useTaskContext();
   const isUpdate = open === 'update';
   const user = useUser();
+  // Setup form with React Hook Form and Zod validation
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -103,10 +107,12 @@ export function TasksMutateDrawer() {
       status: 'pending',
       priority: 'low',
       category: '',
-      startTime: '',
-      endTime: '',
-      dueTime: '',
-      estimatedTime: 30,
+      startTime: start ? start.toISOString() : '',
+      endTime: end ? end.toISOString() : '',
+      estimatedTime: 30, // Default value for estimated time
+      pomodoro_required_number: 0,
+      pomodoro_number: 0,
+      is_on_pomodoro_list: false,
       style: {
         backgroundColor: '#ffffff',
         textColor: '#000000',
@@ -114,10 +120,9 @@ export function TasksMutateDrawer() {
     },
   });
 
-  // Load currentRow data into the form when updating
+  // Reset form with currentRow data when updating
   useEffect(() => {
     if (isUpdate && currentRow) {
-      // Populate form with currentRow data in update mode
       form.reset({
         _id: currentRow._id,
         userId: currentRow.userId,
@@ -130,6 +135,9 @@ export function TasksMutateDrawer() {
         endTime: currentRow.endTime || '',
         dueTime: currentRow.dueTime || '',
         estimatedTime: currentRow.estimatedTime,
+        pomodoro_required_number: currentRow.pomodoro_required_number || 0,
+        pomodoro_number: currentRow.pomodoro_number || 0,
+        is_on_pomodoro_list: currentRow.is_on_pomodoro_list || false,
         style: currentRow.style || {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -138,7 +146,7 @@ export function TasksMutateDrawer() {
     } else {
       // Reset form to default values in create mode
       form.reset({
-        userId: user.user?.id, // Default userId
+        userId: user.user?.id,
         title: '',
         description: '',
         status: 'pending',
@@ -147,7 +155,10 @@ export function TasksMutateDrawer() {
         startTime: '',
         endTime: '',
         dueTime: '',
-        estimatedTime: 0,
+        estimatedTime: undefined,
+        pomodoro_required_number: 0,
+        pomodoro_number: 0,
+        is_on_pomodoro_list: false,
         style: {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -206,6 +217,8 @@ export function TasksMutateDrawer() {
     }
   };
 
+  const [isDisabled, setIsDisabled] = useState(true);
+
   const handleToggle = (value: any) => {
     setIsDisabled(!value); // Toggle the disabled state
     if (!value) {
@@ -218,6 +231,9 @@ export function TasksMutateDrawer() {
     }
   };
 
+  form.setValue('startTime', start?.toISOString());
+  form.setValue('endTime', end?.toISOString());
+
   return (
     <>
       <Dialog open={open === 'create' || open === 'update'} onOpenChange={(v) => {
@@ -225,9 +241,18 @@ export function TasksMutateDrawer() {
           handleOpen(null); // Close dialog when toggled off
           form.reset();
         }
-        
+
       }}>
-        <DialogContent className="flex flex-col custom-scrollbar min-w-[680px] max-h-[100vh] overflow-y-auto [&>button]:hidden">
+        <DialogContent className="flex flex-col custom-scrollbar min-w-[640px] max-h-[100vh] overflow-y-auto [&>button]:hidden" bgOverlay='bg-black/20'>
+          <DialogHeader>
+            <DialogTitle className='font-bold text-indigo-800 text-lg'>{isUpdate ? 'Update' : 'Create'} Task</DialogTitle>
+            <DialogDescription className='text-[12px] text-muted-foreground'>
+              {isUpdate
+                ? 'Update the task by providing the necessary info. '
+                : 'Add a new task by providing the necessary info. '}
+              Click save when you're done.
+            </DialogDescription>
+          </DialogHeader>
           <Form {...form}>
             <form
               id="tasks-form"
@@ -248,20 +273,11 @@ export function TasksMutateDrawer() {
                   onClick={() => handleToggle(isDisabled)}
                   className="flex justify-center items-center space-x-2 bg-zinc-200 px-2 rounded-md w-16 h-8 text-center"
                 >
-                  <p className="text-[12px] text-zinc-800">
+                  <p className="flex-nowrap text-[12px] text-nowrap text-zinc-800">
                     {isDisabled ? "No dates" : "From/To"}
                   </p>
                 </button>
-                <button
-                  type="button"
-                  className={`${isDisabled ? '' : 'invisible'} right-6 absolute flex justify-center items-center space-x-2 px-2 border rounded-md w-16 h-8 text-center`}
-                >
-                  <p className="text-[12px] text-zinc-800">
-                    Task
-                  </p>
-                </button>
                 <span className={`mx-2 ${isDisabled ? 'invisible' : ''}`}>|</span>
-
                 {/* Conditional Rendering of Date Fields */}
                 <FormField
                   control={form.control}
@@ -437,7 +453,7 @@ export function TasksMutateDrawer() {
                               { label: 'Feature', value: 'feature' },
                               { label: 'Bug', value: 'bug' },
                             ]}
-                            className='border-0 shadow-none px-1 text-[12px]'
+                            className='border-0 shadow-none px-1 w-28 text-[12px]'
                           />
                           <FormMessage />
                         </FormItem>

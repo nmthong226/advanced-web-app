@@ -129,6 +129,11 @@ const MyCalendar: React.FC = () => {
 
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
 
+  const [selectedEvent, setSelectedEvent] = useState<{ start: Date | null; end: Date | null }>({
+    start: null,
+    end: null,
+  });
+
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
     const draggableTask = convertTasksToDraggedEvents(tasks);
@@ -200,15 +205,16 @@ const MyCalendar: React.FC = () => {
   );
 
 
-  // const newEvent = useCallback(
-  //   (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
-  //     handleOpen('create');
-  //     // setMyEvents((prev) => {
-  //     //   return [...prev, { ...event }];
-  //     // });
-  //   },
-  //   [setMyEvents]
-  // );
+  const newEvent = useCallback(
+    (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
+      setSelectedEvent({ start: event.start, end: event.end });
+      handleOpen('create');
+      // setMyEvents((prev) => {
+      //   return [...prev, { ...event }];
+      // });
+    },
+    [setMyEvents]
+  );
 
   const onDropFromOutside = useCallback(
     ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
@@ -279,6 +285,18 @@ const MyCalendar: React.FC = () => {
   );
 
   const defaultDate = useMemo(() => new Date(), [])
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
+
+  const handleSelectEvent = (event: Event) => {
+    setSelectedCalendarEvent(event); // Set the selected event data
+    setDialogOpen(true); // Open the dialog
+  };
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setSelectedCalendarEvent(null); // Clear the selected event
+  };
 
   return (
     <div className="relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full">
@@ -317,14 +335,15 @@ const MyCalendar: React.FC = () => {
           onDropFromOutside={onDropFromOutside}
           onEventDrop={moveEvent}
           onEventResize={resizeEvent}
-          onSelectSlot={() => handleOpen('create')}
+          onSelectSlot={newEvent}
+          onSelectEvent={handleSelectEvent}
           resizable
           selectable
           popup
           style={{ height: 690 }}
           className="px-2"
         />
-        <MemoizedTasksMutateDrawer />
+        <MemoizedTasksMutateDrawer start={selectedEvent.start} end={selectedEvent.end} />
         <ChatAI />
       </div>
     </div>
