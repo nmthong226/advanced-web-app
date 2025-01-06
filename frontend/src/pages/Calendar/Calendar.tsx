@@ -87,7 +87,7 @@ const mockTasks = [
 ];
 
 const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
-  if (!tasks || tasks.length === 0) {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
@@ -103,7 +103,7 @@ const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
 };
 
 const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
-  if (!tasks || tasks.length === 0) {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks

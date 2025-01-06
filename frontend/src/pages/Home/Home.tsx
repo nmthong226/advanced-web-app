@@ -48,7 +48,7 @@ const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
 
 const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
-  if (!tasks || tasks.length === 0) {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
@@ -186,7 +186,7 @@ const Home = () => {
                   </Select>
                 </div>
                 <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
-                  {tasks.map((task) => (
+                  {Array.isArray(tasks) && tasks.map((task) => (
                     <div key={task._id} className="flex space-x-2 shadow-sm p-1.5 border rounded">
                       <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
                         {task.priority === 'high' && (<GoArrowUp />)}
