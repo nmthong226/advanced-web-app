@@ -31,6 +31,7 @@ interface Event {
   end: Date;
   allDay?: boolean;
   status: string;
+  description?: string;
 }
 
 interface DraggedEvent {
@@ -49,6 +50,8 @@ interface Task {
 import { Task as TaskSchema } from "../../types/task.ts";
 import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer.tsx";
 import { useTasksContext } from "../../components/table/context/task-context.tsx";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
+import { DialogHeader } from "../../components/ui/dialog.tsx";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -87,7 +90,7 @@ const mockTasks = [
 ];
 
 const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
-  if (!tasks || tasks.length === 0) {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
@@ -103,7 +106,7 @@ const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
 };
 
 const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
-  if (!tasks || tasks.length === 0) {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
@@ -344,6 +347,39 @@ const MyCalendar: React.FC = () => {
           className="px-2"
         />
         <MemoizedTasksMutateDrawer start={selectedEvent.start} end={selectedEvent.end} />
+        {/* ShadCN Dialog */}
+        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+          <DialogContent className="min-w-[500px]">
+            <DialogHeader>
+              <DialogTitle>{selectedCalendarEvent?.title || "Event Details"}</DialogTitle>
+              <DialogDescription>
+                View and edit the details of your event.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <p><strong>Start:</strong> {selectedCalendarEvent?.start?.toLocaleString()}</p>
+              <p><strong>End:</strong> {selectedCalendarEvent?.end?.toLocaleString()}</p>
+              <p><strong>Status:</strong> {selectedCalendarEvent?.status || "N/A"}</p>
+              <p><strong>Description:</strong> {selectedCalendarEvent?.description || "No description available."}</p>
+            </div>
+            <div className="flex justify-end space-x-2 mt-4">
+              <button
+                className="btn btn-secondary"
+                onClick={handleCloseDialog}
+              >
+                Close
+              </button>
+              <button
+                className="btn btn-primary"
+                onClick={() => {
+                  console.log("Edit event:", selectedEvent);
+                }}
+              >
+                Edit
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
         <ChatAI />
       </div>
     </div>
