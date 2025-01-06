@@ -48,7 +48,7 @@ const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
 
 const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
-  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+  if (!tasks || tasks.length === 0 || !Array.isArray(tasks)) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
