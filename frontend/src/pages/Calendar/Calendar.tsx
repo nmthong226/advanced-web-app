@@ -1,5 +1,5 @@
 // Import frameworks
-import { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 // Import icons
 import { BsListTask } from "react-icons/bs";
@@ -47,6 +47,8 @@ interface Task {
 }
 
 import { Task as TaskSchema } from "../../types/task.ts";
+import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer.tsx";
+import { useTasksContext } from "../../components/table/context/task-context.tsx";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -109,11 +111,15 @@ const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
     }));
 };
 
+const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
+
 const MyCalendar: React.FC = () => {
   const [myEvents, setMyEvents] = useState<Event[]>([]);
   const [draggedEvent, setDraggedEvent] = useState<DraggedEvent | null>(null);
   const [draggableTasks, setDraggableTasks] = useState<Task[]>(mockTasks);
   const [displayDragItemInCell,] = useState<boolean>(true);
+
+  const { handleOpen } = useTasksContext();
 
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
 
@@ -161,15 +167,15 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
       );
-  
+
       // Update the task context
       setTasks(updatedTasks);
-  
+
       // Update the event in the `myEvents` list
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-  
+
         return [
           ...filtered,
           {
@@ -186,16 +192,17 @@ const MyCalendar: React.FC = () => {
     },
     [tasks, setMyEvents, setTasks] // Adding `tasks` here to access the latest context value
   );
-  
 
-  const newEvent = useCallback(
-    (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
-      setMyEvents((prev) => {
-        return [...prev, { ...event }];
-      });
-    },
-    [setMyEvents]
-  );
+
+  // const newEvent = useCallback(
+  //   (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
+  //     handleOpen('create');
+  //     // setMyEvents((prev) => {
+  //     //   return [...prev, { ...event }];
+  //     // });
+  //   },
+  //   [setMyEvents]
+  // );
 
   const onDropFromOutside = useCallback(
     ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
@@ -231,6 +238,14 @@ const MyCalendar: React.FC = () => {
 
   const resizeEvent = useCallback(
     ({ event, start, end }: { event: Event; start: Date; end: Date }) => {
+      // Update tasks state
+      const updatedTasks = tasks.map((task) =>
+        task._id === event.id
+          ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
+          : task
+      );
+      setTasks(updatedTasks);
+
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {
           allDay: false,
@@ -241,11 +256,6 @@ const MyCalendar: React.FC = () => {
           status: event.status
         };
 
-        const updatedTasks = tasks.map((task) =>
-          task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
-        );
-        // Update the task context
-        setTasks(updatedTasks);
 
         const filtered = prev.filter((ev) => ev.id !== event.id);
 
@@ -259,7 +269,7 @@ const MyCalendar: React.FC = () => {
         ];
       });
     },
-    [setMyEvents]
+    [tasks, setTasks, setMyEvents]
   );
 
   const defaultDate = useMemo(() => new Date(), [])
@@ -301,13 +311,14 @@ const MyCalendar: React.FC = () => {
           onDropFromOutside={onDropFromOutside}
           onEventDrop={moveEvent}
           onEventResize={resizeEvent}
-          onSelectSlot={newEvent}
+          onSelectSlot={() => handleOpen('create')}
           resizable
           selectable
           popup
           style={{ height: 690 }}
           className="px-2"
         />
+        <MemoizedTasksMutateDrawer />
         <ChatAI />
       </div>
     </div>

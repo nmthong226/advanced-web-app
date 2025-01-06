@@ -7,7 +7,6 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "../../components/ui/dropdown-menu"
-import { TasksMutateDrawer } from '../../components/table/ui/tasks-mutate-drawer.tsx';
 import {
     Collapsible,
     CollapsibleContent,
@@ -25,14 +24,11 @@ import { GoTag } from "react-icons/go";
 import { MdOutlineDragIndicator } from "react-icons/md";
 
 // Import context
-import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 import { useTasksContext } from '../table/context/task-context.tsx';
 import { Button } from '../ui/button.tsx';
 import { ChevronsUpDown } from 'lucide-react';
 import { FaRegCircle, FaRegCircleCheck, FaRegCircleXmark } from 'react-icons/fa6';
 import { BiSolidCircleQuarter } from 'react-icons/bi';
-
-const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 
 // Define types for props
 type DraggableTaskType = {
@@ -48,14 +44,8 @@ type SideBarTaskProps = {
 };
 
 const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragStart }) => {
-    const { tasks } = useTaskContext();
     const [loading, setLoading] = useState(true);
     const { handleOpen } = useTasksContext();
-
-    // Filter tasks where status is 'completed' or isOnCalendar is true
-    const filteredTasks = tasks.filter(
-        (task) => task.status !== 'completed' && task.startTime && task.endTime
-    );
 
     // Simulate data fetching
     useEffect(() => {
@@ -103,7 +93,6 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                     </DropdownMenuContent>
                 </DropdownMenu>
             </div>
-            <MemoizedTasksMutateDrawer />
             <hr className="border-[1px] my-2" />
             <div className="relative flex bg-gray-100 dark:bg-slate-600 p-2 rounded-lg w-full">
                 <IoSearchSharp className="top-1/2 left-2 absolute transform -translate-y-1/2" />
@@ -130,7 +119,7 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                         </div>
                     ) : (
                         <>
-                            {filteredTasks.length === 0 && (
+                            {draggableTasks.length === 0 && (
                                 <div className="flex flex-col items-center space-x-2 space-y-2 px-2 p-2 w-full text-sm text-zinc-500">
                                     <GiEmptyChessboard className="size-10" />
                                     <p className="text-xs">No tasks available for you yet.</p>

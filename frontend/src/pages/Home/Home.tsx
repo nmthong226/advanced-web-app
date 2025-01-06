@@ -20,7 +20,7 @@ import ProgressBar from "../../components/ProgressBar/ProgressBar";
 import ChatAI from "../../components/AI/chatHistory";
 
 //Import icons
-import { BsListTask } from "react-icons/bs";
+import { BsCheck, BsListTask } from "react-icons/bs";
 import { GiTomato } from "react-icons/gi";
 import { FaCheck } from "react-icons/fa6";
 import { RiRestTimeLine } from "react-icons/ri";
@@ -41,11 +41,16 @@ interface Event {
 }
 import { Task as TaskSchema } from "../../types/task.ts";
 import CustomEvent from "../Calendar/Event.tsx";
+import { formatDate } from "date-fns";
+import { GoArrowDown, GoArrowRight, GoArrowUp } from "react-icons/go";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
 
-const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
+const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
+  if (!tasks || tasks.length === 0) {
+    return []; // Return an empty array if tasks is null, undefined, or empty
+  }
   return tasks
     .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
@@ -181,6 +186,29 @@ const Home = () => {
                   </Select>
                 </div>
                 <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
+                  {tasks.map((task) => (
+                    <div key={task._id} className="flex space-x-2 shadow-sm p-1.5 border rounded">
+                      <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
+                        {task.priority === 'high' && (<GoArrowUp />)}
+                        {task.priority === 'medium' && (<GoArrowRight />)}
+                        {task.priority === 'low' && (<GoArrowDown />)}
+                        <span className="mr-2">{task.title}</span>
+                      </div>
+                      <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
+                        {task.status === 'pending' && (<BsCheck className="mr-1 size-3" />)}
+                        {task.status === 'in-progress' && (<BsCheck className="mr-1 size-3" />)}
+                        {task.status === 'completed' && (<BsCheck className="mr-1 size-3" />)}
+                        {task.status === 'expired' && (<BsCheck className="mr-1 size-3" />)}
+                        <span className="font-medium">{task.status}</span>
+                      </div>
+                      <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                        <span className=""> {task.category}</span>
+                      </div>
+                      <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                        <span className="">{formatDate(task.dueTime as string, 'dd-MM-yy')}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
               <div className="flex items-center p-2 border-t-2 h-[15%]">
