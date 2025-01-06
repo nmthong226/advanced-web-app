@@ -205,7 +205,7 @@ const Home = () => {
                         <span className=""> {task.category}</span>
                       </div>
                       <div className="w-[20%] text-[12px] text-gray-500 truncate">
-                        <span className="">{formatDate(task.dueTime as string, 'dd-MM-yy')}</span>
+                        <span className="">{task.dueTime ? formatDate(task.dueTime as string, 'dd-MM-yy') : 'N/A'}</span>
                       </div>
                     </div>
                   ))}

@@ -22,6 +22,7 @@ const ChatAI = () => {
         ...prev,
         { sender: 'user', message: messageInput },
       ]);
+      setMessageInput('');
 
       console.log('User sent message:', messageInput);
 
@@ -45,7 +46,6 @@ const ChatAI = () => {
           { sender: 'ai', message: 'Sorry, something went wrong.' },
         ]);
       } finally {
-        setMessageInput('');
       }
     }
   };
