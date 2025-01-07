@@ -18,22 +18,20 @@ import { Input } from 'src/components/ui/input';
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogHeader,
-  DialogTitle,
   DialogTrigger,
-} from "../../ui/dialog";
+} from '../../ui/dialog';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../ui/tooltip";
+} from '../../ui/tooltip';
 import { SelectDropdown } from 'src/components/ui/select-dropdown';
-import { Switch } from '../../ui/switch';
+import ReactQuill from 'react-quill';
 
 //Import icons
-import { LuInfo } from "react-icons/lu";
+import { FaCirclePlus } from 'react-icons/fa6';
 
 //Import context
 import { useTasksContext } from '../context/task-context'; // Task UI management
@@ -42,54 +40,69 @@ import { useTaskContext } from '@/contexts/UserTaskContext.tsx'; // Task data ma
 //Import packages/libs
 import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
+
+//Import types
+import 'react-quill/dist/quill.snow.css'; // For snow theme
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 // Validation Schema
-// New Validation Schema
 const formSchema = z.object({
-  _id: z.string().optional(),
-  userId: z.string().min(1, 'UserId is required.'),
-  title: z.string().min(1, 'Title is required.'),
-  description: z.string().optional(),
+  _id: z.string().optional(), // Optional _id for updates
+  userId: z.string().min(1, 'UserId is required.'), // User ID is required
+  title: z.string().min(1, 'Title is required.'), // Title is required
+  description: z.string().optional(), // Optional description
   status: z.enum(['pending', 'in-progress', 'completed', 'expired'], {
-    errorMap: () => ({ message: 'Select a valid status.' }),
+    errorMap: () => ({ message: 'Select a valid status.' }), // Enum for status
   }),
   priority: z.enum(['high', 'medium', 'low'], {
-    errorMap: () => ({ message: 'Select a valid priority.' }),
+    errorMap: () => ({ message: 'Select a valid priority.' }), // Enum for priority
   }),
-  category: z.string().min(1, 'Category is required.'),
+  category: z.string().min(1, 'Category is required.'), // Category is required
   startTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional start time
   endTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional end time
   dueTime: z
     .string()
-    .datetime()
     .optional()
-    .transform((val) => (val ? new Date(val).toISOString() : undefined)),
-  estimatedTime: z.number().optional(),
+    .transform((val) => (val ? new Date(val).toISOString() : undefined)), // Optional end time
+  estimatedTime: z.number().optional(), // Optional estimated time
+  pomodoro_required_number: z
+    .number()
+    .min(0, 'Pomodoro required number should be 0 or greater')
+    .optional(), // Optional but can be used for pomodoro number
+  pomodoro_number: z
+    .number()
+    .min(0, 'Pomodoro number should be 0 or greater')
+    .optional(), // Optional pomodoro number
+  is_on_pomodoro_list: z.boolean().optional(), // Optional but boolean indicating whether it's on the Pomodoro list
   style: z
     .object({
       backgroundColor: z.string(),
       textColor: z.string(),
     })
-    .optional(),
+    .optional(), // Optional style for background and text color
 });
 
 type TasksForm = z.infer<typeof formSchema>;
 
-export function TasksMutateDrawer() {
+export function TasksMutateDrawer({
+  start,
+  end,
+}: {
+  start: Date | null;
+  end: Date | null;
+}) {
   const { open, currentRow, handleOpen } = useTasksContext();
-  const [isDisabled, setIsDisabled] = useState(true);
   const { setTasks } = useTaskContext();
   const isUpdate = open === 'update';
   const user = useUser();
+  // Setup form with React Hook Form and Zod validation
   const form = useForm<TasksForm>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -99,10 +112,12 @@ export function TasksMutateDrawer() {
       status: 'pending',
       priority: 'low',
       category: '',
-      startTime: '',
-      endTime: '',
-      dueTime: '',
-      estimatedTime: 30,
+      startTime: start ? start.toISOString() : '',
+      endTime: end ? end.toISOString() : '',
+      estimatedTime: 30, // Default value for estimated time
+      pomodoro_required_number: 0,
+      pomodoro_number: 0,
+      is_on_pomodoro_list: false,
       style: {
         backgroundColor: '#ffffff',
         textColor: '#000000',
@@ -110,10 +125,9 @@ export function TasksMutateDrawer() {
     },
   });
 
-  // Load currentRow data into the form when updating
+  // Reset form with currentRow data when updating
   useEffect(() => {
     if (isUpdate && currentRow) {
-      // Populate form with currentRow data in update mode
       form.reset({
         _id: currentRow._id,
         userId: currentRow.userId,
@@ -126,6 +140,9 @@ export function TasksMutateDrawer() {
         endTime: currentRow.endTime || '',
         dueTime: currentRow.dueTime || '',
         estimatedTime: currentRow.estimatedTime,
+        pomodoro_required_number: currentRow.pomodoro_required_number || 0,
+        pomodoro_number: currentRow.pomodoro_number || 0,
+        is_on_pomodoro_list: currentRow.is_on_pomodoro_list || false,
         style: currentRow.style || {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -134,7 +151,7 @@ export function TasksMutateDrawer() {
     } else {
       // Reset form to default values in create mode
       form.reset({
-        userId: user.user?.id, // Default userId
+        userId: user.user?.id,
         title: '',
         description: '',
         status: 'pending',
@@ -143,7 +160,10 @@ export function TasksMutateDrawer() {
         startTime: '',
         endTime: '',
         dueTime: '',
-        estimatedTime: 0,
+        estimatedTime: undefined,
+        pomodoro_required_number: 0,
+        pomodoro_number: 0,
+        is_on_pomodoro_list: false,
         style: {
           backgroundColor: '#ffffff',
           textColor: '#000000',
@@ -172,9 +192,7 @@ export function TasksMutateDrawer() {
           ),
         );
         toast.success(
-          <p className='text-sm'>
-            Your task has been successfully updated.
-          </p>
+          <p className="text-sm">Your task has been successfully updated.</p>,
         );
       } else {
         console.log(payload);
@@ -184,9 +202,7 @@ export function TasksMutateDrawer() {
         );
         setTasks((prev) => [...prev, response.data]);
         toast.success(
-          <p className='text-sm'>
-            Your task has been successfully created.
-          </p>
+          <p className="text-sm">Your task has been successfully created.</p>,
         );
       }
 
@@ -195,12 +211,14 @@ export function TasksMutateDrawer() {
     } catch (error) {
       console.error('Error submitting task:', error);
       toast.error(
-        <p className='text-sm'>
+        <p className="text-sm">
           Failed to save the task. Please try again later.
-        </p>
+        </p>,
       );
     }
   };
+
+  const [isDisabled, setIsDisabled] = useState(true);
 
   const handleToggle = (value: any) => {
     setIsDisabled(!value); // Toggle the disabled state
@@ -214,25 +232,41 @@ export function TasksMutateDrawer() {
     }
   };
 
+  useEffect(() => {
+    if (start) {
+      form.setValue('startTime', start.toISOString());
+    }
+    if (end) {
+      form.setValue('endTime', end.toISOString());
+    }
+  }, [start, end, form]);
+
   return (
     <>
-      <Dialog open={open === 'create' || open === 'update'} onOpenChange={(v) => {
-        if (!v) {
-          handleOpen(null); // Close dialog when toggled off
-          form.reset();
-        }
-      }}>
-        <DialogContent className="flex flex-col custom-scrollbar min-w-[640px] max-h-[100vh] overflow-y-auto">
+      <Dialog
+        open={open === 'create' || open === 'update'}
+        onOpenChange={(v) => {
+          if (!v) {
+            handleOpen(null); // Close dialog when toggled off
+            form.reset();
+          }
+        }}
+      >
+        <DialogContent
+          className="flex flex-col custom-scrollbar min-w-[640px] max-h-[100vh] overflow-y-auto [&>button]:hidden"
+          bgOverlay="bg-black/20"
+        >
           <DialogHeader>
-            <DialogTitle className='text-bold text-indigo-800'>{isUpdate ? 'Update' : 'Create'} Task</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="font-bold text-indigo-800 text-lg">
+              {isUpdate ? 'Update' : 'Create'} Task
+            </DialogTitle>
+            <DialogDescription className="text-[12px] text-muted-foreground">
               {isUpdate
                 ? 'Update the task by providing the necessary info. '
                 : 'Add a new task by providing the necessary info. '}
               Click save when you're done.
             </DialogDescription>
           </DialogHeader>
-
           <Form {...form}>
             <form
               id="tasks-form"
@@ -245,13 +279,113 @@ export function TasksMutateDrawer() {
                   console.error('Validation errors:', errors); // Debug validation errors
                 },
               )}
-              className="flex flex-col flex-1">
+              className="flex flex-col"
+            >
+              <div className="flex items-center mb-2 w-full">
+                {/* Button to Toggle Date Fields */}
+                <button
+                  type="button"
+                  // onClick={() => handleToggle(isDisabled)}
+                  className="flex justify-center items-center space-x-2 bg-zinc-200 px-2 rounded-md w-16 h-8 text-center"
+                >
+                  <p className="flex-nowrap text-[12px] text-nowrap text-zinc-800">
+                    {isDisabled ? 'No dates' : 'From/To'}
+                  </p>
+                </button>
+                <span className={`mx-2 ${isDisabled ? 'invisible' : ''}`}>
+                  |
+                </span>
+                {/* Conditional Rendering of Date Fields */}
+                <FormField
+                  control={form.control}
+                  name="startTime"
+                  render={({ field }) => (
+                    <FormItem className={`flex space-x-2 space-y-0 mr-4`}>
+                      <FormLabel className="flex items-center space-x-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger disabled className="items-center">
+                              <p className="font-normal text-muted-foreground">
+                                Start:
+                              </p>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Your time to start this task.
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="datetime-local"
+                          value={field.value ? field.value.slice(0, 16) : ''}
+                          onChange={(e) => {
+                            const inputValue = e.target.value; // Local datetime format
+                            const vnLocalDate = new Date(inputValue); // Parse local date
+                            const offsetInMs = 7 * 60 * 60 * 1000; // UTC+7 offset
+                            const localTime = new Date(
+                              vnLocalDate.getTime() + offsetInMs,
+                            ).toISOString();
+                            field.onChange(localTime); // Save local time string
+                          }}
+                          className="bg-white w-52 md:text-[12px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* End Date Field */}
+                <FormField
+                  control={form.control}
+                  name="endTime"
+                  render={({ field }) => (
+                    <FormItem className={`flex space-x-2 space-y-0 mr-4`}>
+                      <FormLabel className="flex items-center space-x-2">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger disabled>
+                              <p className="font-normal text-muted-foreground">
+                                End:
+                              </p>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              Your time to end this task before or at the due
+                              date.
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          type="datetime-local"
+                          value={field.value ? field.value.slice(0, 16) : ''}
+                          onChange={(e) => {
+                            const inputValue = e.target.value; // Local datetime format
+                            const vnLocalDate = new Date(inputValue); // Parse local date
+                            const offsetInMs = 7 * 60 * 60 * 1000; // UTC+7 offset
+                            const localTime = new Date(
+                              vnLocalDate.getTime() + offsetInMs,
+                            ).toISOString();
+                            field.onChange(localTime); // Update the form's state
+                          }}
+                          onBlur={() => {
+                            form.trigger('endTime'); // Ensure validation is triggered on blur
+                          }}
+                          className="bg-white w-52 md:text-[12px]"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
               {/* Title Field */}
-              <div className='flex justify-between w-full'>
-                <div className='w-1/4'>
-                  <p className='font-semibold text-indigo-700 text-sm'>Task details</p>
-                </div>
-                <div className='flex flex-col space-y-4 w-3/4'>
+              <div className="flex justify-between w-full">
+                <div className="flex flex-col space-y-4 w-full">
                   <FormField
                     control={form.control}
                     name="title"
@@ -265,14 +399,35 @@ export function TasksMutateDrawer() {
                       </FormItem>
                     )}
                   />
-                  <div className='flex flex-row space-x-2'>
+                  {/* Task Description Field */}
+                  <div>
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem className="space-y-1">
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <ReactQuill
+                              theme="snow"
+                              value={field.value || ''}
+                              onChange={field.onChange}
+                              placeholder="Write the task description..."
+                              className="bg-white"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className="flex flex-row space-x-2">
                     {/* Status Field */}
                     <FormField
                       control={form.control}
                       name="status"
                       render={({ field }) => (
-                        <FormItem className="space-y-1 w-1/2">
-                          <FormLabel>Status</FormLabel>
+                        <FormItem className="flex items-center space-x-2 space-y-0 bg-white pl-2 border rounded-md h-10">
                           <SelectDropdown
                             defaultValue={field.value}
                             onValueChange={field.onChange}
@@ -283,6 +438,7 @@ export function TasksMutateDrawer() {
                               { label: 'Completed', value: 'completed' },
                               { label: 'Expired', value: 'expired' },
                             ]}
+                            className="border-0 shadow-none px-1 text-[12px]"
                           />
                           <FormMessage />
                         </FormItem>
@@ -293,8 +449,7 @@ export function TasksMutateDrawer() {
                       control={form.control}
                       name="priority"
                       render={({ field }) => (
-                        <FormItem className="space-y-1 w-1/2">
-                          <FormLabel>Priority</FormLabel>
+                        <FormItem className="flex items-center space-x-2 space-y-0 bg-white pl-2 border rounded-md h-10">
                           <SelectDropdown
                             defaultValue={field.value}
                             onValueChange={field.onChange}
@@ -304,229 +459,83 @@ export function TasksMutateDrawer() {
                               { label: 'Medium', value: 'medium' },
                               { label: 'Low', value: 'low' },
                             ]}
+                            className="border-0 shadow-none px-1 text-[12px]"
                           />
                           <FormMessage />
                         </FormItem>
                       )}
                     />
-                  </div>
-                  {/* Category Field */}
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1 w-1/2">
-                        <FormLabel>Label</FormLabel>
-                        <SelectDropdown
-                          defaultValue={field.value}
-                          onValueChange={field.onChange}
-                          placeholder="Select label"
-                          items={[
-                            { label: 'Documentation', value: 'documentation' },
-                            { label: 'Feature', value: 'feature' },
-                            { label: 'Bug', value: 'bug' },
-                          ]}
-                        />
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  {/* Due Date Field */}
-                  <FormField
-                    control={form.control}
-                    name="dueTime"
-                    render={({ field }) => (
-                      <FormItem className="space-y-2 w-1/2">
-                        <FormLabel className='flex items-center space-x-2'>
-                          <p>Due Time</p>
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger disabled>
-                                <LuInfo
-                                  className="text-gray-500 hover:cursor-default pointer-events-none"
+                    {/* Category Field */}
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="flex items-center space-x-2 space-y-0 bg-white pl-2 border rounded-md h-10">
+                          <SelectDropdown
+                            defaultValue={field.value}
+                            onValueChange={field.onChange}
+                            placeholder="Select category"
+                            items={[
+                              { label: 'Work', value: 'work' },
+                              { label: 'Leisure', value: 'leisure' },
+                              { label: 'Personal', value: 'personal' },
+                              { label: 'Urgent', value: 'urgent' },
+                            ]}
+                            className="border-0 shadow-none px-1 w-28 text-[12px]"
+                          />
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    {/* Due Date Field */}
+                    <FormField
+                      control={form.control}
+                      name="dueTime"
+                      render={({ field }) => {
+                        const [isEditing, setIsEditing] = useState(false);
+
+                        return (
+                          <FormItem className="flex items-center space-x-2 space-y-0 bg-white px-2 border rounded-md h-10">
+                            <FormLabel className="text-[12px]">
+                              <p>Due:</p>
+                            </FormLabel>
+                            <FormControl>
+                              {isEditing || field.value ? (
+                                <Input
+                                  {...field}
+                                  type="datetime-local"
+                                  value={
+                                    field.value ? field.value.slice(0, 16) : ''
+                                  }
+                                  onChange={(e) => {
+                                    const inputValue = e.target.value; // Local datetime format
+                                    const vnLocalDate = new Date(inputValue); // Parse it as local date
+                                    const offsetInMs = 7 * 60 * 60 * 1000; // UTC+7 offset
+                                    const localTime = new Date(
+                                      vnLocalDate.getTime() + offsetInMs,
+                                    ).toISOString();
+                                    field.onChange(localTime); // Save the local time string
+                                  }}
+                                  className="border-0 shadow-none px-1 md:text-[12px]"
+                                  onBlur={() =>
+                                    !field.value && setIsEditing(false)
+                                  } // Exit edit mode if no value
                                 />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                This is the task's deadline.
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </FormLabel>
-                        <FormControl>
-                          <Input
-                            {...field}
-                            type="datetime-local"
-                            value={field.value ? field.value.slice(0, 16) : ''}
-                            onChange={(e) => {
-                              const inputValue = e.target.value; // This is in local datetime format
-                              const vnLocalDate = new Date(inputValue); // Parse it as a local date
-                              const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
-                              const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
-                                .toISOString()
-                              field.onChange(localTime); // Save the local time string
-                            }}
-                            className="bg-white"
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-              </div>
-              <hr className='my-4' />
-              <div className='flex justify-between w-full'>
-                <div className='space-y-1.5 pr-4 w-1/4'>
-                  <p className='font-semibold text-indigo-700 text-sm'>Time track options</p>
-                  <div className='flex flex-col p-2 border rounded-md w-[120px]'>
-                    <div className='flex items-center space-x-2 mx-auto'>
-                      <p className='text-xs'>Set active:</p>
-                      <Switch
-                        checked={!isDisabled} // Toggle state
-                        onCheckedChange={handleToggle}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <div className='flex flex-col space-y-4 mt-1 w-3/4'>
-                  <div className='flex justify-between space-x-2'>
-                    {/* Start Date Field */}
-                    <FormField
-                      control={form.control}
-                      name="startTime"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2 w-1/2">
-                          <FormLabel className='flex items-center space-x-2'>
-                            <p>Start Time</p>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger disabled>
-                                  <LuInfo
-                                    className="text-gray-500 hover:cursor-default pointer-events-none"
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Your time to start this task.
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="datetime-local"
-                              value={field.value ? field.value.slice(0, 16) : ''}
-                              onChange={(e) => {
-                                const inputValue = e.target.value; // This is in local datetime format
-                                const vnLocalDate = new Date(inputValue); // Parse it as a local date
-                                const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
-                                const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
-                                  .toISOString()
-                                field.onChange(localTime); // Save the local time string
-                              }}
-                              className="bg-white"
-                              disabled={isDisabled}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    {/* End Date Field */}
-                    <FormField
-                      control={form.control}
-                      name="endTime"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2 w-1/2">
-                          <FormLabel className='flex items-center space-x-2'>
-                            <p>End Time</p>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger disabled>
-                                  <LuInfo
-                                    className="text-gray-500 hover:cursor-default pointer-events-none"
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Your time to end this task before or at the due date.
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="datetime-local"
-                              value={field.value ? field.value.slice(0, 16) : ''}
-                              onChange={(e) => {
-                                const inputValue = e.target.value; // This is in local datetime format
-                                const vnLocalDate = new Date(inputValue); // Parse it as a local date
-                                const offsetInMs = 7 * 60 * 60 * 1000; // Offset for UTC+7
-                                const localTime = new Date(vnLocalDate.getTime() + offsetInMs)
-                                  .toISOString()
-                                field.onChange(localTime); // Save the local time string
-                              }}
-                              className="bg-white"
-                              disabled={isDisabled}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
+                              ) : (
+                                <div
+                                  className="px-1 text-gray-500 md:text-[12px] cursor-pointer"
+                                  onClick={() => setIsEditing(true)}
+                                >
+                                  No due date
+                                </div>
+                              )}
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        );
+                      }}
                     />
                   </div>
-                  <div className='flex space-x-2'>
-                    {/* Estimated time Field */}
-                    <FormField
-                      control={form.control}
-                      name="estimatedTime"
-                      render={({ field }) => (
-                        <FormItem className="space-y-2 w-1/2">
-                          <FormLabel className='flex items-center space-x-2'>
-                            <p>Estimated Time</p>
-                            <TooltipProvider>
-                              <Tooltip>
-                                <TooltipTrigger disabled>
-                                  <LuInfo
-                                    className="text-gray-500 hover:cursor-default pointer-events-none"
-                                  />
-                                </TooltipTrigger>
-                                <TooltipContent>
-                                  Your estimated time to finish this task with start and end time.
-                                </TooltipContent>
-                              </Tooltip>
-                            </TooltipProvider>
-                          </FormLabel>
-                          <FormControl>
-                            <Input
-                              {...field}
-                              type="number"
-                              value={field.value}
-                              onChange={(e) => {
-                                field.onChange(e);
-                              }}
-                              disabled={true}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  </div>
-                  {/* Description
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem className="space-y-1">
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Input {...field} placeholder="Enter a description" />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  /> */}
                 </div>
               </div>
             </form>
@@ -535,8 +544,13 @@ export function TasksMutateDrawer() {
             <DialogTrigger asChild>
               <Button variant="outline">Close</Button>
             </DialogTrigger>
-            <Button form="tasks-form" type="submit" className='bg-indigo-800'>
-              Save changes
+            <Button
+              form="tasks-form"
+              type="submit"
+              className="items-center bg-indigo-800"
+            >
+              <FaCirclePlus className="" />
+              Create Task
             </Button>
           </div>
         </DialogContent>

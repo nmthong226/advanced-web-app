@@ -1,34 +1,39 @@
 //Import frameworks
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from 'react';
 
 //Import libs/packages
 import dayjs from 'dayjs';
-import moment from "moment";
-import { Calendar, momentLocalizer, Views, EventPropGetter } from "react-big-calendar";
-import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
+import moment from 'moment';
+import {
+  Calendar,
+  momentLocalizer,
+  Views,
+  EventPropGetter,
+} from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
 //Import components
-import Chart from "../../components/charts/BarChart";
+import Chart from '../../components/charts/BarChart';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select"
-import ProgressBar from "../../components/ProgressBar/ProgressBar";
-import ChatAI from "../../components/AI/chatHistory";
+} from '../../components/ui/select';
+import ProgressBar from '../../components/ProgressBar/ProgressBar';
+import ChatAI from '../../components/AI/chatHistory';
 
 //Import icons
-import { BsListTask } from "react-icons/bs";
-import { GiTomato } from "react-icons/gi";
-import { FaCheck } from "react-icons/fa6";
-import { RiRestTimeLine } from "react-icons/ri";
+import { BsCheck, BsListTask } from 'react-icons/bs';
+import { GiTomato } from 'react-icons/gi';
+import { FaCheck } from 'react-icons/fa6';
+import { RiRestTimeLine } from 'react-icons/ri';
 
 //Import contexts
-import { useSettings } from "../../contexts/SettingsContext";
-import { useUser } from "@clerk/clerk-react";
-import { useTaskContext } from "@/contexts/UserTaskContext.tsx";
+import { useSettings } from '../../contexts/SettingsContext';
+import { useUser } from '@clerk/clerk-react';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
 //Types
 interface Event {
@@ -39,21 +44,26 @@ interface Event {
   allDay?: boolean;
   status: string;
 }
-import { Task as TaskSchema } from "../../types/task.ts";
-import CustomEvent from "../Calendar/Event.tsx";
+import { Task as TaskSchema } from '../../types/task.ts';
+import CustomEvent from '../Calendar/Event.tsx';
+import { formatDate } from 'date-fns';
+import { GoArrowDown, GoArrowRight, GoArrowUp } from 'react-icons/go';
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
 
-const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
+const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
+  if (!tasks || tasks.length === 0 || !Array.isArray(tasks)) {
+    return []; // Return an empty array if tasks is null, undefined, or empty
+  }
   return tasks
-    .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
+    .filter((task) => task.startTime && task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
       id: task._id, // Generate unique IDs
       title: task.title,
       status: task.status,
       start: new Date(task.startTime!), // Convert ISO 8601 string to Date
-      end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
+      end: new Date(task.endTime!), // Convert ISO 8601 string to Date
       allDay: false, // Assuming tasks are not all-day by default
     }));
 };
@@ -61,14 +71,14 @@ const convertTasksToEvents = (tasks: TaskSchema[]): Event[] => {
 const Home = () => {
   const { user } = useUser();
   const { settings, showLeftBar } = useSettings();
-  const [currentTime, setCurrentTime] = useState<string>("");
+  const [currentTime, setCurrentTime] = useState<string>('');
   const [isMorning, setIsMorning] = useState<boolean>(true);
-  const [greeting, setGreeting] = useState<string>("Good Morning");
+  const [greeting, setGreeting] = useState<string>('Good Morning');
 
   //Task Calendar
   const [myEvents, setMyEvents] = useState<Event[]>([]);
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
-  const defaultDate = useMemo(() => new Date(), [])
+  const defaultDate = useMemo(() => new Date(), []);
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
@@ -87,11 +97,11 @@ const Home = () => {
 
     // Set the greeting based on the time of day
     if (hour < 12) {
-      setGreeting("Good Morning");
+      setGreeting('Good Morning');
     } else if (hour < 18) {
-      setGreeting("Good Afternoon");
+      setGreeting('Good Afternoon');
     } else {
-      setGreeting("Good Evening");
+      setGreeting('Good Evening');
     }
   };
 
@@ -104,10 +114,10 @@ const Home = () => {
 
   const eventPropGetter: EventPropGetter<Event> = () => {
     return {
-      className: "bg-indigo-50 shadow-lg border-0 text-xs",
+      className: 'bg-indigo-50 shadow-lg border-0 text-xs',
       style: {
-        borderRadius: "4px",
-        color: "black",
+        borderRadius: '4px',
+        color: 'black',
       },
     };
   };
@@ -123,8 +133,12 @@ const Home = () => {
                 className={`flex flex-col w-full h-full border rounded-lg items-start justify-center pl-4 
           ${isMorning ? 'bg-gradient-to-b from-sky-400 to-indigo-100 dark:to-indigo-800' : 'bg-gradient-to-b from-purple-400 to-indigo-100 dark:to-indigo-800'}`}
               >
-                <p className="font-base text-[13px] text-zinc-500 dark:text-gray-100">{currentTime}</p>
-                <p className="font-semibold text-lg text-zinc-700 dark:text-white truncate">{greeting}, {user?.fullName}!</p>
+                <p className="font-base text-[13px] text-zinc-500 dark:text-gray-100">
+                  {currentTime}
+                </p>
+                <p className="font-semibold text-lg text-zinc-700 dark:text-white truncate">
+                  {greeting}, {user?.fullName}!
+                </p>
               </div>
             </div>
           )}
@@ -135,9 +149,16 @@ const Home = () => {
                 <div className="flex justify-between items-center border-b">
                   <p className="m-2 font-semibold text-sm">Your Upcoming</p>
                   <div className="flex space-x-1 text-[12px]">
-                    <button className="px-1.5 border rounded-sm w-14">Activity</button>
-                    <button className="px-1.5 border rounded-sm w-14">Task</button>
+                    <button className="px-1.5 border rounded-sm w-14">
+                      Activity
+                    </button>
+                    <button className="px-1.5 border rounded-sm w-14">
+                      Task
+                    </button>
                   </div>
+                </div>
+                <div className="flex justify-center items-center w-full h-[50px] text-[12px]">
+                  You have no upcoming activity.
                 </div>
               </div>
             </div>
@@ -181,15 +202,50 @@ const Home = () => {
                   </Select>
                 </div>
                 <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
+                  {Array.isArray(tasks) &&
+                    tasks.map((task) => (
+                      <div
+                        key={task._id}
+                        className="flex space-x-2 shadow-sm p-1.5 border rounded"
+                      >
+                        <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
+                          {task.priority === 'high' && <GoArrowUp />}
+                          {task.priority === 'medium' && <GoArrowRight />}
+                          {task.priority === 'low' && <GoArrowDown />}
+                          <span className="mr-2">{task.title}</span>
+                        </div>
+                        <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
+                          {task.status === 'pending' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'in-progress' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'completed' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'expired' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          <span className="font-medium">{task.status}</span>
+                        </div>
+                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                          <span className=""> {task.category}</span>
+                        </div>
+                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                          <span className="">
+                            {task.dueTime
+                              ? formatDate(task.dueTime as string, 'dd-MM-yy')
+                              : 'N/A'}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
               <div className="flex items-center p-2 border-t-2 h-[15%]">
                 <p className="flex mr-2 text-[12px] text-nowrap">Progress: </p>
-                <ProgressBar
-                  completed={2}
-                  pending={2}
-                  todo={1}
-                />
+                <ProgressBar completed={2} pending={2} todo={1} />
               </div>
             </div>
           )}
@@ -197,7 +253,9 @@ const Home = () => {
           {settings.showProductivityInsights && (
             <div className="flex flex-col justify-between bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg w-full h-[30%]">
               <div className="flex justify-between items-center">
-                <p className="m-2 font-semibold text-sm">Productivity Insights</p>
+                <p className="m-2 font-semibold text-sm">
+                  Productivity Insights
+                </p>
                 <Select value="pomo">
                   <SelectTrigger className="m-2 w-[100px]">
                     <SelectValue placeholder="Theme" />
@@ -223,7 +281,9 @@ const Home = () => {
           )}
         </div>
       )}
-      <div className={`relative flex flex-col bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg ${showLeftBar ? 'w-[75%]' : 'w-full'} h-full`}>
+      <div
+        className={`relative flex flex-col bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg ${showLeftBar ? 'w-[75%]' : 'w-full'} h-full`}
+      >
         <DragAndDropCalendar
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
@@ -246,8 +306,8 @@ const Home = () => {
           <p className="bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-400 font-bold text-center text-transparent text-xl">✨</p>
         </div>
       </button> */}
-    </div >
+    </div>
   );
-}
+};
 
 export default Home;

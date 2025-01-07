@@ -13,7 +13,7 @@ export const taskSchema = z.object({
   dueTime: z.string().datetime().optional(),  // Optional ISO 8601 date string
   estimatedTime: z.number().optional(), // Time in minutes (optional)
   color: z.string().optional(),
-  // isOnCalendar: z.boolean()
+  isOnPomodoroList: z.string().boolean(),
 });
 
 export type Task = z.infer<typeof taskSchema>
