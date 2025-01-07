@@ -55,7 +55,7 @@ import { Task as TaskSchema } from "../../types/task.ts";
 import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer.tsx";
 import { useTasksContext } from "../../components/table/context/task-context.tsx";
 import EventCalendar from "./EventCalendar.tsx";
-import axios from "axios";
+import { updateTaskApi } from "@/api/tasks.api.ts";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -93,22 +93,36 @@ const mockTasks = [
   },
 ];
 
+const isInThePast = (currentTime: Date) => {
+  const now = new Date(); 
+  return currentTime < now; 
+};
+
 const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
   if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
     .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
-    .map((task) => ({
-      id: task._id, // Generate unique IDs
-      title: task.title,
-      status: task.status,
-      category: task.category,
-      priority: task.priority,
-      start: new Date(task.startTime!), // Convert ISO 8601 string to Date
-      end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
-      allDay: false, // Assuming tasks are not all-day by default
-    }));
+    .map((task) => {
+      const startTime = new Date(task.startTime!); 
+      const endTime = new Date(task.endTime!);
+
+      // Adjust to UTC timezone
+      startTime.setUTCMinutes(startTime.getMinutes() + startTime.getTimezoneOffset());
+      endTime.setUTCMinutes(endTime.getMinutes() + endTime.getTimezoneOffset()); 
+
+      return {
+        id: task._id, // Generate unique IDs
+        title: task.title,
+        status: task.status,
+        category: task.category,
+        priority: task.priority,
+        start: startTime, 
+        end: endTime,
+        allDay: false, // Assuming tasks are not all-day by default
+      };
+    });
 };
 
 const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
@@ -132,7 +146,7 @@ const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MyCalendar: React.FC = () => {
   const [myEvents, setMyEvents] = useState<Event[]>([]);
   const [draggedEvent, setDraggedEvent] = useState<DraggedEvent | null>(null);
-  const [draggableTasks, setDraggableTasks] = useState<Task[]>(mockTasks);
+  const [draggableTasks, setDraggableTasks] = useState<Task[]>([]);
   const [displayDragItemInCell,] = useState<boolean>(true);
   const defaultDate = useMemo(() => new Date(), [])
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -149,6 +163,7 @@ const MyCalendar: React.FC = () => {
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
+    console.log('convert task to events', events);
     const draggableTask = convertTasksToDraggedEvents(tasks);
     setMyEvents(events);
     setDraggableTasks(draggableTask);
@@ -188,12 +203,28 @@ const MyCalendar: React.FC = () => {
       isAllDay?: boolean;
     }) => {
       // Update the task context with new start and end times
-      const updatedTasks = tasks.map((task) =>
-        task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
-      );
+      const timezoneOffsetInMinutes = start.getTimezoneOffset();
+
+    // Create new Date objects adjusted for local time zone
+    const localStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60000);
+    const localEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60000);
+
+    // Use the adjusted local times to create ISO strings without offset
+    const newStatus = isInThePast(localEnd) ? 'expired' : 'pending';
+    const updateTaskTimeDto = {
+      startTime: localStart.toISOString(),
+      endTime: localEnd.toISOString(),
+      status: newStatus,
+    };
+    const updatedTasks = tasks.map((task) =>
+      task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+    );
+
+    console.log("Sending time update:", updateTaskTimeDto);
   
       // Update the task context
       setTasks(updatedTasks);
+      console.log('updated tasks', updatedTasks)
   
       // Update the event in the `myEvents` list
       setMyEvents((prev) => {
@@ -209,34 +240,25 @@ const MyCalendar: React.FC = () => {
             allDay: droppedOnAllDaySlot || event.allDay,
             id: event.id,
             title: event.title,
-            status: event.status || "default", // Ensure status has a value
+            status: newStatus, // Ensure status has a value
           },
         ];
       });
   
       // Send updates to the backend
+      
       try {
-        const updateTaskTimeDto = {
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
-        };
-  
-        console.log("Sending time update:", updateTaskTimeDto);
   
         // Make the backend request to update the task
-        const response = await axios.patch(
-          `http://localhost:3000/tasks/${event.id}/time`,
-          updateTaskTimeDto
-        );
-  
-        if (response.status === 200) {
-          console.log("Task updated successfully:", response.data);
-  
+        const response = await updateTaskApi(event.id, updateTaskTimeDto);
+        console.log('move response', response);
+        if (response) {
+          console.log("Task updated successfully:", response);
           // Optionally, update state again after a successful backend update
           setTasks((prevTasks) =>
             prevTasks.map((task) =>
               task._id === event.id
-                ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
+                ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString(), status: newStatus }
                 : task
             )
           );
@@ -245,43 +267,48 @@ const MyCalendar: React.FC = () => {
         console.error(`Failed to update task with ID ${event.id}:`, error);
       }
     },
-    [tasks, setMyEvents, setTasks] // Adding `tasks` to ensure we access the latest context value
+    [tasks, myEvents, setMyEvents, setTasks] // Adding `tasks` to ensure we access the latest context value
   );
   
 
   console.log("myEvents:", myEvents);
 
-  const newEvent = useCallback(
-    (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
-      setSelectedEvent({ start: event.start, end: event.end });
-      handleOpen('create');
-      // setMyEvents((prev) => {
-      //   return [...prev, { ...event }];
-      // });
-    },
-    [setMyEvents]
-  );
+
 
   const onDropFromOutside = useCallback(
     async ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
       if (!draggedEvent) return;
+
+      const timezoneOffsetInMinutes = start.getTimezoneOffset();
+
+    // Create new Date objects adjusted for local time zone
+    const localStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60000);
+    const localEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60000);
+
+    // Use the adjusted local times to create ISO strings without offset
+    const newStatus = isInThePast(localEnd) ? 'expired' : 'pending';
+    const updateTaskTimeDto = {
+      startTime: localStart.toISOString(),
+      endTime: localEnd.toISOString(),
+      status: newStatus,
+    };
   
       const { title, status, _id, category } = draggedEvent;
   
       // Create a new event object
       const newEvent: Omit<Event, "id"> & { id: string } = {
         title: formatName(title),
-        start,
-        end,
+        start: localStart,
+        end: localEnd,
         allDay: isAllDay || false,
-        status: status || "default", // Ensure status has a value
+        status: newStatus || "pending", // Ensure status has a value
         id: _id, // Use the draggedEvent id directly
         category,
       };
   
       // Update tasks state locally
       const updatedTasks = tasks.map((task) =>
-        task._id === _id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+        task._id === _id ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString() } : task
       );
   
       setTasks(updatedTasks);
@@ -294,24 +321,20 @@ const MyCalendar: React.FC = () => {
   
       // Send updates to the backend
       try {
-        const updateTaskTimeDto = {
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
-        };
   
         console.log("Sending time update:", updateTaskTimeDto);
   
         // Use the correct ID for the backend request
-        const response = await axios.patch(`http://localhost:3000/tasks/${_id}/time`, updateTaskTimeDto);
+        const response = await updateTaskApi(_id, updateTaskTimeDto);
   
-        if (response.status === 200) {
-          console.log("Task updated successfully:", response.data);
-  
+        if (response) {
+          console.log("Task updated successfully:", response);
+
           // Update tasks state again if needed
           setTasks((prevTasks) =>
             prevTasks.map((task) =>
               task._id === _id
-                ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
+                ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString(), status: newStatus }
                 : task
             )
           );
@@ -326,12 +349,27 @@ const MyCalendar: React.FC = () => {
   const resizeEvent = useCallback(
     async ({ event, start, end }: { event: Event; start: Date; end: Date }) => {
       // Update tasks state
-      const updatedTasks = tasks.map((task) =>
-        task._id === event.id
-          ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
-          : task
-      );
-      setTasks(updatedTasks);
+       const timezoneOffsetInMinutes = start.getTimezoneOffset();
+
+       // Create new Date objects adjusted for local time zone
+       const localStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60000);
+       const localEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60000);
+   
+       // Use the adjusted local times to create ISO strings without offset
+       const newStatus = isInThePast(localEnd) ? 'expired' : 'pending';
+       const updateTaskTimeDto = {
+         startTime: localStart.toISOString(),
+         endTime: localEnd.toISOString(),
+         status: newStatus,
+       };
+       const updatedTasks = tasks.map((task) =>
+         task._id === event.id ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString() } : task
+       );
+   
+       console.log("Sending time update:", updateTaskTimeDto);
+     
+         // Update the task context
+          setTasks(updatedTasks);
 
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {
@@ -357,23 +395,20 @@ const MyCalendar: React.FC = () => {
 
       // Send updates to the backend
       try {
-        const updateTaskTimeDto = {
-          startTime: start.toISOString(),
-          endTime: end.toISOString(),
-        };
         console.log("time", updateTaskTimeDto);
 
-        const response = await axios.patch(`http://localhost:3000/tasks/${event.id}/time`, updateTaskTimeDto);
+        const response = await updateTaskApi(event.id, updateTaskTimeDto);
 
-        if (response.status === 200) {
-          console.log("1", response.data);
+        if (response) {
+          console.log("1", response);
           setTasks((prevTasks) => {
             return prevTasks.map((task) => {
               if (task._id === event.id) {
                 return {
                   ...task,
-                  startTime: start.toISOString(),
-                  endTime: end.toISOString(),
+                  startTime: localStart.toISOString(),
+                  endTime: localEnd.toISOString(),
+                  status: newStatus,
                 };
               }
               return task;
@@ -437,7 +472,7 @@ const MyCalendar: React.FC = () => {
           onDropFromOutside={onDropFromOutside}
           onEventDrop={moveEvent}
           onEventResize={resizeEvent}
-          onSelectSlot={newEvent}
+          onSelectSlot={() => handleOpen("create")}
           onSelectEvent={handleSelectEvent}
           resizable
           selectable
