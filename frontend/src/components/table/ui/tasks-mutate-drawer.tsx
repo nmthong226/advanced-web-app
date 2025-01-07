@@ -231,8 +231,14 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
     }
   };
 
-  form.setValue('startTime', start?.toISOString());
-  form.setValue('endTime', end?.toISOString());
+  useEffect(() => {
+    if (start) {
+      form.setValue('startTime', start.toISOString());
+    }
+    if (end) {
+      form.setValue('endTime', end.toISOString());
+    }
+  }, [start, end, form]);
 
   return (
     <>
@@ -270,7 +276,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                 {/* Button to Toggle Date Fields */}
                 <button
                   type="button"
-                  onClick={() => handleToggle(isDisabled)}
+                  // onClick={() => handleToggle(isDisabled)}
                   className="flex justify-center items-center space-x-2 bg-zinc-200 px-2 rounded-md w-16 h-8 text-center"
                 >
                   <p className="flex-nowrap text-[12px] text-nowrap text-zinc-800">
@@ -283,7 +289,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                   control={form.control}
                   name="startTime"
                   render={({ field }) => (
-                    <FormItem className={`flex space-x-2 space-y-0 mr-4 ${isDisabled ? 'invisible' : ''}`}>
+                    <FormItem className={`flex space-x-2 space-y-0 mr-4`}>
                       <FormLabel className="flex items-center space-x-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -321,7 +327,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                   control={form.control}
                   name="endTime"
                   render={({ field }) => (
-                    <FormItem className={`flex space-x-2 space-y-0 mr-4 ${isDisabled ? 'invisible' : ''}`}>
+                    <FormItem className={`flex space-x-2 space-y-0 mr-4`}>
                       <FormLabel className="flex items-center space-x-2">
                         <TooltipProvider>
                           <Tooltip>
@@ -346,7 +352,10 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                             const localTime = new Date(
                               vnLocalDate.getTime() + offsetInMs
                             ).toISOString();
-                            field.onChange(localTime); // Save local time string
+                            field.onChange(localTime); // Update the form's state
+                          }}
+                          onBlur={() => {
+                            form.trigger("endTime"); // Ensure validation is triggered on blur
                           }}
                           className="bg-white w-52 md:text-[12px]"
                         />

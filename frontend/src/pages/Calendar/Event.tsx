@@ -16,9 +16,9 @@ const CustomEvent: React.FC<EventProps> = ({ event }) => {
     return (
         <div className="flex">
             <p className="line-clamp-1">{event.title}</p>
-            <div className="top-0 right-0 absolute">
+            <div className="top-0 right-0 absolute flex">
                 <div className='flex items-center w-full h-full'>
-                    <div className='hover:bg-slate-200 hover:cursor-pointer'>
+                    <div className='bg-white hover:bg-slate-200 rounded-full hover:cursor-pointer'>
                         {event.status === 'pending' && (
                             <FaRegCircle className='w-4 h-4 text-purple-700' />
                         )}

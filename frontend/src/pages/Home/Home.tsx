@@ -144,6 +144,7 @@ const Home = () => {
                     <button className="px-1.5 border rounded-sm w-14">Task</button>
                   </div>
                 </div>
+                <div className="flex justify-center items-center w-full h-[50px] text-[12px]">You have no upcoming activity.</div>
               </div>
             </div>
           )}

@@ -42,8 +42,8 @@ const AIFeedback = () => {
 
     return (
         <div className="flex flex-col gap-2 bg-white shadow-md p-2 h-full">
-            <div className="flex flex-col space-y-2 p-4 border rounded-lg h-[92%]">
-                <h3 className="bg-gradient-to-r from-indigo-500 to-cyan-400 mb-2 p-1 rounded-lg font-bold font-mono text-center text-white">✨ Summary Feedback & Insights</h3>
+            <div className="flex flex-col space-y-2 custom-scrollbar p-4 border rounded-lg h-[92%] text-xs overflow-y-auto">
+                <h3 className="bg-gradient-to-r from-indigo-500 to-cyan-400 mb-2 p-1 rounded-lg font-bold font-mono text-center text-lg text-white">✨ Summary Feedback & Insights</h3>
                 <hr className="border-gray-300 border-t" />
                 <div className="flex flex-col gap-2">
                     <h4 className="flex items-center gap-2 font-semibold text-sm text-zinc-900">

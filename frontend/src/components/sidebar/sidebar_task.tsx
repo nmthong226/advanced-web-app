@@ -40,7 +40,7 @@ type DraggableTaskType = {
 
 type SideBarTaskProps = {
     draggableTasks: DraggableTaskType[];
-    handleDragStart: (task: { _id: string; title: string; name: string, status: string }) => void;
+    handleDragStart: (task: { _id: string; title: string; name: string, status: string, category: string }) => void;
 };
 
 const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragStart }) => {
@@ -145,7 +145,7 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                                                         draggable="true"
                                                         key={task._id}
                                                         onDragStart={() =>
-                                                            handleDragStart({ _id: task._id, title: `${task.title}`, name: task.title, status: task.status })
+                                                            handleDragStart({ _id: task._id, title: `${task.title}`, name: task.title, status: task.status, category: task.category })
                                                         }
                                                     >
                                                         <MdOutlineDragIndicator className='size-4' />

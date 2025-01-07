@@ -10,7 +10,7 @@ import "./style.css";
 // Import components
 import SideBarTask from "../../components/sidebar/sidebar_task.tsx";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { Calendar, momentLocalizer, Views, EventPropGetter } from "react-big-calendar";
+import { Calendar, momentLocalizer, Views } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
@@ -29,15 +29,19 @@ interface Event {
   title: string;
   start: Date;
   end: Date;
+  dueDate?: Date;
   allDay?: boolean;
   status: string;
+  category?: string;
   description?: string;
+  priority?: string;
 }
 
 interface DraggedEvent {
   _id: string;
   title: string;
   status: string;
+  category: string;
 }
 
 interface Task {
@@ -50,8 +54,8 @@ interface Task {
 import { Task as TaskSchema } from "../../types/task.ts";
 import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer.tsx";
 import { useTasksContext } from "../../components/table/context/task-context.tsx";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@radix-ui/react-dialog";
-import { DialogHeader } from "../../components/ui/dialog.tsx";
+import EventCalendar from "./EventCalendar.tsx";
+import axios from "axios";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -99,6 +103,8 @@ const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
       id: task._id, // Generate unique IDs
       title: task.title,
       status: task.status,
+      category: task.category,
+      priority: task.priority,
       start: new Date(task.startTime!), // Convert ISO 8601 string to Date
       end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
       allDay: false, // Assuming tasks are not all-day by default
@@ -116,6 +122,7 @@ const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
       category: task.category,
       title: task.title,
       status: task.status,
+      priority: task.priority,
       allDay: false, // Assuming tasks are not all-day by default
     }));
 };
@@ -127,6 +134,9 @@ const MyCalendar: React.FC = () => {
   const [draggedEvent, setDraggedEvent] = useState<DraggedEvent | null>(null);
   const [draggableTasks, setDraggableTasks] = useState<Task[]>(mockTasks);
   const [displayDragItemInCell,] = useState<boolean>(true);
+  const defaultDate = useMemo(() => new Date(), [])
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
 
   const { handleOpen } = useTasksContext();
 
@@ -144,14 +154,14 @@ const MyCalendar: React.FC = () => {
     setDraggableTasks(draggableTask);
   }, [tasks, setTasks]);
 
-  console.log(myEvents);
+  const eventPropGetter = (event: Event) => {
+    const isSelected = event.id === selectedCalendarEvent?.id;
 
-  const eventPropGetter: EventPropGetter<Event> = () => {
     return {
       className: "bg-indigo-50 shadow-lg border-0 text-xs",
       style: {
-        borderRadius: "4px",
-        color: "black",
+        backgroundColor: isSelected ? "#ccc" : "#EEF2FF", // Gray for selected, default for others
+        color: isSelected ? "#555" : "black", // Adjust text color if needed
       },
     };
   };
@@ -166,7 +176,7 @@ const MyCalendar: React.FC = () => {
   );
 
   const moveEvent = useCallback(
-    ({
+    async ({
       event,
       start,
       end,
@@ -181,15 +191,15 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
       );
-
+  
       // Update the task context
       setTasks(updatedTasks);
-
+  
       // Update the event in the `myEvents` list
       setMyEvents((prev) => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {};
         const filtered = prev.filter((ev) => ev.id !== event.id);
-
+  
         return [
           ...filtered,
           {
@@ -203,10 +213,43 @@ const MyCalendar: React.FC = () => {
           },
         ];
       });
+  
+      // Send updates to the backend
+      try {
+        const updateTaskTimeDto = {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        };
+  
+        console.log("Sending time update:", updateTaskTimeDto);
+  
+        // Make the backend request to update the task
+        const response = await axios.patch(
+          `http://localhost:3000/tasks/${event.id}/time`,
+          updateTaskTimeDto
+        );
+  
+        if (response.status === 200) {
+          console.log("Task updated successfully:", response.data);
+  
+          // Optionally, update state again after a successful backend update
+          setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task._id === event.id
+                ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
+                : task
+            )
+          );
+        }
+      } catch (error) {
+        console.error(`Failed to update task with ID ${event.id}:`, error);
+      }
     },
-    [tasks, setMyEvents, setTasks] // Adding `tasks` here to access the latest context value
+    [tasks, setMyEvents, setTasks] // Adding `tasks` to ensure we access the latest context value
   );
+  
 
+  console.log("myEvents:", myEvents);
 
   const newEvent = useCallback(
     (event: Omit<Event, "id"> & { id: string }) => {  // Ensure `id` is passed
@@ -220,39 +263,68 @@ const MyCalendar: React.FC = () => {
   );
 
   const onDropFromOutside = useCallback(
-    ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
-      if (draggedEvent) {
-        const { title, status, _id } = draggedEvent;
-
-        // Pass the task ID directly when creating the event
-        const newEvent: Omit<Event, "id"> & { id: string } = {
-          title: formatName(title),
-          start,
-          end,
-          allDay: isAllDay,
-          status: status || "default", // Ensure status has a value
-          id: _id,  // Use the draggedEvent id directly
+    async ({ start, end, allDay: isAllDay }: { start: Date; end: Date; allDay?: boolean }) => {
+      if (!draggedEvent) return;
+  
+      const { title, status, _id, category } = draggedEvent;
+  
+      // Create a new event object
+      const newEvent: Omit<Event, "id"> & { id: string } = {
+        title: formatName(title),
+        start,
+        end,
+        allDay: isAllDay || false,
+        status: status || "default", // Ensure status has a value
+        id: _id, // Use the draggedEvent id directly
+        category,
+      };
+  
+      // Update tasks state locally
+      const updatedTasks = tasks.map((task) =>
+        task._id === _id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+      );
+  
+      setTasks(updatedTasks);
+  
+      // Reset draggedEvent to null
+      setDraggedEvent(null);
+  
+      // Update events list
+      setMyEvents((prev) => [...prev, newEvent]);
+  
+      // Send updates to the backend
+      try {
+        const updateTaskTimeDto = {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
         };
-
-        // Update the task context with new start and end time
-        const updatedTasks = tasks.map((task) =>
-          task._id === _id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
-        );
-
-        setTasks(updatedTasks);
-
-        // Reset draggedEvent to null
-        setDraggedEvent(null);
-
-        // Update events list
-        setMyEvents((prev) => [...prev, newEvent]);
+  
+        console.log("Sending time update:", updateTaskTimeDto);
+  
+        // Use the correct ID for the backend request
+        const response = await axios.patch(`http://localhost:3000/tasks/${_id}/time`, updateTaskTimeDto);
+  
+        if (response.status === 200) {
+          console.log("Task updated successfully:", response.data);
+  
+          // Update tasks state again if needed
+          setTasks((prevTasks) =>
+            prevTasks.map((task) =>
+              task._id === _id
+                ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() }
+                : task
+            )
+          );
+        }
+      } catch (error) {
+        console.error(`Failed to update task with ID ${_id}:`, error);
       }
     },
-    [draggedEvent, setDraggedEvent, setMyEvents]
+    [draggedEvent, tasks, setDraggedEvent, setMyEvents, setTasks]
   );
 
   const resizeEvent = useCallback(
-    ({ event, start, end }: { event: Event; start: Date; end: Date }) => {
+    async ({ event, start, end }: { event: Event; start: Date; end: Date }) => {
       // Update tasks state
       const updatedTasks = tasks.map((task) =>
         task._id === event.id
@@ -268,9 +340,8 @@ const MyCalendar: React.FC = () => {
           title: event.title,
           start: event.start,
           end: event.end,
-          status: event.status
+          status: event.status,
         };
-
 
         const filtered = prev.filter((ev) => ev.id !== event.id);
 
@@ -283,13 +354,39 @@ const MyCalendar: React.FC = () => {
           },
         ];
       });
+
+      // Send updates to the backend
+      try {
+        const updateTaskTimeDto = {
+          startTime: start.toISOString(),
+          endTime: end.toISOString(),
+        };
+        console.log("time", updateTaskTimeDto);
+
+        const response = await axios.patch(`http://localhost:3000/tasks/${event.id}/time`, updateTaskTimeDto);
+
+        if (response.status === 200) {
+          console.log("1", response.data);
+          setTasks((prevTasks) => {
+            return prevTasks.map((task) => {
+              if (task._id === event.id) {
+                return {
+                  ...task,
+                  startTime: start.toISOString(),
+                  endTime: end.toISOString(),
+                };
+              }
+              return task;
+            });
+          })
+        }
+        console.log(`Task with ID ${event.id} updated successfully.`);
+      } catch (error) {
+        console.error(`Failed to update task with ID ${event.id}:`, error);
+      }
     },
     [tasks, setTasks, setMyEvents]
   );
-
-  const defaultDate = useMemo(() => new Date(), [])
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
 
   const handleSelectEvent = (event: Event) => {
     setSelectedCalendarEvent(event); // Set the selected event data
@@ -298,7 +395,9 @@ const MyCalendar: React.FC = () => {
 
   const handleCloseDialog = () => {
     setDialogOpen(false);
-    setSelectedCalendarEvent(null); // Clear the selected event
+    setTimeout(() => {
+      setSelectedCalendarEvent(null); // Clear the selected event
+    }, 100);
   };
 
   return (
@@ -347,39 +446,14 @@ const MyCalendar: React.FC = () => {
           className="px-2"
         />
         <MemoizedTasksMutateDrawer start={selectedEvent.start} end={selectedEvent.end} />
-        {/* ShadCN Dialog */}
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogContent className="min-w-[500px]">
-            <DialogHeader>
-              <DialogTitle>{selectedCalendarEvent?.title || "Event Details"}</DialogTitle>
-              <DialogDescription>
-                View and edit the details of your event.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <p><strong>Start:</strong> {selectedCalendarEvent?.start?.toLocaleString()}</p>
-              <p><strong>End:</strong> {selectedCalendarEvent?.end?.toLocaleString()}</p>
-              <p><strong>Status:</strong> {selectedCalendarEvent?.status || "N/A"}</p>
-              <p><strong>Description:</strong> {selectedCalendarEvent?.description || "No description available."}</p>
-            </div>
-            <div className="flex justify-end space-x-2 mt-4">
-              <button
-                className="btn btn-secondary"
-                onClick={handleCloseDialog}
-              >
-                Close
-              </button>
-              <button
-                className="btn btn-primary"
-                onClick={() => {
-                  console.log("Edit event:", selectedEvent);
-                }}
-              >
-                Edit
-              </button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <EventCalendar
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onCloseChange={handleCloseDialog}
+          selectedEvent={selectedCalendarEvent}
+          setSelectedEvent={setSelectedCalendarEvent} // Pass the setter function
+          setMyEvents={setMyEvents}
+        />
         <ChatAI />
       </div>
     </div>
