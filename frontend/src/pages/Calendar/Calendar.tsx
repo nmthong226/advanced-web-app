@@ -156,11 +156,24 @@ const MyCalendar: React.FC = () => {
 
   const eventPropGetter = (event: Event) => {
     const isSelected = event.id === selectedCalendarEvent?.id;
-
+  
+    // Define category-based colors
+    const categoryColors: { [key: string]: string } = {
+      work: "#6895D2", // Blue
+      leisure: "#96E9C6", // Green
+      personal: "#FDE767", // Yellow
+      urgent: "#FC4100", // Red
+      default: "#EEF2FF", // Default color
+    };
+  
+    // Get the background color based on category or fallback to default
+    const backgroundColor =
+      categoryColors[event?.category?.toLowerCase() as keyof typeof categoryColors] || categoryColors.default;
+  
     return {
       className: "bg-indigo-50 shadow-lg border-0 text-xs",
       style: {
-        backgroundColor: isSelected ? "#ccc" : "#EEF2FF", // Gray for selected, default for others
+        backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
         color: isSelected ? "#555" : "black", // Adjust text color if needed
       },
     };

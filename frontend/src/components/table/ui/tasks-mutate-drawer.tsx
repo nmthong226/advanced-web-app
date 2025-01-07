@@ -458,9 +458,10 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                             onValueChange={field.onChange}
                             placeholder="Select category"
                             items={[
-                              { label: 'Documentation', value: 'documentation' },
-                              { label: 'Feature', value: 'feature' },
-                              { label: 'Bug', value: 'bug' },
+                              { label: 'Work', value: 'work' },
+                              { label: 'Leisure', value: 'leisure' },
+                              { label: 'Personal', value: 'personal' },
+                              { label: 'Urgent', value: 'urgent' },
                             ]}
                             className='border-0 shadow-none px-1 w-28 text-[12px]'
                           />
