@@ -1,15 +1,21 @@
-import React from "react";
-import { BiSolidCircleQuarter } from "react-icons/bi";
-import { FaRegCircle, FaRegCircleCheck, FaRegCircleXmark } from "react-icons/fa6";
+import React from 'react';
+import { BiSolidCircleQuarter } from 'react-icons/bi';
+import {
+  FaRegCircle,
+  FaRegCircleCheck,
+  FaRegCircleXmark,
+} from 'react-icons/fa6';
 
 interface EventProps {
     event: {
-        id: string;
+        _id: string;
         userId: string;
         title: string;
-        status: string;
+        status: 'pending' | 'in-progress' | 'completed' | 'expired';
         start: Date;
         end: Date;
+        category: string;
+        priority: 'low' | 'medium' | 'high';
     };
 }
 

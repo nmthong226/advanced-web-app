@@ -37,12 +37,23 @@ type DraggableTaskType = {
     userId: string;
     title: string;
     category: string;
-    status: string; // Added status to type
+    status: 'pending' | 'in-progress' | 'completed' | 'expired';
+    priority: 'low' | 'medium' | 'high';
 };
 
 type SideBarTaskProps = {
     draggableTasks: DraggableTaskType[];
-    handleDragStart: (task: { _id: string; userId: string; title: string; name: string, status: string, category: string }) => void;
+    handleDragStart:
+    (task:
+        {
+            _id: string;
+            userId: string;
+            title: string;
+            name: string,
+            status: 'pending' | 'in-progress' | 'completed' | 'expired',
+            category: string, priority: 'low' | 'medium' | 'high'
+        })
+        => void;
 };
 
 // Define category-based colors
@@ -167,7 +178,7 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                                                         draggable="true"
                                                         key={task._id}
                                                         onDragStart={() =>
-                                                            handleDragStart({ _id: task._id, userId: task.userId, title: `${task.title}`, name: task.title, status: task.status, category: task.category })
+                                                            handleDragStart({ _id: task._id, userId: task.userId, title: `${task.title}`, name: task.title, status: task.status, category: task.category, priority: task.priority })
                                                         }
                                                     >
                                                         <MdOutlineDragIndicator className='size-4' />

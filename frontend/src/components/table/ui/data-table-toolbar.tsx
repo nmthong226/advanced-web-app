@@ -9,7 +9,7 @@ import { Button } from 'src/components/ui/button';
 //   DropdownMenuContent,
 // } from 'src/components/ui/dropdown-menu';
 import { DataTableViewOptions } from '../ui/data-table-view-options';
-import { priorities, statuses } from '../data/data';
+import { labels, priorities, statuses } from '../data/data';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
 // import { useState } from 'react';
 
@@ -52,13 +52,6 @@ export function DataTableToolbar<TData>({
         />
         {/* Faceted Filters */}
         <div className="flex gap-x-2">
-          {table.getColumn('status') && (
-            <DataTableFacetedFilter
-              column={table.getColumn('status')!}
-              title="Status"
-              options={statuses}
-            />
-          )}
           {table.getColumn('priority') && (
             <DataTableFacetedFilter
               column={table.getColumn('priority')!}

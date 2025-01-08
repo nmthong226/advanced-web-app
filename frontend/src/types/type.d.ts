@@ -4,25 +4,29 @@ import { Task } from './task.d.ts';
 
 // Types
 interface Event {
-    id: string;
+    _id: string;
     userId: string;
     title: string;
     start: Date;
     end: Date;
     dueDate?: Date;
     allDay?: boolean;
-    status: string;
-    category?: string;
+    status: 'pending' | 'in-progress' | 'completed' | 'expired';
+    category: string;
     description?: string;
-    priority?: string | undefined;
+    priority: 'low' | 'medium' | 'high';
+    pomodoro_required_number?: number; // Matches snake_case in Mongoose schema
+    pomodoro_number?: number; // Matches snake_case in Mongoose schema
+    is_on_pomodoro_list?: boolean; // Matches snake_case in Mongoose schema
 }
 
 interface DraggedEvent {
     _id: string;
     userId: string;
     title: string;
-    status: string;
+    status: 'pending' | 'in-progress' | 'completed' | 'expired';
     category: string;
+    priority: 'low' | 'medium' | 'high';
 }
 
 interface Task {
@@ -30,7 +34,26 @@ interface Task {
     userId: string;
     title: string;
     category: string;
-    status: string;
+    status: 'pending' | 'in-progress' | 'completed' | 'expired';
+    priority: 'low' | 'medium' | 'high';
+}
+
+interface TaskItem {
+    _id?: string;
+    userId: string;
+    title: string;
+    description?: string;
+    status: 'pending' | 'in-progress' | 'completed' | 'expired';
+    priority: 'low' | 'medium' | 'high';
+    category: string; // Made optional since Mongoose default is an empty string
+    startTime?: string; // Changed to match Mongoose's Date type
+    endTime?: string;
+    dueTime?: string;
+    estimatedTime?: number; // Time needed in minutes
+    pomodoro_required_number?: number; // Matches snake_case in Mongoose schema
+    pomodoro_number?: number; // Matches snake_case in Mongoose schema
+    is_on_pomodoro_list?: boolean; // Matches snake_case in Mongoose schema
+    color?: string;
 }
 
 type Style = {
@@ -49,21 +72,6 @@ type Activity = {
     duration: number;
     relatedItems?: string[];
 };
-
-//This goes for tasks scheduling
-type TaskSchedule = {
-    userId: string;
-    date: string; // e.g., '2024-11-20'
-    dayOfWeek: string; // e.g., 'Wed'
-    tasks: Task[];
-};
-
-//This goes for timetable
-type ActivitySchedule = {
-    date: string; // e.g., '2024-11-20'
-    dayOfWeek: string; // e.g., 'Wed'
-    activities: Activity[];
-}
 
 type User = {
     id: string;

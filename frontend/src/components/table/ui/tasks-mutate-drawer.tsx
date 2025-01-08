@@ -20,15 +20,17 @@ import {
   DialogContent,
   DialogHeader,
   DialogTrigger,
-} from "../../ui/dialog";
+} from '../../ui/dialog';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "../../ui/tooltip";
+} from '../../ui/tooltip';
 import { SelectDropdown } from 'src/components/ui/select-dropdown';
 import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css'; // For snow theme
+import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 //Import icons
 import { FaCirclePlus } from "react-icons/fa6";
@@ -42,9 +44,6 @@ import axios from 'axios';
 import { useUser } from '@clerk/clerk-react';
 import { toast } from "react-toastify";
 
-//Import types
-import 'react-quill/dist/quill.snow.css'; // For snow theme
-import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 // Validation Schema
 const formSchema = z.object({
@@ -173,9 +172,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
           ),
         );
         toast.success(
-          <p className='text-sm'>
-            Your task has been successfully updated.
-          </p>
+          <p className="text-sm">Your task has been successfully updated.</p>,
         );
       } else {
         console.log(payload);
@@ -185,9 +182,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
         );
         setTasks((prev) => [...prev, response.data]);
         toast.success(
-          <p className='text-sm'>
-            Your task has been successfully created.
-          </p>
+          <p className="text-sm">Your task has been successfully created.</p>,
         );
       }
 
@@ -196,9 +191,9 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
     } catch (error) {
       console.error('Error submitting task:', error);
       toast.error(
-        <p className='text-sm'>
+        <p className="text-sm">
           Failed to save the task. Please try again later.
-        </p>
+        </p>,
       );
     }
   };

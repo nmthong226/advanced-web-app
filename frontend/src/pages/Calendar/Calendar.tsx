@@ -2,10 +2,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 // Import icons
-import { BsListTask } from "react-icons/bs";
+import { BsListTask } from 'react-icons/bs';
 
 // Import styles
-import "./style.css";
+import './style.css';
 
 // Import components
 import SideBarTask from "../../components/sidebar/sidebar_task.tsx";
@@ -19,19 +19,18 @@ import { useTasksContext } from "../../components/table/context/task-context.tsx
 import { ConfirmDialog } from "../../components/ui/confirm-dialog.tsx";
 
 // Import libs/packages
-import ChatAI from "../../components/AI/chatHistory.tsx";
-import { Link } from "react-router-dom";
-import CustomEvent from "./Event.tsx";
+import ChatAI from '../../components/AI/chatHistory.tsx';
+import { Link } from 'react-router-dom';
+import CustomEvent from './Event.tsx';
 
 // Import contexts
-import { useTaskContext } from "@/contexts/UserTaskContext.tsx";
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
 import EventCalendar from "./EventCalendar.tsx";
 import { updateTaskApi } from "@/api/tasks.api.ts";
 
 // Import types
-import { Task as TaskSchema } from "../../types/task.ts";
-import { DraggedEvent, Event, Task } from "../../types/type.js";
+import { DraggedEvent, Event, Task, TaskItem } from "../../types/type.js";
 import { convertTasksToEvents } from "@/lib/utils.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
@@ -47,18 +46,18 @@ const isInThePast = (currentTime: Date) => {
   return currentTime < now;
 };
 
-const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
+const convertTasksToDraggedEvents = (tasks: TaskItem[]): Task[] => {
   if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
   return tasks
-    .filter(task => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
+    .filter((task) => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
       _id: task._id as string, // Generate unique IDs
-      userId: task.userId,
+      userId: task.userId as string,
       category: task.category as string,
-      title: task.title,
-      status: task.status as string,
+      title: task.title as string,
+      status: task.status,
       priority: task.priority,
       allDay: false, // Assuming tasks are not all-day by default
     }));
@@ -89,13 +88,14 @@ const MyCalendar: React.FC = () => {
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
+    console.log('convert task to events', events);
     const draggableTask = convertTasksToDraggedEvents(tasks);
     setMyEvents(events);
     setDraggableTasks(draggableTask);
   }, [tasks, setTasks]);
 
   const eventPropGetter = (event: Event) => {
-    const isSelected = event.id === selectedCalendarEvent?.id;
+    const isSelected = event._id === selectedCalendarEvent?._id;
 
     // Define category-based colors
     const categoryColors: { [key: string]: string } = {
@@ -116,18 +116,20 @@ const MyCalendar: React.FC = () => {
         backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
         color: isSelected ? "#555" : "black", // Adjust text color if needed
         border: "1px solid #A7BBC7",
+        opacity: event.status === "completed" || event.status === "expired" ? 0.5 : 1,
+        textDecoration: event.status === "completed" || event.status === "expired" ? "line-through" : "none",
       },
     };
   };
 
-  const handleDragStart = useCallback((event: DraggedEvent) => setDraggedEvent(event), []);
-
-  const dragFromOutsideItem = useCallback(
-    () => {
-      return (event: Event) => event.start;  // Or another Date field, such as `event.end`
-    },
-    [draggedEvent]
+  const handleDragStart = useCallback(
+    (event: DraggedEvent) => setDraggedEvent(event),
+    [],
   );
+
+  const dragFromOutsideItem = useCallback(() => {
+    return (event: Event) => event.start; // Or another Date field, such as `event.end`
+  }, [draggedEvent]);
 
   const moveEvent = useCallback(
     async ({
@@ -157,7 +159,13 @@ const MyCalendar: React.FC = () => {
       };
 
       const updatedTasks = tasks.map((task) =>
-        task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
+        task._id === event._id
+          ? {
+              ...task,
+              startTime: start.toISOString(),
+              endTime: end.toISOString(),
+            }
+          : task,
       );
 
       console.log("Sending time update:", updateTaskTimeDto);
@@ -168,8 +176,8 @@ const MyCalendar: React.FC = () => {
 
       // Update the event in the `myEvents` list
       setMyEvents((prev) => {
-        const existing = prev.find((ev) => ev.id === event.id) ?? {};
-        const filtered = prev.filter((ev) => ev.id !== event.id);
+        const existing = prev.find((ev) => ev._id === event._id) ?? {};
+        const filtered = prev.filter((ev) => ev._id !== event._id);
 
         return [
           ...filtered,
@@ -178,10 +186,12 @@ const MyCalendar: React.FC = () => {
             start,
             end,
             allDay: droppedOnAllDaySlot || event.allDay,
-            id: event.id,
+            _id: event._id,
             userId: event.userId,
             title: event.title,
             status: newStatus, // Ensure status has a value
+            category: event.category,
+            priority: event.priority
           },
         ];
       });
@@ -191,21 +201,21 @@ const MyCalendar: React.FC = () => {
       try {
 
         // Make the backend request to update the task
-        const response = await updateTaskApi(event.id, updateTaskTimeDto);
+        const response = await updateTaskApi(event._id, updateTaskTimeDto);
         console.log('move response', response);
         if (response) {
           console.log("Task updated successfully:", response);
           // Optionally, update state again after a successful backend update
           setTasks((prevTasks) =>
             prevTasks.map((task) =>
-              task._id === event.id
+              task._id === event._id
                 ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString(), status: newStatus }
                 : task
             )
           );
         }
       } catch (error) {
-        console.error(`Failed to update task with ID ${event.id}:`, error);
+        console.error(`Failed to update task with ID ${event._id}:`, error);
       }
     },
     [tasks, myEvents, setMyEvents, setTasks] // Adding `tasks` to ensure we access the latest context value
@@ -234,15 +244,16 @@ const MyCalendar: React.FC = () => {
       const { title, _id, userId, category } = draggedEvent;
 
       // Create a new event object
-      const newEvent: Omit<Event, "id"> & { id: string } = {
+      const newEvent: Omit<Event, "_id"> & { _id: string } = {
         title: formatName(title),
         start: localStart,
         end: localEnd,
         allDay: isAllDay || false,
         status: newStatus || "pending", // Ensure status has a value
         userId: userId,
-        id: _id, // Use the draggedEvent id directly
+        _id: _id, // Use the draggedEvent id directly
         category,
+        priority: draggedEvent.priority
       };
 
       // Update tasks state locally
@@ -302,7 +313,7 @@ const MyCalendar: React.FC = () => {
         status: newStatus,
       };
       const updatedTasks = tasks.map((task) =>
-        task._id === event.id ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString() } : task
+        task._id === event._id ? { ...task, startTime: localStart.toISOString(), endTime: localEnd.toISOString() } : task
       );
 
       console.log("Sending time update:", updateTaskTimeDto);
@@ -311,17 +322,19 @@ const MyCalendar: React.FC = () => {
       setTasks(updatedTasks);
 
       setMyEvents((prev) => {
-        const existing = prev.find((ev) => ev.id === event.id) ?? {
+        const existing = prev.find((ev) => ev._id === event._id) ?? {
           allDay: false,
-          id: event.id,
+          _id: event._id,
           userId: event.userId,
           title: event.title,
           start: event.start,
           end: event.end,
           status: event.status,
+          category: event.category,
+          priority: event.priority
         };
 
-        const filtered = prev.filter((ev) => ev.id !== event.id);
+        const filtered = prev.filter((ev) => ev._id !== event._id);
 
         return [
           ...filtered,
@@ -337,13 +350,13 @@ const MyCalendar: React.FC = () => {
       try {
         console.log("time", updateTaskTimeDto);
 
-        const response = await updateTaskApi(event.id, updateTaskTimeDto);
+        const response = await updateTaskApi(event._id, updateTaskTimeDto);
 
         if (response) {
           console.log("1", response);
           setTasks((prevTasks) => {
             return prevTasks.map((task) => {
-              if (task._id === event.id) {
+              if (task._id === event._id) {
                 return {
                   ...task,
                   startTime: localStart.toISOString(),
@@ -355,9 +368,9 @@ const MyCalendar: React.FC = () => {
             });
           })
         }
-        console.log(`Task with ID ${event.id} updated successfully.`);
+        console.log(`Task with ID ${event._id} updated successfully.`);
       } catch (error) {
-        console.error(`Failed to update task with ID ${event.id}:`, error);
+        console.error(`Failed to update task with ID ${event._id}:`, error);
       }
     },
     [tasks, setTasks, setMyEvents]
@@ -381,7 +394,7 @@ const MyCalendar: React.FC = () => {
     handleOpen("create");
   }
 
-  const undoDelete = useCallback((task: TaskSchema) => {
+  const undoDelete = useCallback((task: TaskItem) => {
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
       if (newMap.has(task._id as string)) {
@@ -399,7 +412,7 @@ const MyCalendar: React.FC = () => {
   const handleConfirmDelete = useCallback(() => {
     if (!selectedCalendarEvent) return;
 
-    const taskId = selectedCalendarEvent.id as string;
+    const taskId = selectedCalendarEvent._id as string;
     const taskToDelete = selectedCalendarEvent;
 
     // Temporarily remove the task from the list
@@ -459,7 +472,10 @@ const MyCalendar: React.FC = () => {
 
   return (
     <div className="relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full">
-      <SideBarTask draggableTasks={draggableTasks} handleDragStart={handleDragStart} />
+      <SideBarTask
+        draggableTasks={draggableTasks}
+        handleDragStart={handleDragStart}
+      />
       <div className="relative flex flex-col justify-center bg-white dark:bg-slate-700 p-1 border rounded-lg w-[84%] h-full">
         <div className="flex flex-wrap justify-between items-center p-2">
           <div className="flex items-center">
@@ -483,7 +499,9 @@ const MyCalendar: React.FC = () => {
         <DragAndDropCalendar
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
-          dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : undefined}
+          dragFromOutsideItem={
+            displayDragItemInCell ? dragFromOutsideItem : undefined
+          }
           draggableAccessor={() => true}
           eventPropGetter={eventPropGetter}
           events={myEvents}

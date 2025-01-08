@@ -1,13 +1,13 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { Task as TaskSchema } from "../types/task.ts";
+import { TaskItem } from "../types/type.ts";
 import { Event } from "../types/type.js";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
-export const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
+export const convertTasksToEvents = (tasks: TaskItem[] = []): Event[] => {
   if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
     return []; // Return an empty array if tasks is null, undefined, or empty
   }
@@ -22,15 +22,16 @@ export const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
       endTime.setUTCMinutes(endTime.getMinutes() + endTime.getTimezoneOffset());
 
       return {
-        id: task._id as string, // Generate unique IDs
+        _id: task._id as string, // Generate unique IDs
         userId: task.userId,
         title: task.title,
-        status: task.status as string,
+        status: task.status,
         category: task.category,
         priority: task.priority,
         start: startTime,
         end: endTime,
         allDay: false, // Assuming tasks are not all-day by default
+        color: task.color
       };
     });
 };
