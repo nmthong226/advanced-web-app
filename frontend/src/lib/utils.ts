@@ -40,11 +40,12 @@ export const getCurrentDateInfo = () => {
 };
 
 export const getCurrentWeek = (dateProp?: string) => {
-  const baseDate = dateProp ? new Date(dateProp) : new Date(); // Use the provided date or default to today
+  // Use the provided date or default to today
+  const baseDate = dateProp ? new Date(dateProp) : new Date();
   const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Calculate the difference to find the previous Sunday
-  const dayOffset = baseDate.getDay(); // `getDay()` returns 0 (Sunday) to 6 (Saturday)
+  // Find the previous Sunday (start of the week)
+  const dayOffset = baseDate.getDay(); // Sunday = 0, ..., Saturday = 6
   const startOfWeek = new Date(baseDate);
   startOfWeek.setDate(baseDate.getDate() - dayOffset); // Go back to the previous Sunday
 
@@ -52,17 +53,20 @@ export const getCurrentWeek = (dateProp?: string) => {
 
   // Iterate from Sunday to Saturday
   for (let i = 0; i < 7; i++) {
-    const newDate = new Date(startOfWeek);
-    newDate.setDate(startOfWeek.getDate() + i); // Set the date to the current week day (Sunday + i)
+    const currentDate = new Date(startOfWeek);
+    currentDate.setDate(startOfWeek.getDate() + i); // Calculate each day of the week
 
-    const fullDateString = `${String(newDate.getDate()).padStart(2, '0')}/${String(newDate.getMonth() + 1).padStart(2, '0')}/${newDate.getFullYear()}`;
+    // Format the date in dd/mm/yyyy format
+    const fullDateString = `${String(currentDate.getDate()).padStart(2, '0')}/${String(
+      currentDate.getMonth() + 1
+    ).padStart(2, '0')}/${currentDate.getFullYear()}`;
 
     currentWeekDate.push({
-      dayOfWeek: daysOfWeek[newDate.getDay()],
-      dayOfMonth: newDate.getDate(),
-      month: newDate.toLocaleString('default', { month: 'long' }),
-      year: newDate.getFullYear(),
-      fullDate: fullDateString,
+      dayOfWeek: daysOfWeek[currentDate.getDay()], // Day name (e.g., Sun, Mon)
+      dayOfMonth: currentDate.getDate(), // Numeric day of the month
+      month: currentDate.toLocaleString('default', { month: 'long' }), // Full month name
+      year: currentDate.getFullYear(), // Year
+      fullDate: fullDateString, // Full date as dd/mm/yyyy
     });
   }
 
@@ -192,31 +196,50 @@ export const generateStylesFromParent = (color: string): string => {
 };
 
 export const convertToPeriodTime = (dueTime: string): string => {
-  const date = new Date(dueTime);
-  const options: Intl.DateTimeFormatOptions = {
-    hour: 'numeric',   // No leading zeros for hours
-    minute: '2-digit', // Always show two digits for minutes
-    hour12: true       // Use AM/PM notation
-  };
-  return date.toLocaleTimeString('en-US', options);
+  const date = new Date(dueTime).toLocaleTimeString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: 'UTC',
+  });
+  return date;
 };
 
 // Function to get the current week from a given date
 export const initialCurrentWeek = (date: any) => {
+  // Ensure the input date is a valid Date object
   const currentDate = new Date(date);
-  const startOfWeek = currentDate.getDate() - currentDate.getDay();
+  const currentDayIndex = currentDate.getDay(); // Get day index (0 = Sunday, ..., 6 = Saturday)
+
+  // Calculate the start of the week (Sunday)
+  const startOfWeek = new Date(currentDate);
+  startOfWeek.setDate(currentDate.getDate() - currentDayIndex);
+
+  // Generate the week from Sunday to Saturday
   const week = Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(currentDate.setDate(startOfWeek + i));
+    const day = new Date(startOfWeek);
+    day.setDate(startOfWeek.getDate() + i); // Increment days from Sunday
+
     return {
       date: day.toLocaleDateString('en-GB', {
         day: '2-digit',
         month: '2-digit',
-        year: 'numeric'
-      }), // dd/mm/yyyy format
-      dayOfWeek: day.toLocaleDateString('en-GB', { weekday: 'short' }),
-      userId: 'user-1', // Assuming a default user for simplicity
-      tasks: [],
+        year: 'numeric',
+      }), // Format date as dd/mm/yyyy
+      dayOfWeek: day.toLocaleDateString('en-GB', { weekday: 'short' }), // e.g., "Sun", "Mon"
+      userId: 'user-1', // Default user ID
+      tasks: [], // Initialize with empty tasks
     };
   });
+
   return week;
+};
+
+
+// Convert UTC ISO string to local time in Vietnam (UTC+7)
+export const convertToLocalTime = (isoString: string, offset: number) => {
+  const date = new Date(isoString);
+  // Adjust by the offset (in hours)
+  const localDate = new Date(date.getTime() + offset * 60 * 60 * 1000);
+  return localDate.toISOString();
 };

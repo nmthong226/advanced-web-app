@@ -24,7 +24,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ completed, pending, todo }) =
         {/* Completed Segment */}
         <Tooltip>
           <TooltipTrigger
-            className="border-slate-700 bg-slate-200 border-r-[3px] progress-segment"
+            className="border-slate-700 bg-slate-200 dark:bg-indigo-200 border-r-[3px] progress-segment"
             style={{ width: `${getPercentage(completed)}%` }}
           />
           <TooltipContent>
@@ -35,7 +35,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ completed, pending, todo }) =
         {/* Pending Segment */}
         <Tooltip>
           <TooltipTrigger
-            className="border-slate-700 bg-slate-400 border-r-[3px] progress-segment"
+            className="border-slate-700 bg-slate-400 dark:bg-indigo-500 border-r-[3px] progress-segment"
             style={{ width: `${getPercentage(pending)}%` }}
           />
           <TooltipContent>
@@ -46,7 +46,7 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ completed, pending, todo }) =
         {/* To-do Segment */}
         <Tooltip>
           <TooltipTrigger
-            className="bg-slate-500 progress-segment"
+            className="bg-slate-500 dark:bg-indigo-700 progress-segment"
             style={{ width: `${getPercentage(todo)}%` }}
           />
           <TooltipContent>

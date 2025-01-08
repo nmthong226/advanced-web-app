@@ -12,3 +12,19 @@
   background-color: #00aaff;
   color: #ffffff;
 }
+
+.rbc-btn-group {
+  font-size: 12px;
+}
+
+.rbc-timeslot-group {
+  font-size: 12px;
+}
+
+.rbc-timeslot-group {
+  min-height: 80px !important;
+}
+
+div.rbc-header > button > span {
+  font-weight: 600;
+}

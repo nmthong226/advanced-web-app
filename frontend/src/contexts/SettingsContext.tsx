@@ -6,6 +6,7 @@ type Settings = {
     showTaskOverview: boolean;
     showProductivityInsights: boolean;
     showCalendar: boolean;
+    themeLight: boolean;
 };
 
 type SettingsContextType = {
@@ -23,6 +24,7 @@ export const SettingsProvider: React.FC<{ children: ReactNode }> = ({ children }
         showTaskOverview: true,
         showProductivityInsights: true,
         showCalendar: true,
+        themeLight: true
     });
     const [showLeftBar, setShowLeftBar] = useState(true);
 

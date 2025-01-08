@@ -24,28 +24,15 @@ type TaskSchedule = {
     userId: string;
     date: string; // e.g., '2024-11-20'
     dayOfWeek: string; // e.g., 'Wed'
-    tasks: Task[]; 
+    tasks: Task[];
 };
 
 //This goes for timetable
 type ActivitySchedule = {
     date: string; // e.g., '2024-11-20'
     dayOfWeek: string; // e.g., 'Wed'
-    activities: Activity[]; 
+    activities: Activity[];
 }
-
-type EventItem = {
-    id: string;
-    title: string;
-    backgroundColor: string;
-    textColor: string;
-};
-
-type EventCategory = {
-    id: string;
-    name: string;
-    item: EventItem[];
-};
 
 type User = {
     id: string;
@@ -58,4 +45,34 @@ type User = {
         notifications: boolean;
         language: string;
     };
+};
+
+type DraggableTaskProps = {
+    _id: string;
+    title: string;
+    description: string | undefined;
+    start: string | undefined;
+    end: string | undefined;
+    estimatedTime: number | undefined;
+    color: string | undefined;
+    status: string;
+    priority: string;
+    isOnCalendar: boolean;
+};
+
+export type Appointment = {
+    id: number;
+    status: string;
+    location: string;
+    resource: string;
+    address: string;
+};
+
+export type EventItem = {
+    start?: Date | string;
+    end?: Date | string;
+    data?: { appointment?: Appointment };
+    isDraggable?: boolean;
+    isResizable?: boolean;
+    resourceId?: number;
 };

@@ -8,77 +8,61 @@ import {
   SheetTrigger,
 } from '../../components/ui/sheet';
 import MessageInput from '../../components/AI/chatInput.tsx';
-import axios from 'axios';
-// import { tasks } from './mock-data-ai.tsx';
-import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { chatWithAiAgent } from '@/api/ai-agent.api.ts';
 
 const ChatAI = () => {
-  const { tasks } = useTaskContext();
   const [messageInput, setMessageInput] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<
-    Array<{ type: string; message: string }>
+    { sender: 'user' | 'ai'; message: string }[]
   >([]);
-
-  const analyzeSchedule = async (
-    userId: string,
-    tasks: any[],
-    user_prompt: string,
-  ) => {
-    try {
-      const response = await axios.post(
-        'https://nestbackend1-giejxmpnz-quyhoaphantruongs-projects.vercel.app/ai-feedbacks/analyze-schedule',
-        {
-          userId,
-          tasks: tasks,
-          user_prompt,
-        },
-      );
-
-      console.log(response.data);
-      return response.data;
-    } catch (error) {
-      // Handle any errors
-      console.error('Error analyzing schedule:', error);
-    }
-  };
 
   const sendMessage = async () => {
     if (messageInput.trim() !== '') {
-      const newMessage = { type: 'user', message: messageInput };
-
-      // Add user message to chat history
-      setChatHistory((prevChatHistory) => [...prevChatHistory, newMessage]);
+      setChatHistory((prev) => [
+        ...prev,
+        { sender: 'user', message: messageInput },
+      ]);
       setMessageInput('');
 
-      const aiResponse = await analyzeSchedule(
-        'userid-1',
-        tasks,
-        newMessage.message,
-      );
+      console.log('User sent message:', messageInput);
 
-      if (aiResponse && aiResponse.feedback) {
-        const botMessage = { type: 'ai', message: aiResponse.feedback };
-        setChatHistory((prevChatHistory) => [...prevChatHistory, botMessage]);
+      try {
+        // Send message to the AI agent
+        const response = await chatWithAiAgent(messageInput);
+
+        // Assume response contains a "response" field
+        if (response && response.response) {
+          // Add AI's response to the chat history
+          setChatHistory((prev) => [
+            ...prev,
+            { sender: 'ai', message: response.response },
+          ]);
+        }
+      } catch (error) {
+        console.error('Failed to send message:', error);
+        // Optionally, you can add an error message to the chat history
+        setChatHistory((prev) => [
+          ...prev,
+          { sender: 'ai', message: 'Sorry, something went wrong.' },
+        ]);
+      } finally {
       }
     }
   };
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button
-          className="flex items-center border-[1px] border-gray-300 hover:bg-gray-100 px-2 py-1 rounded-md transition duration-200"
-          title="Click to get AI-powered suggestions for optimizing your study plan"
-        >
-          <span className="text-base">💡</span>
-          <span className="font-medium">AI Insights</span>
+        <button className="right-3 bottom-3 z-50 absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-12 h-12">
+          <div className="flex justify-center items-center bg-white dark:bg-gradient-to-b dark:from-indigo-600 dark:to-cyan-300 rounded-full w-11 h-11">
+            <p className="font-bold text-2xl text-center">🤖</p>
+          </div>
         </button>
       </SheetTrigger>
       <SheetContent className="flex flex-col bg-gradient-to-t from-indigo-50 to-white rounded-l-[26px] sm:max-w-[450px] md:max-w-[500px] h-full">
         <SheetHeader className="flex leading-tight">
-          <SheetTitle>💡 AI Insights</SheetTitle>
+          <SheetTitle>💡 Your AI Assistant</SheetTitle>
           <SheetDescription className="text-xs">
-            Review your task calendar and provide suggestions to optimize your
-            plan.
+            Your assitant
             <hr className="border-gray-300 my-2 w-full" />
           </SheetDescription>
         </SheetHeader>
@@ -90,40 +74,30 @@ const ChatAI = () => {
             <div className="flex items-start">
               <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
                 <p>
-                  Hello! I'm here to assist you in optimizing your schedule. How
-                  can I help?
-                </p>
-              </div>
-            </div>
-            {/* User Message */}
-            <div className="flex justify-end items-end">
-              <div className="bg-blue-600 shadow-md p-2 rounded-2xl max-w-[80%] text-sm text-white">
-                <p>Can you suggest how to prioritize my tasks for today?</p>
-              </div>
-            </div>
-            {/* AI Message */}
-            <div className="flex items-start">
-              <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
-                <p>
-                  Sure! I recommend focusing on the high-priority tasks first,
-                  like "Homework HW3." Would you like me to rearrange your
-                  schedule?
+                  Hello! I'm your assistant. How can I help you ?
                 </p>
               </div>
             </div>
             {chatHistory.map((chat, index) => (
               <div
                 key={index}
-                className={`flex ${chat.type === 'user' ? 'justify-end' : 'justify-start'} ${chat.type === 'user' ? 'items-end' : 'items-start'}`}
+                className={`flex ${
+                  chat.sender === 'user' ? 'justify-end' : 'items-start'
+                }`}
               >
                 <div
-                  className={`${chat.type === 'user' ? 'bg-blue-600' : 'bg-white'} shadow-md p-2 rounded-2xl max-w-[80%] text-${chat.type === 'user' ? 'white' : 'gray-900'} text-sm`}
+                  className={`shadow-md p-2 rounded-2xl max-w-[80%] text-sm ${
+                    chat.sender === 'user'
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-white text-gray-900'
+                  }`}
                 >
                   <p>{chat.message}</p>
                 </div>
               </div>
             ))}
           </div>
+          {}
         </div>
         {/* Chat Input */}
         <MessageInput

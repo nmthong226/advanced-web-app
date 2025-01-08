@@ -14,14 +14,14 @@ import {
     DialogHeader,
     DialogTitle,
     DialogTrigger,
-} from "../ui/dialog"
+} from "../../ui/dialog"
 //Import icons
 import { GoPencil } from "react-icons/go";
-import { Button } from '../ui/button';
+import { Button } from '../../ui/button';
 import { Label } from '@radix-ui/react-label';
-import { Input } from '../ui/input';
+import { Input } from '../../ui/input';
 import { GoTrash } from "react-icons/go";
-import NotifyDeletion from '../toast/notifyDeletion';
+import NotifyDeletion from '../../toast/notifyDeletion';
 import { LuSave } from "react-icons/lu";
 
 type CalendarCellProps = {
