@@ -1,6 +1,9 @@
 import { Cancel } from "@radix-ui/react-alert-dialog";
 import { StopwatchIcon } from "@radix-ui/react-icons";
 import { ArrowDown, ArrowRight, ArrowUp, CheckCircle, Clock } from "lucide-react";
+import { GiCancel } from "react-icons/gi";
+import { MdCancel } from "react-icons/md";
+import { TbCancel, TbFilterCancel } from "react-icons/tb";
 
 // Labels for categorizing tasks
 export const labels = [
@@ -50,7 +53,7 @@ export const statuses = [
   {
     value: 'expired',
     label: 'Expired',
-    icon: Cancel
+    icon: TbCancel
   }
 ];
 

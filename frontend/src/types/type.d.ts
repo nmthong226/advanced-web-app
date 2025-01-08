@@ -2,6 +2,43 @@
 //Import data schema
 import { Task } from './task.d.ts';
 
+// Types
+interface Event {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    dueDate?: Date;
+    allDay?: boolean;
+    status: string;
+    category?: string;
+    description?: string;
+    priority?: string;
+}
+
+interface DraggedEvent {
+    _id: string;
+    title: string;
+    status: string;
+    category: string;
+}
+
+interface Task {
+    _id: string;
+    title: string;
+    category: string;
+    status: string;
+}
+
+interface Event {
+    id: string;
+    title: string;
+    start: Date;
+    end: Date;
+    allDay?: boolean;
+    status: string;
+}
+
 type Style = {
     bgColor: string;
     textColor: string;

@@ -30,38 +30,14 @@ import { useSettings } from "../../contexts/SettingsContext";
 import { useUser } from "@clerk/clerk-react";
 import { useTaskContext } from "@/contexts/UserTaskContext.tsx";
 
-//Types
-interface Event {
-  id: string;
-  title: string;
-  start: Date;
-  end: Date;
-  allDay?: boolean;
-  status: string;
-}
-import { Task as TaskSchema } from "../../types/task.ts";
 import CustomEvent from "../Calendar/Event.tsx";
 import { formatDate } from "date-fns";
 import { GoArrowDown, GoArrowRight, GoArrowUp } from "react-icons/go";
+import { Event } from "../../types/type.js";
+import { convertTasksToEvents } from "@/lib/utils.ts";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
-
-const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
-  if (!tasks || tasks.length === 0 || !Array.isArray(tasks)) {
-    return []; // Return an empty array if tasks is null, undefined, or empty
-  }
-  return tasks
-    .filter(task => task.startTime && task.endTime) // Filter only calendar-relevant tasks
-    .map((task) => ({
-      id: task._id, // Generate unique IDs
-      title: task.title,
-      status: task.status,
-      start: new Date(task.startTime!), // Convert ISO 8601 string to Date
-      end: new Date(task.endTime!),     // Convert ISO 8601 string to Date
-      allDay: false, // Assuming tasks are not all-day by default
-    }));
-};
 
 const Home = () => {
   const { user } = useUser();

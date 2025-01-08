@@ -217,19 +217,19 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
     }
   };
 
-  const [isDisabled, setIsDisabled] = useState(true);
+  const [isDisabled ] = useState(true);
 
-  const handleToggle = (value: any) => {
-    setIsDisabled(!value); // Toggle the disabled state
-    if (!value) {
-      // Reset the form fields when switching to disabled
-      form.reset({
-        startTime: '', // Default or initial values
-        endTime: '',
-        estimatedTime: 0,
-      });
-    }
-  };
+  // const handleToggle = (value: any) => {
+  //   setIsDisabled(!value); // Toggle the disabled state
+  //   if (!value) {
+  //     // Reset the form fields when switching to disabled
+  //     form.reset({
+  //       startTime: '', // Default or initial values
+  //       endTime: '',
+  //       estimatedTime: 0,
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     if (start) {

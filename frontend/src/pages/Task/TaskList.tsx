@@ -26,9 +26,6 @@ import { FaUndoAlt } from "react-icons/fa";
 import { IoIosArrowDown } from 'react-icons/io';
 import { MdTaskAlt } from 'react-icons/md';
 import { GoTag } from 'react-icons/go';
-import { IoTrashBinOutline } from "react-icons/io5";
-import { FaSortAmountDownAlt } from "react-icons/fa";
-import { FaSortAmountUp } from "react-icons/fa";
 
 //Import libs/packages
 import { toast } from 'react-toastify';
@@ -49,7 +46,7 @@ const Tasks = () => {
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
 
-    const taskId = currentRow._id;
+    const taskId = currentRow._id as string;
     const taskToDelete = currentRow;
 
     // Temporarily remove the task from the list
@@ -110,9 +107,9 @@ const Tasks = () => {
   const undoDelete = useCallback((task: Task) => {
     setPendingDeletes((prev) => {
       const newMap = new Map(prev);
-      if (newMap.has(task._id)) {
-        clearTimeout(newMap.get(task._id));
-        newMap.delete(task._id);
+      if (newMap.has(task._id as string)) {
+        clearTimeout(newMap.get(task._id as string) as NodeJS.Timeout);
+        newMap.delete(task._id as string);
       }
       return newMap;
     });
@@ -237,7 +234,7 @@ const Tasks = () => {
         {/* ===== Data Table ===== */}
         <DataTable data={tasks} columns={columns} />
 
-        <MemoizedTasksMutateDrawer />
+        <MemoizedTasksMutateDrawer start={null} end={null} />
 
         {/* ===== Update Drawer & Delete Dialog ===== */}
         {currentRow && (

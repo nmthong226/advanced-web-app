@@ -32,6 +32,7 @@ export const TaskProvider: React.FC<{ children: ReactNode }> = ({
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND}/tasks/user/${userId}`
       );
+      console.log('fetch tasks by user_id', userId, tasks);
       setTasks(response.data);
     } catch (error) {
       console.error('Error fetching tasks:', error);

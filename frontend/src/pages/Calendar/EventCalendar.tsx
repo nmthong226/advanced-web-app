@@ -19,7 +19,6 @@ import axios from "axios";
 import { useTaskContext } from "@/contexts/UserTaskContext";
 import { IoTrashBinOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
-import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer";
 import { useTasksContext } from "../../components/table/context/task-context";
 
 interface EventTrigger {
@@ -30,8 +29,6 @@ interface EventTrigger {
     setMyEvents: (events: any) => void
     setSelectedEvent: (event: any) => void; // Correct type for the setter
 }
-
-const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 
 const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChange, selectedEvent, setMyEvents, setSelectedEvent }) => {
     const { setTasks } = useTaskContext();
