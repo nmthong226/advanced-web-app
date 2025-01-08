@@ -5,6 +5,7 @@ import { Task } from './task.d.ts';
 // Types
 interface Event {
     id: string;
+    userId: string;
     title: string;
     start: Date;
     end: Date;
@@ -13,11 +14,12 @@ interface Event {
     status: string;
     category?: string;
     description?: string;
-    priority?: string;
+    priority?: string | undefined;
 }
 
 interface DraggedEvent {
     _id: string;
+    userId: string;
     title: string;
     status: string;
     category: string;
@@ -25,17 +27,9 @@ interface DraggedEvent {
 
 interface Task {
     _id: string;
+    userId: string;
     title: string;
     category: string;
-    status: string;
-}
-
-interface Event {
-    id: string;
-    title: string;
-    start: Date;
-    end: Date;
-    allDay?: boolean;
     status: string;
 }
 

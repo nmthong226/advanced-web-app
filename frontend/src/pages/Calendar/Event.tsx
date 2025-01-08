@@ -5,6 +5,7 @@ import { FaRegCircle, FaRegCircleCheck, FaRegCircleXmark } from "react-icons/fa6
 interface EventProps {
     event: {
         id: string;
+        userId: string;
         title: string;
         status: string;
         start: Date;

@@ -81,14 +81,8 @@ const formSchema = z.object({
     .min(0, 'Pomodoro number should be 0 or greater')
     .optional(), // Optional pomodoro number
   is_on_pomodoro_list: z.boolean().optional(), // Optional but boolean indicating whether it's on the Pomodoro list
-  style: z
-    .object({
-      backgroundColor: z.string(),
-      textColor: z.string(),
-    })
-    .optional(), // Optional style for background and text color
+  color: z.string().optional(), // Optional style for background and text color
 });
-
 
 type TasksForm = z.infer<typeof formSchema>;
 
@@ -106,17 +100,14 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
       description: '',
       status: 'pending',
       priority: 'low',
-      category: '',
+      category: 'work',
       startTime: start ? start.toISOString() : '',
       endTime: end ? end.toISOString() : '',
       estimatedTime: 30, // Default value for estimated time
       pomodoro_required_number: 0,
       pomodoro_number: 0,
       is_on_pomodoro_list: false,
-      style: {
-        backgroundColor: '#ffffff',
-        textColor: '#000000',
-      },
+      color: '#ffffff',
     },
   });
 
@@ -138,10 +129,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
         pomodoro_required_number: currentRow.pomodoro_required_number || 0,
         pomodoro_number: currentRow.pomodoro_number || 0,
         is_on_pomodoro_list: currentRow.is_on_pomodoro_list || false,
-        style: currentRow.style || {
-          backgroundColor: '#ffffff',
-          textColor: '#000000',
-        },
+        color: currentRow.color || '#ffffff',
       });
     } else {
       // Reset form to default values in create mode
@@ -151,7 +139,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
         description: '',
         status: 'pending',
         priority: 'low',
-        category: '',
+        category: 'work',
         startTime: '',
         endTime: '',
         dueTime: '',
@@ -159,20 +147,18 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
         pomodoro_required_number: 0,
         pomodoro_number: 0,
         is_on_pomodoro_list: false,
-        style: {
-          backgroundColor: '#ffffff',
-          textColor: '#000000',
-        },
+        color: '',
       });
     }
   }, [currentRow, isUpdate]);
+
 
   const onSubmit = async (data: TasksForm) => {
     try {
       // Transform _id to id for backend compatibility
       const payload = {
         ...data,
-        id: data._id || `TASK-${Date.now()}`, // Generate a new ID if not updating
+        id: data._id || `TASK-${Date.now()}`,
       };
       delete payload._id; // Remove _id field to avoid conflicts
 
@@ -217,7 +203,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
     }
   };
 
-  const [isDisabled ] = useState(true);
+  const [isDisabled] = useState(true);
 
   // const handleToggle = (value: any) => {
   //   setIsDisabled(!value); // Toggle the disabled state
@@ -232,11 +218,16 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
   // };
 
   useEffect(() => {
-    if (start) {
-      form.setValue('startTime', start.toISOString());
-    }
-    if (end) {
-      form.setValue('endTime', end.toISOString());
+    if (start && end) {
+      const timezoneOffsetInMinutes = start.getTimezoneOffset();
+
+      // Adjust start and end times to local time
+      const localStart = new Date(start.getTime() - timezoneOffsetInMinutes * 60000);
+      const localEnd = new Date(end.getTime() - timezoneOffsetInMinutes * 60000);
+
+      // Set adjusted values in the form
+      form.setValue('startTime', localStart.toISOString());
+      form.setValue('endTime', localEnd.toISOString());
     }
   }, [start, end, form]);
 
@@ -307,12 +298,12 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                           value={field.value ? field.value.slice(0, 16) : ""}
                           onChange={(e) => {
                             const inputValue = e.target.value; // Local datetime format
-                            const vnLocalDate = new Date(inputValue); // Parse local date
-                            const offsetInMs = 7 * 60 * 60 * 1000; // UTC+7 offset
-                            const localTime = new Date(
-                              vnLocalDate.getTime() + offsetInMs
+                            const localDateTime = new Date(inputValue); // Parse local datetime
+                            const timezoneOffsetInMinutes = localDateTime.getTimezoneOffset(); // Get timezone offset
+                            const adjustedLocalTime = new Date(
+                              localDateTime.getTime() - timezoneOffsetInMinutes * 60000 // Adjust for local timezone
                             ).toISOString();
-                            field.onChange(localTime); // Save local time string
+                            field.onChange(adjustedLocalTime); // Save ISO string with adjustment
                           }}
                           className="bg-white w-52 md:text-[12px]"
                         />
@@ -463,7 +454,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
                               { label: 'Personal', value: 'personal' },
                               { label: 'Urgent', value: 'urgent' },
                             ]}
-                            className='border-0 shadow-none px-1 w-28 text-[12px]'
+                            className='border-0 shadow-none px-1 text-[12px]'
                           />
                           <FormMessage />
                         </FormItem>

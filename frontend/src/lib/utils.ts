@@ -23,8 +23,9 @@ export const convertTasksToEvents = (tasks: TaskSchema[] = []): Event[] => {
 
       return {
         id: task._id as string, // Generate unique IDs
+        userId: task.userId,
         title: task.title,
-        status: task.status,
+        status: task.status as string,
         category: task.category,
         priority: task.priority,
         start: startTime,

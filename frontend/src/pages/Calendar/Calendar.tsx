@@ -16,6 +16,7 @@ import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import { TasksMutateDrawer } from "../../components/table/ui/tasks-mutate-drawer.tsx";
 import { useTasksContext } from "../../components/table/context/task-context.tsx";
+import { ConfirmDialog } from "../../components/ui/confirm-dialog.tsx";
 
 // Import libs/packages
 import ChatAI from "../../components/AI/chatHistory.tsx";
@@ -32,6 +33,9 @@ import { updateTaskApi } from "@/api/tasks.api.ts";
 import { Task as TaskSchema } from "../../types/task.ts";
 import { DraggedEvent, Event, Task } from "../../types/type.js";
 import { convertTasksToEvents } from "@/lib/utils.ts";
+import { toast } from "react-toastify";
+import axios from "axios";
+import { FaUndoAlt } from "react-icons/fa";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -51,15 +55,17 @@ const convertTasksToDraggedEvents = (tasks: TaskSchema[]): Task[] => {
     .filter(task => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
     .map((task) => ({
       _id: task._id as string, // Generate unique IDs
-      category: task.category,
+      userId: task.userId,
+      category: task.category as string,
       title: task.title,
-      status: task.status,
+      status: task.status as string,
       priority: task.priority,
       allDay: false, // Assuming tasks are not all-day by default
     }));
 };
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
+const MemoizedConfirmDialog = React.memo(ConfirmDialog);
 
 const MyCalendar: React.FC = () => {
   const [myEvents, setMyEvents] = useState<Event[]>([]);
@@ -69,8 +75,10 @@ const MyCalendar: React.FC = () => {
   const defaultDate = useMemo(() => new Date(), [])
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
-
-  const { handleOpen } = useTasksContext();
+  const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
+    new Map(),
+  );
+  const { open, setOpen, handleOpen } = useTasksContext();
 
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
 
@@ -91,10 +99,10 @@ const MyCalendar: React.FC = () => {
 
     // Define category-based colors
     const categoryColors: { [key: string]: string } = {
-      work: "#6895D2", // Blue
+      work: "#CDC1FF", // Blue
       leisure: "#96E9C6", // Green
       personal: "#FDE767", // Yellow
-      urgent: "#FC4100", // Red
+      urgent: "#FF8F8F", // Red
       default: "#EEF2FF", // Default color
     };
 
@@ -103,10 +111,11 @@ const MyCalendar: React.FC = () => {
       categoryColors[event?.category?.toLowerCase() as keyof typeof categoryColors] || categoryColors.default;
 
     return {
-      className: "bg-indigo-50 shadow-lg border-0 text-xs",
+      className: "bg-indigo-50 shadow-lg text-xs",
       style: {
         backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
         color: isSelected ? "#555" : "black", // Adjust text color if needed
+        border: "1px solid #A7BBC7",
       },
     };
   };
@@ -146,6 +155,7 @@ const MyCalendar: React.FC = () => {
         endTime: localEnd.toISOString(),
         status: newStatus,
       };
+
       const updatedTasks = tasks.map((task) =>
         task._id === event.id ? { ...task, startTime: start.toISOString(), endTime: end.toISOString() } : task
       );
@@ -169,6 +179,7 @@ const MyCalendar: React.FC = () => {
             end,
             allDay: droppedOnAllDaySlot || event.allDay,
             id: event.id,
+            userId: event.userId,
             title: event.title,
             status: newStatus, // Ensure status has a value
           },
@@ -220,7 +231,7 @@ const MyCalendar: React.FC = () => {
         status: newStatus,
       };
 
-      const { title, _id, category } = draggedEvent;
+      const { title, _id, userId, category } = draggedEvent;
 
       // Create a new event object
       const newEvent: Omit<Event, "id"> & { id: string } = {
@@ -229,6 +240,7 @@ const MyCalendar: React.FC = () => {
         end: localEnd,
         allDay: isAllDay || false,
         status: newStatus || "pending", // Ensure status has a value
+        userId: userId,
         id: _id, // Use the draggedEvent id directly
         category,
       };
@@ -302,6 +314,7 @@ const MyCalendar: React.FC = () => {
         const existing = prev.find((ev) => ev.id === event.id) ?? {
           allDay: false,
           id: event.id,
+          userId: event.userId,
           title: event.title,
           start: event.start,
           end: event.end,
@@ -368,6 +381,82 @@ const MyCalendar: React.FC = () => {
     handleOpen("create");
   }
 
+  const undoDelete = useCallback((task: TaskSchema) => {
+    setPendingDeletes((prev) => {
+      const newMap = new Map(prev);
+      if (newMap.has(task._id as string)) {
+        clearTimeout(newMap.get(task._id as string) as NodeJS.Timeout);
+        newMap.delete(task._id as string);
+      }
+      return newMap;
+    });
+    setTasks((prevTasks) => [...prevTasks, task]);
+    toast.success(
+      <p className='text-sm'>Task restored successfully!</p>
+    );
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!selectedCalendarEvent) return;
+
+    const taskId = selectedCalendarEvent.id as string;
+    const taskToDelete = selectedCalendarEvent;
+
+    // Temporarily remove the task from the list
+    setTasks((prevTasks) => prevTasks.filter((t) => t._id !== taskId));
+
+    // Track if the delete was undone
+    let isUndone = false;
+
+    // Show toast with undo option
+    const toastId = toast.error(
+      <div className='flex items-center space-x-2 text-sm'>
+        <p>Task deleted.{' '}</p>
+        <button
+          onClick={() => {
+            undoDelete(taskToDelete); // Restore the task
+            isUndone = true; // Mark as undone
+            toast.dismiss(toastId); // Close the toast immediately
+          }}
+          className='flex items-center border-white px-2 py-0.5 border rounded-md font-semibold text-indigo-100'
+        >
+          <FaUndoAlt className='mr-1 size-3' />
+          Undo
+        </button>
+      </div>,
+      {
+        autoClose: 4000, // Automatically close after 4 seconds
+        closeOnClick: false, // Prevent toast from closing on accidental clicks
+        onClose: () => {
+          if (!isUndone) {
+            // Permanently delete if not undone
+            const timeoutId = setTimeout(async () => {
+              try {
+                await axios.delete(`${import.meta.env.VITE_BACKEND}/tasks/${taskId}`);
+              } catch (error) {
+                console.error('Error deleting task:', error);
+                setTasks((prevTasks) => [...prevTasks, taskToDelete]);
+              }
+              setPendingDeletes((prev) => {
+                const newMap = new Map(prev);
+                newMap.delete(taskId);
+                return newMap;
+              });
+            }, 0); // Start delete operation immediately
+            setPendingDeletes((prev) => {
+              const newMap = new Map(prev);
+              newMap.set(taskId, timeoutId);
+              return newMap;
+            });
+          }
+        },
+      },
+    );
+
+    setSelectedCalendarEvent(null);
+    setOpen(null);
+  }, [selectedCalendarEvent, setTasks, setOpen, setPendingDeletes]);
+
   return (
     <div className="relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full">
       <SideBarTask draggableTasks={draggableTasks} handleDragStart={handleDragStart} />
@@ -414,6 +503,21 @@ const MyCalendar: React.FC = () => {
           className="px-2"
         />
         <MemoizedTasksMutateDrawer start={selectedEvent.start} end={selectedEvent.end} />
+        {/* ===== Update Drawer & Delete Dialog ===== */}
+        <MemoizedConfirmDialog
+          destructive
+          open={open === 'delete'}
+          onOpenChange={() => setOpen(null)}
+          handleConfirm={handleConfirmDelete}
+          title={`Confirm Delete`}
+          desc={
+            <p>
+              Are you sure you want to delete {' '}
+              <strong>{selectedCalendarEvent?.title}?</strong>
+            </p>
+          }
+          confirmText="Delete"
+        />
         <EventCalendar
           open={dialogOpen}
           onOpenChange={setDialogOpen}
@@ -421,6 +525,7 @@ const MyCalendar: React.FC = () => {
           selectedEvent={selectedCalendarEvent}
           setSelectedEvent={setSelectedCalendarEvent} // Pass the setter function
           setMyEvents={setMyEvents}
+          handleConfirm={handleConfirmDelete}
         />
         <ChatAI />
       </div>

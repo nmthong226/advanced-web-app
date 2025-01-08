@@ -29,10 +29,12 @@ import { Button } from '../ui/button.tsx';
 import { ChevronsUpDown } from 'lucide-react';
 import { FaRegCircle, FaRegCircleCheck, FaRegCircleXmark } from 'react-icons/fa6';
 import { BiSolidCircleQuarter } from 'react-icons/bi';
+import { cn } from '@/lib/utils.ts';
 
 // Define types for props
 type DraggableTaskType = {
     _id: string;
+    userId: string;
     title: string;
     category: string;
     status: string; // Added status to type
@@ -40,7 +42,16 @@ type DraggableTaskType = {
 
 type SideBarTaskProps = {
     draggableTasks: DraggableTaskType[];
-    handleDragStart: (task: { _id: string; title: string; name: string, status: string, category: string }) => void;
+    handleDragStart: (task: { _id: string; userId: string; title: string; name: string, status: string, category: string }) => void;
+};
+
+// Define category-based colors
+const categoryColors: { [key: string]: string } = {
+    work: "bg-[#CDC1FF]/40 border-gray-300 border-[1px]", // Blue
+    leisure: "bg-[#96E9C6]/40 border-gray-300 border-[1px]", // Green
+    personal: "bg-[#FDE767]/40 border-gray-300 border-[1px]", // Yellow
+    urgent: "bg-[#FC4100]/40 border-gray-300 border-[1px]", // Red
+    default: "bg-[#EEF2FF]/40 border-gray-300 border-[1px]", // Default color
 };
 
 const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragStart }) => {
@@ -66,6 +77,11 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
         acc[task.category].push(task);
         return acc;
     }, {} as Record<string, DraggableTaskType[]>);
+
+    const handleColor = (category: string): string => {
+        // Return the color based on the category or the default color if not found
+        return categoryColors[category.toLowerCase()] || categoryColors.default;
+    };
 
     return (
         <div className="flex flex-col space-y-2 bg-white dark:bg-slate-700 p-2 border rounded-lg w-[16%] h-full">
@@ -129,7 +145,13 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                                 {Object.keys(categorizedTasks).map((category) => (
                                     <Collapsible key={category} className='w-full' open>
                                         <div className="flex justify-between items-center space-x-4">
-                                            <h4 className="font-semibold text-sm">{category}</h4>
+                                            <h4 className="flex font-semibold text-sm">
+                                                {category === 'leisure' && <p className='mr-1'>🧩 </p>}
+                                                {category === 'work' && <p className='mr-1'>💼</p>}
+                                                {category === 'personal' && <p className='mr-1'>🪅</p>}
+                                                {category === 'urgent' && <p className='mr-1'>💥</p>}
+                                                {category}
+                                            </h4>
                                             <CollapsibleTrigger asChild>
                                                 <Button variant="ghost" size="sm" className="p-0 w-9">
                                                     <ChevronsUpDown className="w-4 h-4" />
@@ -141,11 +163,11 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                                             <div>
                                                 {categorizedTasks[category].map((task) => (
                                                     <div
-                                                        className="flex items-center bg-indigo-50 my-1 px-0.5 py-2 rounded-sm w-full text-sm cursor-grab"
+                                                        className={cn(`flex items-center my-1 px-0.5 py-2 rounded-sm w-full text-sm cursor-grab`, handleColor(task.category))}
                                                         draggable="true"
                                                         key={task._id}
                                                         onDragStart={() =>
-                                                            handleDragStart({ _id: task._id, title: `${task.title}`, name: task.title, status: task.status, category: task.category })
+                                                            handleDragStart({ _id: task._id, userId: task.userId, title: `${task.title}`, name: task.title, status: task.status, category: task.category })
                                                         }
                                                     >
                                                         <MdOutlineDragIndicator className='size-4' />

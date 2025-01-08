@@ -28,3 +28,7 @@
 div.rbc-header > button > span {
   font-weight: 600;
 }
+
+.rbc-toolbar-label {
+  font-size: 12px !important;
+}

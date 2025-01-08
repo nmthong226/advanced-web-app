@@ -1,9 +1,13 @@
 import React from "react";
 import {
     Dialog,
+    DialogClose,
     DialogContent,
+    DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
+    DialogTrigger,
 } from "../../components/ui/dialog";
 import {
     DropdownMenu,
@@ -20,6 +24,7 @@ import { useTaskContext } from "@/contexts/UserTaskContext";
 import { IoTrashBinOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 import { useTasksContext } from "../../components/table/context/task-context";
+import { Button } from "../../components/ui/button";
 
 interface EventTrigger {
     open: boolean;
@@ -28,9 +33,10 @@ interface EventTrigger {
     selectedEvent: any; // Add selected event prop
     setMyEvents: (events: any) => void
     setSelectedEvent: (event: any) => void; // Correct type for the setter
+    handleConfirm: () => void
 }
 
-const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChange, selectedEvent, setMyEvents, setSelectedEvent }) => {
+const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChange, selectedEvent, setMyEvents, setSelectedEvent, handleConfirm }) => {
     const { setTasks } = useTaskContext();
     // Utility function to format the time
     const formatTime = (dateString: string) => {
@@ -81,8 +87,8 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
 
     console.log(selectedEvent);
 
-      const { handleOpen } = useTasksContext();
-    
+    const { handleOpen } = useTasksContext();
+
 
     // Handle status selection
     const onSelectStatus = async (status: string) => {
@@ -242,7 +248,11 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                                     </div>
                                     {/* Category Field */}
                                     <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8">
-                                        <div className="text-[12px]">{selectedEvent?.category || 'No category'}</div>
+                                        {selectedEvent?.category === 'leisure' && <p>🧩</p>}
+                                        {selectedEvent?.category === 'work' && <p>💼</p>}
+                                        {selectedEvent?.category === 'personal' && <p>🪅</p>}
+                                        {selectedEvent?.category === 'urgent' && <p>💥</p>}
+                                        <div className="text-[12px] capitalize">{selectedEvent?.category || 'Uncategorized'}</div>
                                     </div>
                                     {/* Due Date Field */}
                                     <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8">
@@ -266,9 +276,47 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                                         </div>
                                     </div>
                                 </div>
-                                <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer">
-                                    <IoTrashBinOutline className="text-muted-foreground" />
-                                </div>
+                                <Dialog>
+                                    <DialogTrigger>
+                                        <div
+                                            className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer">
+                                            <IoTrashBinOutline className="text-muted-foreground" />
+                                        </div>
+                                    </DialogTrigger>
+                                    <DialogContent
+                                        onCloseAutoFocus={() => {
+                                            onOpenChange(false); // Close the parent dialog when delete dialog is closed
+                                        }}
+                                    >
+                                        <DialogHeader>
+                                            <DialogTitle>Confirm Delete</DialogTitle>
+                                            <DialogDescription>
+                                                This action cannot be undone. This will permanently delete your account
+                                                and remove your data from our servers.
+                                            </DialogDescription>
+                                        </DialogHeader>
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button
+                                                    type="button"
+                                                    variant="secondary"
+                                                    onClick={() => onOpenChange(false)} // Close parent dialog explicitly
+                                                >
+                                                    Close
+                                                </Button>
+                                            </DialogClose>
+                                            <Button
+                                                variant={'destructive'}
+                                                onClick={() => {
+                                                    handleConfirm();
+                                                    onOpenChange(false); // Close parent dialog after confirm
+                                                }}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                             </div>
                         </div>
                     </div>

@@ -52,9 +52,6 @@ const SignInPage = () => {
       </div>
       {/* Main Container */}
       <div className="flex justify-end space-x-3 bg-gradient-to-b from-white to-indigo-200 p-2 border rounded-lg w-[730px] h-[472px]">
-        <div className="flex w-[400px] h-full">
-          <SignIn signUpUrl="/sign-up" />
-        </div>
         {/* Carousel Section */}
         <div className="relative flex flex-col flex-1 justify-center items-center shadow-xl rounded-lg h-auto overflow-hidden group">
           {/* Background Image Layer */}
@@ -105,6 +102,9 @@ const SignInPage = () => {
               ❯
             </button>
           </div>
+        </div>
+        <div className="flex w-[400px] h-full">
+          <SignIn signUpUrl="/sign-up" />
         </div>
       </div>
       {/* Footer */}

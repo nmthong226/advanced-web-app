@@ -244,11 +244,11 @@ const Tasks = () => {
               open={open === 'delete'}
               onOpenChange={() => setOpen(null)}
               handleConfirm={handleConfirmDelete}
-              title={`Delete this task: ${currentRow?.title}?`}
+              title={`Confirm Delete`}
               desc={
                 <p>
-                  You are about to delete task{' '}
-                  <strong>{currentRow?.title}</strong>.
+                  Are you sure you want to delete {' '}
+                  <strong>{currentRow?.title}?</strong>
                 </p>
               }
               confirmText="Delete"
