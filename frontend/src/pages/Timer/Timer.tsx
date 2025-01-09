@@ -16,7 +16,7 @@ import { IoMdMore } from 'react-icons/io';
 import { Trash, Trash2 } from 'lucide-react';
 import { BsFillSkipEndFill } from 'react-icons/bs';
 
-import { Task } from './tasks';
+import { Task, TaskItem } from './tasks';
 import { Howl } from 'howler';
 import { useTaskContext } from 'src/contexts/UserTaskContext.tsx';
 import { useUser, useAuth } from '@clerk/clerk-react';
@@ -80,7 +80,7 @@ const Timer = () => {
 
   // Task States from Context
   const { tasks, setTasks, addTask, editTask } = useTaskContext();
-  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [selectedTask, setSelectedTask] = useState<TaskItem | null>(null);
 
   // Edit Task Inline States
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
@@ -310,12 +310,12 @@ const Timer = () => {
   };
 
   // Function to handle task selection
-  const handleTaskSelect = async (task: Task) => {
+  const handleTaskSelect = async (task: TaskItem) => {
     try {
       if (!user) throw new Error('User not authenticated');
 
       // Update the task in the backend
-      const updatedTask = await updateTaskApi(task._id, {
+      const updatedTask = await updateTaskApi(task._id ?? '', {
         is_on_pomodoro_list: true,
         status: 'in-progress', // Optionally update the status as well
       });
@@ -435,10 +435,10 @@ const Timer = () => {
     // Prepare log data
     const logData: PomodoroLog = {
       user_id,
-      task_id: selectedTask._id,
+      task_id: selectedTask._id || '',
       current_pomodoro_number: currentPomodoro?.current_pomodoro_number || 0,
       current_cycle_number: currentPomodoro?.current_cycle_number || 0,
-      required_cycle_number: selectedTask.pomodoro_required_number,
+      required_cycle_number: selectedTask.pomodoro_required_number || 0,
       start_time,
       end_time,
       session_status: 'pomodoro', // Assuming it's a pomodoro completion
@@ -480,8 +480,8 @@ const Timer = () => {
       console.log('Updated Current Pomodoro:', updatedCurrentPomodoro);
 
       // Update the task in the backend
-      const updatedTask = await updateTaskApi(selectedTask._id, {
-        pomodoro_number: selectedTask.pomodoro_number + 1,
+      const updatedTask = await updateTaskApi(selectedTask._id ?? '', {
+        pomodoro_number: (selectedTask.pomodoro_number || 1) + 1,
       });
 
       // Update the task in the context
@@ -489,9 +489,12 @@ const Timer = () => {
       console.log('Updated Task:', updatedTask);
 
       // Check if the task is completed
-      if (updatedTask.pomodoro_number >= updatedTask.pomodoro_required_number) {
+      if (
+        (updatedTask.pomodoro_number || 0) >=
+        (updatedTask.pomodoro_required_number || 0)
+      ) {
         // Update the task's status to 'completed'
-        const completedTask = await updateTaskApi(selectedTask._id, {
+        const completedTask = await updateTaskApi(selectedTask._id ?? '', {
           status: 'completed',
         });
         editTask(completedTask);
@@ -608,7 +611,7 @@ const Timer = () => {
   };
 
   // Function to handle selecting a task
-  const handleSelectTask = (task: Task) => {
+  const handleSelectTask = (task: TaskItem) => {
     if (!isSignedIn) return; // Prevent selection if not signed in
 
     if (task.status === 'completed') return; // Do not allow selecting completed tasks
@@ -651,8 +654,8 @@ const Timer = () => {
     try {
       if (mode === 'pomodoro') {
         // Increment pomodoroNumber in the backend
-        const updatedTask = await updateTaskApi(selectedTask._id, {
-          pomodoro_number: selectedTask.pomodoro_number + 1,
+        const updatedTask = await updateTaskApi(selectedTask._id ?? '', {
+          pomodoro_number: (selectedTask.pomodoro_number || 0) + 1,
         });
 
         // Update the task in the context
@@ -662,10 +665,11 @@ const Timer = () => {
 
         // Check if the task is completed
         if (
-          updatedTask.pomodoro_number >= updatedTask.pomodoro_required_number
+          (updatedTask.pomodoro_number || 0) >=
+          (updatedTask.pomodoro_required_number || 0)
         ) {
           // Update the task's status to 'completed'
-          const completedTask = await updateTaskApi(selectedTask._id, {
+          const completedTask = await updateTaskApi(selectedTask._id ?? '', {
             status: 'completed',
           });
           editTask(completedTask);
@@ -709,10 +713,10 @@ const Timer = () => {
         // Log the skipped Pomodoro
         const logData: PomodoroLog = {
           user_id,
-          task_id: selectedTask._id,
+          task_id: selectedTask._id || '',
           current_pomodoro_number: newPomodoroNumber,
           current_cycle_number: newCycleNumber,
-          required_cycle_number: selectedTask.pomodoro_required_number,
+          required_cycle_number: selectedTask.pomodoro_required_number || 0,
           start_time: new Date().toISOString(), // Adjust as needed
           end_time: new Date().toISOString(), // Adjust as needed
           session_status: 'pomodoro',
@@ -721,24 +725,29 @@ const Timer = () => {
         console.log('Pomodoro Log Created:', logData);
 
         // Set timer and mode based on new session status
-        if (newSessionStatus === 'pomodoro') {
+        if (
+          newSessionStatus === 'short-break' ||
+          newSessionStatus === 'long-break'
+        ) {
+          setMode(newSessionStatus);
+          setTimerTime(newSessionStatus);
+        } else {
           setMode('pomodoro');
           setTimerTime('pomodoro');
           setSelectedTask(null); // Optionally deselect the task
-        } else {
-          setMode(newSessionStatus);
-          setTimerTime(newSessionStatus);
         }
 
         // Play appropriate sound
-        if (newSessionStatus === 'pomodoro') {
-          playAlarmSoundFunction();
-        } else {
+        if (newSessionStatus === 'short-break') {
           playBreakSoundFunction();
+        } else if (newSessionStatus === 'long-break') {
+          playBreakSoundFunction();
+        } else {
+          playAlarmSoundFunction();
         }
 
         // Activate Overlay only if Focus Mode is ON and new session is Pomodoro
-        if (isFocusModeOn && newSessionStatus === 'pomodoro') {
+        if (isFocusModeOn && mode === 'pomodoro') {
           setIsOverlayActive(true);
         }
       } else if (mode === 'short-break' || mode === 'long-break') {
@@ -755,10 +764,10 @@ const Timer = () => {
   };
 
   // Function to initiate editing a task
-  const initiateEditTask = (task: Task) => {
-    setEditingTaskId(task._id);
+  const initiateEditTask = (task: TaskItem) => {
+    setEditingTaskId(task._id || '');
     setEditingTaskTitle(task.title);
-    setEditingPomodoroRequiredNumber(task.pomodoro_required_number);
+    setEditingPomodoroRequiredNumber(task.pomodoro_required_number || 0);
     setEditingEstimatedTime(task.estimatedTime || 25);
     setError(null);
   };
@@ -833,6 +842,8 @@ const Timer = () => {
         priority: 'low',
         category: '',
         is_on_pomodoro_list: false,
+        startTime: '',
+        color: '',
       };
       addTask(newTask);
       setEditingTaskTitle('');
@@ -872,11 +883,11 @@ const Timer = () => {
   // Total Pomodoros and Estimated Time
   const totalPomodorosPlanned = tasks
     .filter((task) => task.is_on_pomodoro_list)
-    .reduce((acc, task) => acc + task.pomodoro_required_number, 0);
+    .reduce((acc, task) => acc + (task.pomodoro_required_number || 0), 0);
 
   const totalPomodorosCompleted = tasks
     .filter((task) => task.is_on_pomodoro_list)
-    .reduce((acc, task) => acc + task.pomodoro_number, 0);
+    .reduce((acc, task) => acc + (task.pomodoro_number || 0), 0);
 
   // Calculate estimated finish time based on selected task and Pomodoros
   const calculateCompletionTimeWithRemaining = (): string => {
@@ -886,7 +897,7 @@ const Timer = () => {
       .filter((task) => task.is_on_pomodoro_list)
       .forEach((task) => {
         const remainingPomos =
-          task.pomodoro_required_number - task.pomodoro_number;
+          (task.pomodoro_required_number || 0) - (task.pomodoro_number || 0);
         if (remainingPomos <= 0) return; // Skip completed tasks
 
         const fullCycles = Math.floor(
@@ -996,13 +1007,13 @@ const Timer = () => {
             </div>
             <div className="flex space-x-2">
               <PomoSettings
-                pomodoroDuration={pomodoroDuration}
+                pomodoroDuration={pomodoroDuration || 25}
                 setPomodoroDuration={setPomodoroDuration}
-                shortBreakDuration={shortBreakDuration}
+                shortBreakDuration={shortBreakDuration || 5}
                 setShortBreakDuration={setShortBreakDuration}
-                longBreakDuration={longBreakDuration}
+                longBreakDuration={longBreakDuration || 15}
                 setLongBreakDuration={setLongBreakDuration}
-                longBreakInterval={longBreakInterval}
+                longBreakInterval={longBreakInterval || 4}
                 setLongBreakInterval={setLongBreakInterval}
                 soundAlarm={soundAlarm}
                 setSoundAlarm={setSoundAlarm}
@@ -1172,7 +1183,7 @@ const Timer = () => {
                             try {
                               // Iterate through all tasks and update is_on_pomodoro_list to false
                               const updatePromises = tasks.map((task) =>
-                                updateTaskApi(task._id, {
+                                updateTaskApi(task._id || '', {
                                   is_on_pomodoro_list: false,
                                 }),
                               );
@@ -1216,7 +1227,7 @@ const Timer = () => {
                               );
                               const updatePromises = completedTasks.map(
                                 (task) =>
-                                  updateTaskApi(task._id, {
+                                  updateTaskApi(task._id || '', {
                                     is_on_pomodoro_list: false,
                                   }),
                               );
@@ -1335,7 +1346,7 @@ const Timer = () => {
                               Cancel
                             </button>
                             <button
-                              onClick={() => saveEditedTask(task._id)}
+                              onClick={() => saveEditedTask(task._id || '')}
                               className="bg-blue-600 px-4 py-2 rounded-md text-white"
                             >
                               Save
@@ -1383,7 +1394,7 @@ const Timer = () => {
                                   } else {
                                     try {
                                       const updatedTask = await updateTaskApi(
-                                        task._id,
+                                        task._id || '',
                                         {
                                           status: 'pending',
                                           pomodoro_number: 0,
