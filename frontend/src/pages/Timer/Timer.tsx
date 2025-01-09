@@ -1,9 +1,9 @@
 // src/components/Timer.tsx
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import ReactDOM from 'react-dom';
 import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,11 +17,11 @@ import { IoMdMore } from 'react-icons/io';
 import { Trash, Trash2 } from 'lucide-react';
 import { BsFillSkipEndFill } from 'react-icons/bs';
 import { FaRegChartBar, FaCheck } from 'react-icons/fa';
-import { Task } from './tasks'; // Import Task
-import { Howl } from 'howler'; // Ensure you have howler installed
+import { Task } from './tasks';
+import { Howl } from 'howler';
 import { useTaskContext } from 'src/contexts/UserTaskContext.tsx';
-import { useUser, useAuth } from '@clerk/clerk-react'; // Added useAuth
-import { deleteTaskApi, updateTaskApi, addTaskApi } from './tasksApi'; // Adjust the path as necessary
+import { useUser, useAuth } from '@clerk/clerk-react';
+import { deleteTaskApi, updateTaskApi, addTaskApi } from './tasksApi';
 import {
   createSessionSettings,
   updateSessionSettings,
@@ -30,8 +30,8 @@ import {
   updateCurrentPomodoro,
   createPomodoroLog,
   getAllPomodoroLogs,
-} from './focusSessionsApi'; // Adjust the path as necessary
-import { SessionSettings, CurrentPomodoro, PomodoroLog } from './types'; // Adjust the path as necessary
+} from './focusSessionsApi';
+import { SessionSettings, CurrentPomodoro, PomodoroLog } from './types';
 import { useNavigate } from 'react-router-dom';
 
 // Function to handle mode title
@@ -55,11 +55,17 @@ const Timer = () => {
   const { isSignedIn, user } = useUser(); // Ensure user is obtained
 
   // Settings State
-  const [pomodoroDuration, setPomodoroDuration] = useState<number>(25); // in minutes
-  const [shortBreakDuration, setShortBreakDuration] = useState<number>(5); // in minutes
-  const [longBreakDuration, setLongBreakDuration] = useState<number>(15); // in minutes
-  const [longBreakInterval, setLongBreakInterval] = useState<number>(4); // number of Pomodoros before a long break
-  const [loading, setLoading] = useState(true);
+  const [pomodoroDuration, setPomodoroDuration] = useState<number | null>(null); // in minutes
+  const [shortBreakDuration, setShortBreakDuration] = useState<number | null>(
+    null,
+  ); // in minutes
+  const [longBreakDuration, setLongBreakDuration] = useState<number | null>(
+    null,
+  ); // in minutes
+  const [longBreakInterval, setLongBreakInterval] = useState<number | null>(
+    null,
+  ); // number of Pomodoros before a long break
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Sound Settings
   const [soundAlarm, setSoundAlarm] = useState<string>('bell');
@@ -69,10 +75,10 @@ const Timer = () => {
   const [mode, setMode] = useState<'pomodoro' | 'short-break' | 'long-break'>(
     'pomodoro',
   );
-  const [time, setTime] = useState<number>(pomodoroDuration * 60); // in seconds
+  const [time, setTime] = useState<number | null>(null); // in seconds
   const [isActive, setIsActive] = useState<boolean>(false);
   const [pomodoroCount, setPomodoroCount] = useState<number>(0);
-  const [isonpomodorolist, setIsonpomodorolist] = useState<boolean>(false);
+
   // Task States from Context
   const { tasks, setTasks, addTask, deleteTask, editTask } = useTaskContext();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -80,36 +86,57 @@ const Timer = () => {
   // Edit Task Inline States
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null);
   const [editingTaskTitle, setEditingTaskTitle] = useState<string>('');
-  const [editingEstimatedPomodoros, setEditingEstimatedPomodoros] =
-    useState<number>(1);
-  const [editingEstimatedTime, setEditingEstimatedTime] = useState<number>(25); // in minutes
   const [editingPomodoroRequiredNumber, setEditingPomodoroRequiredNumber] =
     useState<number>(1);
-  // Modal State for Adding Task
+  const [editingEstimatedTime, setEditingEstimatedTime] = useState<number>(25); // in minutes
+
+  // Modal States
   const [isAddModalOpen, setIsAddModalOpen] = useState<boolean>(false);
-  // Task Selection Modal State
   const [isTaskSelectModalOpen, setIsTaskSelectModalOpen] =
     useState<boolean>(false);
-  // Lock Screen State
-  const [isLockScreenActive, setIsLockScreenActive] = useState<boolean>(false);
-  // State for form errors
+
+  // Focus Mode State
+  const [isFocusModeOn, setIsFocusModeOn] = useState<boolean>(false);
+
+  // Overlay State
+  const [isOverlayActive, setIsOverlayActive] = useState<boolean>(false);
+
+  // Form Error State
   const [error, setError] = useState<string | null>(null);
-  console.log(tasks);
 
   // Session Settings and Current Pomodoro State
   const [sessionSettings, setSessionSettings] =
     useState<SessionSettings | null>(null);
   const [currentPomodoro, setCurrentPomodoro] =
     useState<CurrentPomodoro | null>(null);
+
   const navigate = useNavigate(); // React Router's useNavigate hook
+
   // Token State
   const [token, setToken] = useState<string>('');
-  const setDebugTime = (newTime: number, context: string) => {
-    console.log(
-      `[DEBUG] Time updated to ${newTime} in context: ${context}`,
-      new Error().stack,
-    );
-    setTime(newTime);
+
+  // Lock Screen Overlay Ref for Focus Management
+  const lockScreenRef = useRef<HTMLDivElement>(null);
+
+  // Function to set time based on current mode
+  const setTimerTime = (
+    currentMode: 'pomodoro' | 'short-break' | 'long-break',
+  ) => {
+    if (!sessionSettings) return;
+    switch (currentMode) {
+      case 'pomodoro':
+        setTime(sessionSettings.default_work_time * 60);
+        break;
+      case 'short-break':
+        setTime(sessionSettings.default_break_time * 60);
+        break;
+      case 'long-break':
+        setTime(sessionSettings.long_break_time * 60);
+        break;
+      default:
+        setTime(sessionSettings.default_work_time * 60);
+        break;
+    }
   };
 
   // Fetch and set the token
@@ -117,7 +144,7 @@ const Timer = () => {
     const fetchToken = async () => {
       try {
         const fetchedToken = await getToken({ template: 'supabase' }); // Replace with your Clerk template name if applicable
-        console.log(fetchedToken);
+        console.log('Fetched Token:', fetchedToken);
         if (fetchedToken) {
           setToken(fetchedToken);
         } else {
@@ -129,19 +156,8 @@ const Timer = () => {
     };
 
     fetchToken();
-  }, [getToken]);
-  useEffect(() => {
-    if (!loading && sessionSettings) {
-      if (mode === 'pomodoro') {
-        setTime(sessionSettings.default_work_time * 60);
-      } else if (mode === 'short-break') {
-        setTime(sessionSettings.default_break_time * 60);
-      } else if (mode === 'long-break') {
-        setTime(sessionSettings.long_break_time * 60);
-      }
-    }
-  }, [sessionSettings, mode]);
-  // Fetch initial session settings and current pomodoro
+  }, [getToken, navigate]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -151,24 +167,14 @@ const Timer = () => {
           // Fetch all session settings
           const settings = await getAllSessionSettings(token);
           console.log('Fetched Settings:', settings);
-          // Find the settings for the current user
 
           if (settings) {
-            console.log('OK', settings);
             setSessionSettings(settings);
             setPomodoroDuration(settings.default_work_time);
             setShortBreakDuration(settings.default_break_time);
             setLongBreakDuration(settings.long_break_time);
             setLongBreakInterval(settings.cycles_per_set);
-            setTimeout(() => {
-              if (mode === 'pomodoro') {
-                setTime(settings.default_work_time * 60);
-              } else if (mode === 'short-break') {
-                setTime(settings.default_break_time * 60);
-              } else if (mode === 'long-break') {
-                setTime(settings.long_break_time * 60);
-              }
-            }, 500); // Adjust the delay as needed (100ms here)
+            setTimerTime(mode); // Set time based on current mode
           } else {
             // Create default settings
             const defaultSettings = await createSessionSettings(
@@ -182,11 +188,14 @@ const Timer = () => {
               token,
             );
             setSessionSettings(defaultSettings);
-            setTime(25 * 60); // Set default time
+            setPomodoroDuration(defaultSettings.default_work_time);
+            setShortBreakDuration(defaultSettings.default_break_time);
+            setLongBreakDuration(defaultSettings.long_break_time);
+            setLongBreakInterval(defaultSettings.cycles_per_set);
+            setTimerTime(mode); // Set time based on current mode
           }
 
           // Fetch current pomodoro
-          // Assuming you have an endpoint to get current pomodoro by user_id
           const currentPomodoroLogs = await getAllPomodoroLogs(token);
           const userCurrentPomodoro = currentPomodoroLogs.find(
             (log: PomodoroLog) => log.user_id === user_id,
@@ -194,7 +203,7 @@ const Timer = () => {
           if (userCurrentPomodoro) {
             setCurrentPomodoro(userCurrentPomodoro);
             setMode(userCurrentPomodoro.session_status);
-            setTime(getDefaultTime(userCurrentPomodoro.session_status));
+            setTimerTime(userCurrentPomodoro.session_status);
           } else {
             // Create a new current pomodoro
             const newCurrentPomodoro = await createCurrentPomodoro(
@@ -207,18 +216,36 @@ const Timer = () => {
               token,
             );
             setCurrentPomodoro(newCurrentPomodoro);
+            setMode('pomodoro');
+            setTimerTime('pomodoro');
           }
         }
       } catch (error) {
         console.error('Failed to fetch initial data:', error);
       } finally {
-        setLoading(false); // Set loading to false once data is fetched
+        setIsLoading(false); // Set loading to false once data is fetched
       }
     };
 
     fetchData();
-  }, [user, token]);
+  }, [user, token]); // Removed 'mode' from dependencies
 
+  // Update timer time when settings change and no task is selected
+  useEffect(() => {
+    if (!selectedTask && sessionSettings) {
+      setTimerTime(mode);
+    }
+    // If a task is selected, keep the current timer running
+  }, [
+    pomodoroDuration,
+    shortBreakDuration,
+    longBreakDuration,
+    mode,
+    selectedTask,
+    sessionSettings,
+  ]);
+
+  // Function to handle settings update
   const handleSettingsUpdate = async (updatedSettings: {
     default_work_time: number;
     default_break_time: number;
@@ -254,13 +281,6 @@ const Timer = () => {
 
       // Update timer with slight delay
       setTimeout(() => {
-        if (mode === 'pomodoro') {
-          setTime(updatedSessionSettings.default_work_time * 60);
-        } else if (mode === 'short-break') {
-          setTime(updatedSessionSettings.default_break_time * 60);
-        } else if (mode === 'long-break') {
-          setTime(updatedSessionSettings.long_break_time * 60);
-        }
         console.log('[DEBUG] Timer updated after settings update.');
       }, 100);
     } catch (error) {
@@ -279,6 +299,7 @@ const Timer = () => {
         return 'bg-red-100 transition-colors duration-500';
     }
   };
+
   // Function to open Task Selection Modal
   const openTaskSelectModal = () => {
     setIsTaskSelectModalOpen(true);
@@ -288,6 +309,7 @@ const Timer = () => {
   const closeTaskSelectModal = () => {
     setIsTaskSelectModalOpen(false);
   };
+
   // Function to handle task selection
   const handleTaskSelect = async (task: Task) => {
     try {
@@ -305,7 +327,7 @@ const Timer = () => {
 
       // Set as the selected task
       setSelectedTask(updatedTask);
-      setTime(getDefaultTime(mode)); // Reset timer for the new task
+      setTimerTime(mode); // Reset timer for the new task
       closeTaskSelectModal(); // Close the modal
     } catch (error) {
       console.error('Failed to update the task in the backend:', error);
@@ -336,15 +358,16 @@ const Timer = () => {
   const getDefaultTime = (
     currentMode: 'pomodoro' | 'short-break' | 'long-break',
   ): number => {
+    if (!sessionSettings) return 0;
     switch (currentMode) {
       case 'pomodoro':
-        return (sessionSettings?.default_work_time || pomodoroDuration) * 60; // Convert minutes to seconds
+        return sessionSettings.default_work_time * 60; // Convert minutes to seconds
       case 'short-break':
-        return (sessionSettings?.default_break_time || shortBreakDuration) * 60;
+        return sessionSettings.default_break_time * 60;
       case 'long-break':
-        return (sessionSettings?.long_break_time || longBreakDuration) * 60;
+        return sessionSettings.long_break_time * 60;
       default:
-        return (sessionSettings?.default_work_time || pomodoroDuration) * 60;
+        return sessionSettings.default_work_time * 60;
     }
   };
 
@@ -354,8 +377,8 @@ const Timer = () => {
   ) => {
     setMode(newMode);
     setIsActive(false); // Pause timer
-    setIsLockScreenActive(false); // Disable lock screen when mode changes
-    setTime(getDefaultTime(newMode)); // Reset time based on new mode
+    setIsOverlayActive(false); // Disable overlay when mode changes
+    setTimerTime(newMode); // Reset time based on new mode
   };
 
   // Function to play alarm sound
@@ -408,7 +431,7 @@ const Timer = () => {
     // Define start_time and end_time
     const end_time = new Date().toISOString();
     const start_time = new Date(
-      Date.now() - pomodoroDuration * 60 * 1000,
+      Date.now() - getDefaultTime(mode) * 1000,
     ).toISOString(); // Adjust as needed
 
     // Prepare log data
@@ -434,7 +457,7 @@ const Timer = () => {
         newPomodoroNumber += 1;
         if (newPomodoroNumber >= (sessionSettings?.cycles_per_set || 4)) {
           newSessionStatus = 'long-break';
-          newPomodoroNumber = 0; // Reset or adjust based on your logic
+          newPomodoroNumber = 0; // Reset based on cycles
           newCycleNumber += 1;
         } else {
           newSessionStatus = 'short-break';
@@ -452,39 +475,37 @@ const Timer = () => {
         current_cycle_number: newCycleNumber,
         session_status: newSessionStatus,
       };
-      try {
-        // Increment pomodoro_number by 1
-        const updatedTask = await updateTaskApi(selectedTask._id, {
-          pomodoro_number: selectedTask.pomodoro_number + 1,
-        });
 
-        // Update the task in the context
-        editTask(updatedTask);
-        console.log('Updated Task:', updatedTask);
-
-        // Check if the task is completed
-        if (
-          updatedTask.pomodoro_number >= updatedTask.pomodoro_required_number
-        ) {
-          // Update the task's status to 'completed'
-          const completedTask = await updateTaskApi(selectedTask._id, {
-            status: 'completed',
-          });
-          editTask(completedTask);
-          console.log('Task Completed:', completedTask);
-
-          // Optionally, remove the task from the Pomodoro list in the UI
-          setSelectedTask(null);
-        } else {
-          // Update the selectedTask state to reflect the new pomodoro_number
-          setSelectedTask(updatedTask);
-          console.log('Selected Task Updated:', updatedTask);
-        }
-      } catch (error) {}
       // Update CurrentPomodoro in the backend
       await updateCurrentPomodoro(updatedCurrentPomodoro, user_id, token);
       setCurrentPomodoro(updatedCurrentPomodoro);
       console.log('Updated Current Pomodoro:', updatedCurrentPomodoro);
+
+      // Update the task in the backend
+      const updatedTask = await updateTaskApi(selectedTask._id, {
+        pomodoro_number: selectedTask.pomodoro_number + 1,
+      });
+
+      // Update the task in the context
+      editTask(updatedTask);
+      console.log('Updated Task:', updatedTask);
+
+      // Check if the task is completed
+      if (updatedTask.pomodoro_number >= updatedTask.pomodoro_required_number) {
+        // Update the task's status to 'completed'
+        const completedTask = await updateTaskApi(selectedTask._id, {
+          status: 'completed',
+        });
+        editTask(completedTask);
+        console.log('Task Completed:', completedTask);
+
+        // Remove the task from the Pomodoro list
+        setSelectedTask(null);
+      } else {
+        // Update the selectedTask state to reflect the new pomodoro_number
+        setSelectedTask(updatedTask);
+        console.log('Selected Task Updated:', updatedTask);
+      }
 
       // Then create Pomodoro Log
       await createPomodoroLog(logData, token);
@@ -494,12 +515,12 @@ const Timer = () => {
       setPomodoroCount((prevCount) => prevCount + 1);
 
       if (newSessionStatus === 'pomodoro') {
-        setTime(getDefaultTime('pomodoro'));
         setMode('pomodoro');
+        setTimerTime('pomodoro');
         setSelectedTask(null);
       } else {
         setMode(newSessionStatus);
-        setTime(getDefaultTime(newSessionStatus));
+        setTimerTime(newSessionStatus);
       }
 
       // Play appropriate sound
@@ -509,9 +530,9 @@ const Timer = () => {
         playBreakSoundFunction();
       }
 
-      // Activate Lock Screen if in Pomodoro mode
-      if (newSessionStatus === 'pomodoro') {
-        setIsLockScreenActive(true);
+      // Activate Overlay if Focus Mode is ON and new session is Pomodoro
+      if (isFocusModeOn && newSessionStatus === 'pomodoro') {
+        setIsOverlayActive(true);
       }
     } catch (error) {
       console.error('Failed to log Pomodoro session:', error);
@@ -521,10 +542,12 @@ const Timer = () => {
 
   // Timer effect
   useEffect(() => {
+    if (isLoading || time === null) return;
+
     let interval: NodeJS.Timeout | null = null;
     if (isActive && time > 0) {
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime - 1);
+        setTime((prevTime) => (prevTime !== null ? prevTime - 1 : null));
       }, 1000);
     } else if (isActive && time === 0) {
       setIsActive(false); // Stop timer
@@ -535,29 +558,31 @@ const Timer = () => {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isActive, time, selectedTask, pomodoroCount, currentPomodoro, token]);
+  }, [isActive, time, selectedTask, isFocusModeOn, mode]);
 
   // Update document title with time and mode
   useEffect(() => {
-    document.title = `${formatTime(time)} - ${handleModeTitle(mode)}`;
+    if (time !== null) {
+      document.title = `${formatTime(time)} - ${handleModeTitle(mode)}`;
+    } else {
+      document.title = 'Pomofocus';
+    }
   }, [time, mode]);
 
-  // Update timer time when settings change and no task is selected
+  // Prevent scrolling when overlay or modals are active
   useEffect(() => {
-    if (!selectedTask) {
-      setTime(getDefaultTime(mode));
+    if (isAddModalOpen || isTaskSelectModalOpen || isOverlayActive) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'auto';
     }
-    // If a task is selected, keep the current timer running
-  }, [
-    pomodoroDuration,
-    shortBreakDuration,
-    longBreakDuration,
-    mode,
-    selectedTask,
-    sessionSettings,
-  ]);
 
-  // Updated handleDeleteTask function to remove from Pomodoro list
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
+  }, [isAddModalOpen, isTaskSelectModalOpen, isOverlayActive]);
+
+  // Function to handle delete task
   const handleDeleteTask = async (taskId: string) => {
     try {
       const updatedTask = await updateTaskApi(taskId, {
@@ -576,7 +601,6 @@ const Timer = () => {
       setIsActive(false);
       setSelectedTask(null);
       setTime(getDefaultTime(mode));
-      setIsonpomodorolist(false);
 
       console.log(`Task with ID ${taskId} deleted successfully.`);
     } catch (error) {
@@ -599,15 +623,15 @@ const Timer = () => {
         )
       ) {
         setIsActive(false);
-        setIsLockScreenActive(false); // Disable lock screen when switching
+        setIsOverlayActive(false); // Disable overlay when switching
         setSelectedTask(task);
-        setTime(getDefaultTime(mode));
+        setTimerTime(mode);
         // Update the newly selected task's status to 'in-progress'
         editTask({ ...task, status: 'in-progress' });
       }
     } else {
       setSelectedTask(task);
-      setTime(getDefaultTime(mode));
+      setTimerTime(mode);
       // Update task status to 'in-progress' upon selection
       editTask({ ...task, status: 'in-progress' });
     }
@@ -637,9 +661,7 @@ const Timer = () => {
         editTask(updatedTask);
         console.log('Updated Task:', updatedTask);
         setPomodoroCount((prevCount) => prevCount + 1);
-        // Update the selectedTask state to reflect the new pomodoro_number
-        setSelectedTask(updatedTask);
-        console.log('Selected Task Updated:', updatedTask);
+
         // Check if the task is completed
         if (
           updatedTask.pomodoro_number >= updatedTask.pomodoro_required_number
@@ -651,14 +673,13 @@ const Timer = () => {
           editTask(completedTask);
           console.log('Task Completed:', completedTask);
 
-          // Optionally, remove the task from the Pomodoro list in the UI
+          // Remove the task from the Pomodoro list
           setSelectedTask(null);
         } else {
           // Update the selectedTask state to reflect the new pomodoro_number
           setSelectedTask(updatedTask);
           console.log('Selected Task Updated:', updatedTask);
         }
-        // Increment global pomodoro count
 
         // Update Current Pomodoro first
         let newSessionStatus: 'pomodoro' | 'short-break' | 'long-break' =
@@ -669,7 +690,7 @@ const Timer = () => {
         newPomodoroNumber += 1;
         if (newPomodoroNumber >= (sessionSettings?.cycles_per_set || 4)) {
           newSessionStatus = 'long-break';
-          newPomodoroNumber = 0; // Reset or adjust based on your logic
+          newPomodoroNumber = 0; // Reset based on cycles
           newCycleNumber += 1;
         } else {
           newSessionStatus = 'short-break';
@@ -703,12 +724,12 @@ const Timer = () => {
 
         // Set timer and mode based on new session status
         if (newSessionStatus === 'pomodoro') {
-          setTime(getDefaultTime('pomodoro'));
           setMode('pomodoro');
+          setTimerTime('pomodoro');
           setSelectedTask(null); // Optionally deselect the task
         } else {
           setMode(newSessionStatus);
-          setTime(getDefaultTime(newSessionStatus));
+          setTimerTime(newSessionStatus);
         }
 
         // Play appropriate sound
@@ -718,9 +739,9 @@ const Timer = () => {
           playBreakSoundFunction();
         }
 
-        // Activate Lock Screen only if in Pomodoro mode
-        if (newSessionStatus === 'pomodoro') {
-          setIsLockScreenActive(true);
+        // Activate Overlay only if Focus Mode is ON and new session is Pomodoro
+        if (isFocusModeOn && newSessionStatus === 'pomodoro') {
+          setIsOverlayActive(true);
         }
       } else if (mode === 'short-break' || mode === 'long-break') {
         // Transition back to Pomodoro mode
@@ -728,7 +749,7 @@ const Timer = () => {
       }
 
       setIsActive(false); // Stop the timer
-      setIsLockScreenActive(false); // Disable lock screen when timer is stopped
+      setIsOverlayActive(false); // Disable overlay when timer is stopped
     } catch (error) {
       console.error('Failed to skip Pomodoro:', error);
       // Optionally, set error state to display to the user
@@ -739,7 +760,6 @@ const Timer = () => {
   const initiateEditTask = (task: Task) => {
     setEditingTaskId(task._id);
     setEditingTaskTitle(task.title);
-    setEditingEstimatedPomodoros(task.pomodoro_required_number);
     setEditingPomodoroRequiredNumber(task.pomodoro_required_number);
     setEditingEstimatedTime(task.estimatedTime || 25);
     setError(null);
@@ -813,7 +833,7 @@ const Timer = () => {
         title: editingTaskTitle,
         description: '', // Optional
         pomodoro_number: 0,
-        pomodoro_required_number: editingEstimatedPomodoros,
+        pomodoro_required_number: editingPomodoroRequiredNumber,
         estimatedTime: editingEstimatedTime,
         status: 'pending',
         userId: '',
@@ -847,7 +867,7 @@ const Timer = () => {
         addTask(createdTask);
 
         setSelectedTask(createdTask);
-        setTime(getDefaultTime(mode));
+        setTimerTime(mode);
         setIsAddModalOpen(false);
       } catch (error) {
         console.error('Failed to add task:', error);
@@ -889,19 +909,17 @@ const Timer = () => {
         // Full cycle time
         totalSeconds +=
           fullCycles *
-          ((sessionSettings?.default_work_time || pomodoroDuration) *
+          ((sessionSettings?.default_work_time || 25) *
             60 *
             (sessionSettings?.cycles_per_set || 4) +
-            (sessionSettings?.long_break_time || longBreakDuration) * 60); // Pomodoros + Long Breaks
+            (sessionSettings?.long_break_time || 15) * 60); // Pomodoros + Long Breaks
 
         // Remaining Pomodoro time
         totalSeconds +=
-          leftoverPomos *
-          (sessionSettings?.default_work_time || pomodoroDuration) *
-          60; // Pomodoro durations
+          leftoverPomos * (sessionSettings?.default_work_time || 25) * 60; // Pomodoro durations
         totalSeconds +=
           (leftoverPomos > 0 ? leftoverPomos - 1 : 0) *
-          (sessionSettings?.default_break_time || shortBreakDuration) *
+          (sessionSettings?.default_break_time || 5) *
           60; // Short breaks
       });
 
@@ -923,32 +941,19 @@ const Timer = () => {
     return `${formattedTime} (${hoursLeft} hr ${minutesLeft} min left)`;
   };
 
-  // ** New useEffect to handle overflow-hidden for modals and lock screen **
-  useEffect(() => {
-    if (isAddModalOpen || isTaskSelectModalOpen || isLockScreenActive) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isAddModalOpen, isTaskSelectModalOpen, isLockScreenActive]);
-
   // Function to toggle the timer (Start/Pause)
   const toggleTimer = async () => {
     if (isActive) {
       // Pausing the timer
       setIsActive(false);
-      setIsLockScreenActive(false); // Disable lock screen when paused
+      setIsOverlayActive(false); // Disable overlay when paused
     } else {
       if (selectedTask || !isSignedIn) {
         setIsActive(true);
-        if (mode === 'pomodoro') {
-          setIsLockScreenActive(true); // Activate lock screen only for pomodoro
+        if (mode === 'pomodoro' && isFocusModeOn) {
+          setIsOverlayActive(true); // Activate overlay only if Focus Mode is ON
         } else {
-          setIsLockScreenActive(false); // Do not activate lock screen for breaks
+          setIsOverlayActive(false); // Do not activate overlay otherwise
         }
         if (selectedTask) {
           // Update current pomodoro to 'pomodoro' when starting
@@ -977,15 +982,19 @@ const Timer = () => {
     }
   };
 
+  // Function to toggle Focus Mode
+  const toggleFocusMode = () => {
+    setIsFocusModeOn((prev) => !prev);
+    // Optionally, you can decide whether to pause the timer when toggling Focus Mode off
+    if (isFocusModeOn && isActive) {
+      setIsActive(false);
+      setIsOverlayActive(false);
+    }
+  };
+
   return (
     <div className="flex flex-col md:flex-row">
-      {/* Sidebar (Optional for Larger Screens) */}
-      {/* Uncomment and customize if you wish to add a sidebar */}
-      {/* <div className="hidden md:block md:w-1/5 lg:w-1/6 bg-gray-100 p-4">
-        {/* Sidebar Content */}
-      {/* </div> */}
-
-      {/* Main Content */}
+      {/* Main Content Wrapper */}
       <div
         className={`flex flex-col w-full min-h-screen ${getBackgroundColor()} relative overflow-auto h-full`}
       >
@@ -1017,6 +1026,15 @@ const Timer = () => {
                 onUpdateSettings={handleSettingsUpdate} // Add this prop
               />{' '}
               {/* Settings Button */}
+              {/* Focus Mode Toggle Button */}
+              <button
+                onClick={toggleFocusMode}
+                className={`flex items-center rounded-md p-2 px-4 shadow-md text-zinc-700 font-semibold hover:bg-gray-100 transition ${
+                  isFocusModeOn ? 'bg-green-600 text-white' : 'bg-white'
+                }`}
+              >
+                {isFocusModeOn ? 'Focus Mode ON' : 'Focus Mode OFF'}
+              </button>
             </div>
           </div>
         </div>
@@ -1059,9 +1077,8 @@ const Timer = () => {
             </div>
 
             {/* Timer Display */}
-
             <div className="flex justify-center mb-6">
-              {loading ? (
+              {isLoading || time === null ? (
                 <p className="text-4xl sm:text-5xl md:text-6xl font-semibold text-gray-400">
                   Loading...
                 </p>
@@ -1078,6 +1095,7 @@ const Timer = () => {
               <button
                 onClick={toggleTimer}
                 className={`flex-1 h-full p-2 rounded-md ${startButtonColor()} text-white text-lg font-semibold hover:brightness-90 transition`}
+                disabled={isLoading || time === null}
               >
                 <p>{isActive ? 'Pause' : 'Start'}</p>
               </button>
@@ -1177,7 +1195,7 @@ const Timer = () => {
                               setTasks([]);
                               setSelectedTask(null);
                               setIsActive(false);
-                              setTime(getDefaultTime(mode));
+                              setTimerTime(mode);
                             } catch (error) {
                               console.error(
                                 'Failed to remove all tasks from Pomodoro list:',
@@ -1189,7 +1207,7 @@ const Timer = () => {
                             setTasks([]);
                             setSelectedTask(null);
                             setIsActive(false);
-                            setTime(getDefaultTime(mode));
+                            setTimerTime(mode);
                           }
                         }
                       }}
@@ -1305,6 +1323,24 @@ const Timer = () => {
                             />
                           </div>
 
+                          {/* Estimated Time */}
+                          <div>
+                            <label className="font-bold">
+                              Estimated Time (mins)
+                            </label>
+                            <input
+                              type="number"
+                              min="1"
+                              value={editingEstimatedTime}
+                              onChange={(e) =>
+                                setEditingEstimatedTime(
+                                  Math.max(1, Number(e.target.value)),
+                                )
+                              }
+                              className="w-full p-2 border rounded-md"
+                            />
+                          </div>
+
                           {/* Action Buttons */}
                           <div className="flex space-x-2">
                             <button
@@ -1349,9 +1385,9 @@ const Timer = () => {
                                         selectedTask._id === task._id
                                       ) {
                                         setIsActive(false);
-                                        setTime(getDefaultTime(mode));
+                                        setTimerTime(mode);
                                         setSelectedTask(null);
-                                        setIsLockScreenActive(false); // Disable lock screen if task is completed
+                                        setIsOverlayActive(false); // Disable overlay if task is completed
                                       }
                                     } catch (error) {
                                       console.error(
@@ -1462,29 +1498,47 @@ const Timer = () => {
           </div>
         </div>
 
-        {/* Lock Screen Overlay */}
-        {isLockScreenActive && mode === 'pomodoro' && isActive && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-lg p-8 max-w-sm w-11/12 sm:w-full text-center">
-              <GiTomato className="mx-auto text-red-600 w-16 h-16 mb-4" />
-              <h2 className="text-2xl font-bold mb-4 text-[#5f341f]">
-                Stay Focused!
+        {/* Focus Mode Overlay */}
+        {isOverlayActive && mode === 'pomodoro' && isActive && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 p-4"
+            role="dialog"
+            aria-modal="true"
+          >
+            <div
+              ref={lockScreenRef}
+              className="bg-white rounded-lg shadow-lg p-4 flex flex-col items-center space-y-4 w-full max-w-3xl mb-4"
+              onClick={(e) => e.stopPropagation()} // Prevents closing when clicking inside
+              tabIndex={-1}
+            >
+              <GiTomato className="text-red-600 w-12 h-12" />
+              <h2 className="text-xl font-bold text-gray-800">
+                Focus Mode Active
               </h2>
-              <p className="text-gray-700 mb-6">
-                The timer is running. Please focus on your task.
+              <p className="text-gray-600">
+                You are in a Pomodoro session. Stay focused!
               </p>
-              <div className="flex justify-center space-x-4">
+              <div className="flex space-x-3">
+                {/* Pause Timer Button */}
                 <button
-                  onClick={() => setIsLockScreenActive(false)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition text-sm sm:text-base"
+                  onClick={() => setIsActive(false)}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
                 >
                   Pause Timer
                 </button>
+                {/* Skip Pomodoro Button */}
                 <button
                   onClick={handleSkip}
-                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition text-sm sm:text-base"
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition"
                 >
                   Skip Pomodoro
+                </button>
+                {/* Exit Focus Mode Button */}
+                <button
+                  onClick={toggleFocusMode}
+                  className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                >
+                  Exit Focus Mode
                 </button>
               </div>
             </div>
