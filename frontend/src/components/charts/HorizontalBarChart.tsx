@@ -20,7 +20,7 @@ ChartJS.register(
 );
 
 interface WeeklyCategoryChartProps {
-  data: { [category: string]: number }; // Accepts categories data
+  data: { [category: string]: number } | null; // Accepts categories data
 }
 
 const WeeklyCategoryPercentageChart: React.FC<WeeklyCategoryChartProps> = ({
@@ -30,8 +30,8 @@ const WeeklyCategoryPercentageChart: React.FC<WeeklyCategoryChartProps> = ({
   console.log('WeeklyCategoryPercentageChart received data:', data);
 
   // Extract categories and counts
-  const categories = Object.keys(data);
-  const counts = Object.values(data);
+  const categories = Object.keys(data?.categories || {});
+  const counts = Object.values(data?.categories || {});
 
   // Calculate total tasks and percentages
   const totalTasks = counts.reduce((sum, count) => sum + count, 0) || 1; // Avoid division by zero

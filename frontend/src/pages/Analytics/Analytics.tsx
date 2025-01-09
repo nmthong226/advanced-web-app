@@ -744,7 +744,7 @@ const Analytics: React.FC = () => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <WeeklyCategoryPercentageChart data={topCategories as Record<string, number>} />
+            <WeeklyCategoryPercentageChart data={topCategories} />
           </div>
         </div>
 
