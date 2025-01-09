@@ -11,6 +11,8 @@ import MessageInput from '../../components/AI/chatInput.tsx';
 import { AIMessage, chatWithAiAgent } from '@/api/ai-agent.api.ts';
 import { useAuth } from '@clerk/clerk-react';
 import { getUserAPI } from '@/api/users.api.ts';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { getTasksByUserId } from '@/api/tasks.api.ts';
 
 const ChatAI = () => {
   const [messageInput, setMessageInput] = useState<string>('');
@@ -19,6 +21,7 @@ const ChatAI = () => {
   >([]);
   const [userInfo, setUserInfo] = useState({});
   const {userId } = useAuth();
+  const { setTasks } = useTaskContext();
 
   useEffect(() => {
     const getUser = async () => {
@@ -34,6 +37,22 @@ const ChatAI = () => {
     }
     getUser();
   }, [userId])
+
+  useEffect(() => {
+    const storedChatHistory = sessionStorage.getItem('chatHistory');
+    if (storedChatHistory) {
+      try {
+        setChatHistory(JSON.parse(storedChatHistory));
+      } catch (error) {
+        console.error('Error parsing stored chat history:', error);
+        sessionStorage.removeItem('chatHistory'); // Clear invalid data
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  }, [chatHistory]);
 
   const sendMessage = async () => {
     if (messageInput.trim() !== '') {
@@ -65,6 +84,9 @@ const ChatAI = () => {
             ...prev,
             { sender: 'ai', message: response.response },
           ]);
+          // refresh tasks          
+          const newTasks = await getTasksByUserId(userId);
+          setTasks(newTasks);
         }
       } catch (error) {
         console.error('Failed to send message:', error);
