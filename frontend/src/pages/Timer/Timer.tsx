@@ -1,7 +1,6 @@
 // src/components/Timer.tsx
 
 import React, { useEffect, useState, useRef } from 'react';
-import ReactDOM from 'react-dom';
 import { Label } from '../../components/ui/label';
 import { Input } from '../../components/ui/input';
 import {
@@ -16,12 +15,12 @@ import { GiTomato } from 'react-icons/gi';
 import { IoMdMore } from 'react-icons/io';
 import { Trash, Trash2 } from 'lucide-react';
 import { BsFillSkipEndFill } from 'react-icons/bs';
-import { FaRegChartBar, FaCheck } from 'react-icons/fa';
+
 import { Task } from './tasks';
 import { Howl } from 'howler';
 import { useTaskContext } from 'src/contexts/UserTaskContext.tsx';
 import { useUser, useAuth } from '@clerk/clerk-react';
-import { deleteTaskApi, updateTaskApi, addTaskApi } from './tasksApi';
+import { updateTaskApi, addTaskApi } from './tasksApi';
 import {
   createSessionSettings,
   updateSessionSettings,
@@ -80,7 +79,7 @@ const Timer = () => {
   const [pomodoroCount, setPomodoroCount] = useState<number>(0);
 
   // Task States from Context
-  const { tasks, setTasks, addTask, deleteTask, editTask } = useTaskContext();
+  const { tasks, setTasks, addTask, editTask } = useTaskContext();
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   // Edit Task Inline States
@@ -314,7 +313,6 @@ const Timer = () => {
   const handleTaskSelect = async (task: Task) => {
     try {
       if (!user) throw new Error('User not authenticated');
-      const user_id = user.id;
 
       // Update the task in the backend
       const updatedTask = await updateTaskApi(task._id, {
@@ -588,7 +586,7 @@ const Timer = () => {
       const updatedTask = await updateTaskApi(taskId, {
         is_on_pomodoro_list: false,
       });
-
+      console.log(updatedTask);
       // Update the task in the local state
       setTasks((prevTasks) => {
         const updatedTasks = prevTasks.map((task) =>
@@ -818,11 +816,6 @@ const Timer = () => {
     setIsAddModalOpen(true);
   };
 
-  // Function to close the Add Task Modal
-  const closeAddTaskModal = () => {
-    setIsAddModalOpen(false);
-  };
-
   // Function to handle adding a new task from the modal
   const handleAddTaskFromModal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -884,10 +877,6 @@ const Timer = () => {
   const totalPomodorosCompleted = tasks
     .filter((task) => task.is_on_pomodoro_list)
     .reduce((acc, task) => acc + task.pomodoro_number, 0);
-
-  const totalEstimatedTime = tasks
-    .filter((task) => task.is_on_pomodoro_list)
-    .reduce((acc, task) => acc + (task.estimatedTime || 0), 0);
 
   // Calculate estimated finish time based on selected task and Pomodoros
   const calculateCompletionTimeWithRemaining = (): string => {
@@ -1366,7 +1355,7 @@ const Timer = () => {
                                   if (task.status !== 'completed') {
                                     try {
                                       const updatedTask = await updateTaskApi(
-                                        task._id,
+                                        task._id ?? '',
                                         {
                                           status: 'completed',
                                           pomodoro_number:
@@ -1447,7 +1436,7 @@ const Timer = () => {
                                     </DropdownMenuItem>
                                     <DropdownMenuItem
                                       onSelect={() =>
-                                        handleDeleteTask(task._id)
+                                        handleDeleteTask(task._id ?? '')
                                       } // Remove from Pomodoro List
                                     >
                                       <span>Remove from Pomodoro</span>
