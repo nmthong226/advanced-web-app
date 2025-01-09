@@ -31,7 +31,7 @@ import { updateTaskApi } from "@/api/tasks.api.ts";
 
 // Import types
 import { DraggedEvent, Event, Task, TaskItem } from "../../types/type.js";
-import { convertTasksToEvents } from "@/lib/utils.ts";
+import { convertTasksToDraggedEvents, convertTasksToEvents } from "@/lib/utils.ts";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { FaUndoAlt } from "react-icons/fa";
@@ -44,23 +44,6 @@ const formatName = (name: string) => `${name}`;
 const isInThePast = (currentTime: Date) => {
   const now = new Date();
   return currentTime < now;
-};
-
-const convertTasksToDraggedEvents = (tasks: TaskItem[]): Task[] => {
-  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
-    return []; // Return an empty array if tasks is null, undefined, or empty
-  }
-  return tasks
-    .filter((task) => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
-    .map((task) => ({
-      _id: task._id as string, // Generate unique IDs
-      userId: task.userId as string,
-      category: task.category as string,
-      title: task.title as string,
-      status: task.status,
-      priority: task.priority,
-      allDay: false, // Assuming tasks are not all-day by default
-    }));
 };
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
@@ -111,7 +94,7 @@ const MyCalendar: React.FC = () => {
       categoryColors[event?.category?.toLowerCase() as keyof typeof categoryColors] || categoryColors.default;
 
     return {
-      className: "bg-indigo-50 shadow-lg text-xs",
+      className: `shadow-lg text-xs`,
       style: {
         backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
         color: isSelected ? "#555" : "black", // Adjust text color if needed
@@ -519,6 +502,8 @@ const MyCalendar: React.FC = () => {
           popup
           style={{ height: 690 }}
           className="px-2"
+          step={15}
+          timeslots={4}
         />
         <MemoizedTasksMutateDrawer start={selectedEvent.start} end={selectedEvent.end} />
         {/* ===== Update Drawer & Delete Dialog ===== */}

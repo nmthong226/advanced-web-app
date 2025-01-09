@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { TaskItem } from "../types/type.ts";
+import { Task, TaskItem } from "../types/type.ts";
 import { Event } from "../types/type.js";
 
 export function cn(...inputs: ClassValue[]) {
@@ -34,4 +34,21 @@ export const convertTasksToEvents = (tasks: TaskItem[] = []): Event[] => {
         color: task.color
       };
     });
+};
+
+export const convertTasksToDraggedEvents = (tasks: TaskItem[]): Task[] => {
+  if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+    return []; // Return an empty array if tasks is null, undefined, or empty
+  }
+  return tasks
+    .filter((task) => !task.startTime && !task.endTime) // Filter only calendar-relevant tasks
+    .map((task) => ({
+      _id: task._id as string, // Generate unique IDs
+      userId: task.userId as string,
+      category: task.category as string,
+      title: task.title as string,
+      status: task.status,
+      priority: task.priority,
+      allDay: false, // Assuming tasks are not all-day by default
+    }));
 };

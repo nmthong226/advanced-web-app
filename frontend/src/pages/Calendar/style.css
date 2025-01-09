@@ -1,16 +1,16 @@
 .customNavigatorTheme .navigator-header {
   background-color: #123456;
-  color: #ffffff;
+  color           : #ffffff;
 }
 
 .customNavigatorTheme .navigator-cell {
   background-color: #f4f4f4;
-  border: 1px solid #cccccc;
+  border          : 1px solid #cccccc;
 }
 
 .customNavigatorTheme .navigator-cell-selected {
   background-color: #00aaff;
-  color: #ffffff;
+  color           : #ffffff;
 }
 
 .rbc-btn-group {
@@ -25,10 +25,71 @@
   min-height: 80px !important;
 }
 
-div.rbc-header > button > span {
+div.rbc-header>button>span {
   font-weight: 600;
 }
 
 .rbc-toolbar-label {
   font-size: 12px !important;
+}
+
+#root>div>main>div>div.relative.flex.flex-col.justify-center.bg-white.dark\:bg-slate-700.p-1.border.rounded-lg.w-\[84\%\].h-full>div.px-2.rbc-addons-dnd.rbc-calendar>div.rbc-time-view>div.rbc-time-content>div.rbc-day-slot.rbc-time-column.rbc-now.rbc-today {
+  background-color: white !important;
+}
+
+.dark #root>div>main>div>div.relative.flex.flex-col.justify-center.bg-white.dark\:bg-slate-700.p-1.border.rounded-lg.w-\[84\%\].h-full>div.px-2.rbc-addons-dnd.rbc-calendar>div.rbc-time-view>div.rbc-time-content>div.rbc-day-slot.rbc-time-column.rbc-now.rbc-today {
+  background-color: #1e293b !important;
+  /* Use a dark background color */
+  color           : #f1f5f9;
+  /* Adjust text color for better contrast */
+}
+
+.rbc-today {
+  background-color: white !important;
+  /* Use a dark background color */
+  color           : black;
+  /* Adjust text color for better contrast */
+}
+
+.dark .rbc-today {
+  background-color: #1e293b !important;
+  /* Use a dark background color */
+  color           : #f1f5f9;
+  /* Adjust text color for better contrast */
+}
+
+.dark .rbc-time-view {
+  background-color: #1e293b !important;
+}
+
+#root>div>main>div>div.relative.flex.flex-col.justify-center.bg-white.dark\:bg-slate-700.p-1.border.rounded-lg.w-\[84\%\].h-full>div.px-2.rbc-addons-dnd.rbc-calendar>div.rbc-time-view>div.rbc-time-header.rbc-overflowing>div.rbc-time-header-content>div.rbc-row.rbc-time-header-cell>div.rbc-header.rbc-today {
+  color: #bc1b1b !important;
+}
+
+.dark #root>div>main>div>div.relative.flex.flex-col.justify-center.bg-white.dark\:bg-slate-700.p-1.border.rounded-lg.w-\[84\%\].h-full>div.px-2.rbc-addons-dnd.rbc-calendar>div.rbc-time-view>div.rbc-time-header.rbc-overflowing>div.rbc-time-header-content>div.rbc-row.rbc-time-header-cell>div.rbc-header.rbc-today {
+  color: #be92ff !important;
+}
+
+.rbc-toolbar button {
+  color: black
+}
+
+.dark .rbc-toolbar button {
+  color: white
+}
+
+element.style {
+  margin-right: 0px;
+}
+
+.rbc-time-header rbc-overflowing element .style {
+  margin-right: 0px;
+}
+
+.rbc-time-slot {
+  border-top: 0px solid #ccc !important;
+}
+
+.dark .rbc-timeslot-group {
+  border-bottom: 1px solid #727272;
 }

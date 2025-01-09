@@ -52,7 +52,7 @@ const ChatAI = () => {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <button className="right-3 bottom-3 z-50 absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-12 h-12">
+        <button className="right-8 bottom-3 z-50 absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-12 h-12">
           <div className="flex justify-center items-center bg-white dark:bg-gradient-to-b dark:from-indigo-600 dark:to-cyan-300 rounded-full w-11 h-11">
             <p className="font-bold text-2xl text-center">🤖</p>
           </div>

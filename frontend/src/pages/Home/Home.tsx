@@ -1,5 +1,5 @@
 //Import frameworks
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 //Import libs/packages
 import dayjs from 'dayjs';
@@ -8,7 +8,6 @@ import {
   Calendar,
   momentLocalizer,
   Views,
-  EventPropGetter,
 } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
@@ -38,11 +37,19 @@ import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 import CustomEvent from "../Calendar/Event.tsx";
 import { formatDate } from "date-fns";
 import { GoArrowDown, GoArrowRight, GoArrowUp } from "react-icons/go";
-import { Event } from "../../types/type.js";
+import { Event, TaskItem } from "../../types/type.js";
 import { convertTasksToEvents } from "@/lib/utils.ts";
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
+
+//Import styles
+import './style.css';
+import { useTasksContext } from '../../components/table/context/task-context.tsx';
+import { toast } from 'react-toastify';
+import { FaUndoAlt } from 'react-icons/fa';
+import axios from 'axios';
+import EventCalendar from '../Calendar/EventCalendar.tsx';
 
 const Home = () => {
   const { user } = useUser();
@@ -50,11 +57,22 @@ const Home = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [isMorning, setIsMorning] = useState<boolean>(true);
   const [greeting, setGreeting] = useState<string>('Good Morning');
-
-  //Task Calendar
   const [myEvents, setMyEvents] = useState<Event[]>([]);
+  const defaultDate = useMemo(() => new Date(), [])
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
+  const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
+    new Map(),
+  );
+  const { setOpen, handleOpen } = useTasksContext();
+
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
-  const defaultDate = useMemo(() => new Date(), []);
+
+  const [, setSelectedEvent] = useState<{ start: Date | null; end: Date | null }>({
+    start: null,
+    end: null,
+  });
+
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
@@ -88,14 +106,134 @@ const Home = () => {
     return () => clearInterval(timer); // Clear the interval when the component is unmounted
   }, []);
 
-  const eventPropGetter: EventPropGetter<Event> = () => {
+  useEffect(() => {
+    const events = convertTasksToEvents(tasks);
+    setMyEvents(events);
+  }, [tasks, setTasks]);
+
+  const eventPropGetter = (event: Event) => {
+    const isSelected = event._id === selectedCalendarEvent?._id;
+
+    // Define category-based colors
+    const categoryColors: { [key: string]: string } = {
+      work: "#CDC1FF", // Blue
+      leisure: "#96E9C6", // Green
+      personal: "#FDE767", // Yellow
+      urgent: "#FF8F8F", // Red
+      default: "#EEF2FF", // Default color
+    };
+
+    // Get the background color based on category or fallback to default
+    const backgroundColor =
+      categoryColors[event?.category?.toLowerCase() as keyof typeof categoryColors] || categoryColors.default;
+
     return {
-      className: 'bg-indigo-50 shadow-lg border-0 text-xs',
+      className: "shadow-lg text-xs",
       style: {
-        borderRadius: '4px',
-        color: 'black',
+        backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
+        color: isSelected ? "#555" : "black", // Adjust text color if needed
+        border: "1px solid #A7BBC7",
+        opacity: event.status === "completed" || event.status === "expired" ? 0.5 : 1,
+        textDecoration: event.status === "completed" || event.status === "expired" ? "line-through" : "none",
       },
     };
+  };
+
+  console.log("myEvents:", myEvents);
+
+  const handleSelectEvent = (event: Event) => {
+    setSelectedCalendarEvent(event); // Set the selected event data
+    setDialogOpen(true); // Open the dialog
+  };
+
+
+  const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
+    const { start, end } = slotInfo;
+    setSelectedEvent({ start, end });
+    handleOpen("create");
+  }
+
+  const undoDelete = useCallback((task: TaskItem) => {
+    setPendingDeletes((prev) => {
+      const newMap = new Map(prev);
+      if (newMap.has(task._id as string)) {
+        clearTimeout(newMap.get(task._id as string) as NodeJS.Timeout);
+        newMap.delete(task._id as string);
+      }
+      return newMap;
+    });
+    setTasks((prevTasks) => [...prevTasks, task]);
+    toast.success(
+      <p className='text-sm'>Task restored successfully!</p>
+    );
+  }, []);
+
+  const handleConfirmDelete = useCallback(() => {
+    if (!selectedCalendarEvent) return;
+
+    const taskId = selectedCalendarEvent._id as string;
+    const taskToDelete = selectedCalendarEvent;
+
+    // Temporarily remove the task from the list
+    setTasks((prevTasks) => prevTasks.filter((t) => t._id !== taskId));
+
+    // Track if the delete was undone
+    let isUndone = false;
+
+    // Show toast with undo option
+    const toastId = toast.error(
+      <div className='flex items-center space-x-2 text-sm'>
+        <p>Task deleted.{' '}</p>
+        <button
+          onClick={() => {
+            undoDelete(taskToDelete); // Restore the task
+            isUndone = true; // Mark as undone
+            toast.dismiss(toastId); // Close the toast immediately
+          }}
+          className='flex items-center border-white px-2 py-0.5 border rounded-md font-semibold text-indigo-100'
+        >
+          <FaUndoAlt className='mr-1 size-3' />
+          Undo
+        </button>
+      </div>,
+      {
+        autoClose: 4000, // Automatically close after 4 seconds
+        closeOnClick: false, // Prevent toast from closing on accidental clicks
+        onClose: () => {
+          if (!isUndone) {
+            // Permanently delete if not undone
+            const timeoutId = setTimeout(async () => {
+              try {
+                await axios.delete(`${import.meta.env.VITE_BACKEND}/tasks/${taskId}`);
+              } catch (error) {
+                console.error('Error deleting task:', error);
+                setTasks((prevTasks) => [...prevTasks, taskToDelete]);
+              }
+              setPendingDeletes((prev) => {
+                const newMap = new Map(prev);
+                newMap.delete(taskId);
+                return newMap;
+              });
+            }, 0); // Start delete operation immediately
+            setPendingDeletes((prev) => {
+              const newMap = new Map(prev);
+              newMap.set(taskId, timeoutId);
+              return newMap;
+            });
+          }
+        },
+      },
+    );
+
+    setSelectedCalendarEvent(null);
+    setOpen(null);
+  }, [selectedCalendarEvent, setTasks, setOpen, setPendingDeletes]);
+
+  const handleCloseDialog = () => {
+    setDialogOpen(false);
+    setTimeout(() => {
+      setSelectedCalendarEvent(null); // Clear the selected event
+    }, 100);
   };
 
   return (
@@ -245,17 +383,31 @@ const Home = () => {
         <DragAndDropCalendar
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
-          draggableAccessor={() => false}
+          draggableAccessor={() => true}
           eventPropGetter={eventPropGetter}
           events={myEvents}
           components={{
             event: CustomEvent, // Use your custom component
           }}
           localizer={localizer}
+          onSelectSlot={handleSelectSlot}
+          onSelectEvent={handleSelectEvent}
+          resizable
           selectable
           popup
-          style={{ height: '100%' }}
+          style={{ height: "100%" }}
           className="p-2"
+          step={15}
+          timeslots={4}
+        />
+        <EventCalendar
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          onCloseChange={handleCloseDialog}
+          selectedEvent={selectedCalendarEvent}
+          setSelectedEvent={setSelectedCalendarEvent} // Pass the setter function
+          setMyEvents={setMyEvents}
+          handleConfirm={handleConfirmDelete}
         />
         <ChatAI />
       </div>

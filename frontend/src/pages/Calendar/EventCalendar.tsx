@@ -94,7 +94,7 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
     const onSelectStatus = async (status: string) => {
         try {
             const response = await axios.patch(
-                `http://localhost:3000/tasks/${selectedEvent.id}/status`,
+                `http://localhost:3000/tasks/${selectedEvent._id}/status`,
                 { status }, // Payload
                 {
                     headers: {
