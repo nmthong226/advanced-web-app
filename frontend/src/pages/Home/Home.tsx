@@ -374,11 +374,11 @@ const Home = () => {
                         key={task._id}
                         className="flex space-x-2 shadow-sm p-1.5 border rounded"
                       >
-                        <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
+                        <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px]">
                           {task.priority === 'high' && <GoArrowUp />}
                           {task.priority === 'medium' && <GoArrowRight />}
                           {task.priority === 'low' && <GoArrowDown />}
-                          <span className="mr-2">{task.title}</span>
+                          <span className="mr-2 line-clamp-1">{task.title}</span>
                         </div>
                         <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
                           {task.status === 'pending' && (

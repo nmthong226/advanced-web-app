@@ -508,7 +508,7 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
             </DialogTrigger>
             <Button form="tasks-form" type="submit" className='items-center bg-indigo-800'>
               <FaCirclePlus className='' />
-              Create Task
+              {isUpdate ? 'Update Task' : 'Create Task'}
             </Button>
           </div>
         </DialogContent>

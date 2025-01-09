@@ -121,14 +121,14 @@ const ChatAI = () => {
         <SheetHeader className="flex leading-tight">
           <SheetTitle>💡 Your AI Assistant</SheetTitle>
           <SheetDescription className="text-xs">
-            Your assitant
+            Your assitant is here to help you. Feels free to ask anything.
             <hr className="border-gray-300 my-2 w-full" />
           </SheetDescription>
         </SheetHeader>
         {/* Chatbot UI */}
-        <div className="flex custom-scrollbar px-1 h-[74%] overflow-y-scroll">
+        <div className="flex custom-scrollbar px-1 w-full h-[74%] overflow-x-hidden overflow-y-scroll">
           {/* Chat Messages Container */}
-          <div className="space-y-4">
+          <div className="flex flex-col space-y-4 w-full">
             {/* AI Message */}
             <div className="flex items-start">
               <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
@@ -138,12 +138,12 @@ const ChatAI = () => {
             {chatHistory.map((chat, index) => (
               <div
                 key={index}
-                className={`flex ${
-                  chat.sender === 'user' ? 'justify-end' : 'items-start'
+                className={`flex w-full ${
+                  chat.sender === 'user' ? 'justify-end' : 'justify-start'
                 }`}
               >
                 <div
-                  className={`shadow-md p-2 rounded-2xl max-w-[80%] text-sm ${
+                  className={`flex shadow-md p-2 rounded-2xl max-w-[80%] text-sm ${
                     chat.sender === 'user'
                       ? 'bg-blue-600 text-white'
                       : 'bg-white text-gray-900'

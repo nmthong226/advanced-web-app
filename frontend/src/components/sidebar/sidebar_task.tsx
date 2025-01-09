@@ -228,7 +228,7 @@ const SideBarTask: React.FC<SideBarTaskProps> = ({ draggableTasks, handleDragSta
                                                                 </DropdownMenuItem>
                                                             </DropdownMenuContent>
                                                         </DropdownMenu>
-                                                        <p>{task.title}</p>
+                                                        <p className='line-clamp-1'>{task.title}</p>
                                                     </div>
                                                 ))}
                                             </div>
