@@ -13,14 +13,20 @@ import { useAuth } from '@clerk/clerk-react';
 import { getUserAPI } from '@/api/users.api.ts';
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 import { getTasksByUserId } from '@/api/tasks.api.ts';
-
+interface UserInfo {
+  userId: string; // User ID (required)
+  userRole: string; // User role (e.g., 'admin', 'user', 'premium')
+  email?: string; // Optional email
+  fullName?: string; // Optional full name
+  [key: string]: any; // Allow additional properties if needed
+}
 const ChatAI = () => {
   const [messageInput, setMessageInput] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<
     { sender: 'user' | 'ai'; message: string }[]
   >([]);
-  const [userInfo, setUserInfo] = useState({});
-  const {userId } = useAuth();
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const { userId } = useAuth();
   const { setTasks } = useTaskContext();
 
   useEffect(() => {
@@ -32,11 +38,11 @@ const ChatAI = () => {
           setUserInfo(response);
         }
       } catch (error) {
-        console.log(error);        
+        console.log(error);
       }
-    }
+    };
     getUser();
-  }, [userId])
+  }, [userId]);
 
   useEffect(() => {
     const storedChatHistory = sessionStorage.getItem('chatHistory');
@@ -66,16 +72,16 @@ const ChatAI = () => {
 
       try {
         // Send message to the AI agent
-        if (!userId && typeof userId !== 'string' || !userInfo) {
+        if ((!userId && typeof userId !== 'string') || !userInfo) {
           alert('userId is invalid');
           return;
         }
-        const payload : AIMessage = {
+        const payload: AIMessage = {
           userId,
-          userRole: userInfo.userRole, 
-          prompt: messageInput, 
-          preferredModel: 'gemini'
-        }
+          userRole: userInfo.userRole,
+          prompt: messageInput,
+          preferredModel: 'gemini',
+        };
         console.log('payload', payload);
         const response: any = await chatWithAiAgent(payload);
         console.log('response from ai agent', response);
@@ -84,14 +90,16 @@ const ChatAI = () => {
             ...prev,
             { sender: 'ai', message: response.response },
           ]);
-          // refresh tasks          
+          // refresh tasks
           const newTasks = await getTasksByUserId(userId);
           setTasks(newTasks);
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to send message:', error);
         // Optionally, you can add an error message to the chat history
-        const errorMessage = error?.response?.data ? error.response.data.message : 'something went wrong';
+        const errorMessage = error?.response?.data
+          ? error.response.data.message
+          : 'something went wrong';
         setChatHistory((prev) => [
           ...prev,
           { sender: 'ai', message: errorMessage },
@@ -124,9 +132,7 @@ const ChatAI = () => {
             {/* AI Message */}
             <div className="flex items-start">
               <div className="bg-white shadow-md p-2 rounded-2xl max-w-[80%] text-gray-900 text-sm">
-                <p>
-                  Hello! I'm your assistant. How can I help you ?
-                </p>
+                <p>Hello! I'm your assistant. How can I help you ?</p>
               </div>
             </div>
             {chatHistory.map((chat, index) => (
