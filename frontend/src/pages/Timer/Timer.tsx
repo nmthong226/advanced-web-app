@@ -281,7 +281,6 @@ const Timer = () => {
 
       // Update timer with slight delay
       setTimeout(() => {
-        setTimerTime(mode);
         console.log('[DEBUG] Timer updated after settings update.');
       }, 100);
     } catch (error) {
