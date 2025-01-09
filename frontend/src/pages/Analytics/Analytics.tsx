@@ -7,7 +7,7 @@ import { GiTomato } from 'react-icons/gi';
 import { IoCalendar } from 'react-icons/io5';
 import { TbClockHour3Filled } from 'react-icons/tb';
 import { RiFireFill } from 'react-icons/ri';
-import { BsActivity, BsListTask } from 'react-icons/bs';
+import { BsListTask } from 'react-icons/bs';
 import { AiFillInfoCircle } from 'react-icons/ai';
 import { FaExclamationCircle } from 'react-icons/fa';
 
@@ -54,7 +54,7 @@ import { useUser } from '@clerk/clerk-react';
 // Import react-spinners for loading indicator
 import { ClipLoader } from 'react-spinners';
 import { LuCalendarClock } from 'react-icons/lu';
-import WeeklyCategoryPercentageChart from '../../components/charts/HorizontalBarChart';
+import { BarChart } from 'recharts';
 
 // Define Task interface if not already defined
 interface TaskStatusCounts {
@@ -112,7 +112,7 @@ const Analytics: React.FC = () => {
     tasksCompleted: number;
   } | null>(null);
 
-  const [topCategories, setTopCategories] = useState<{
+  const [, setTopCategories] = useState<{
     [category: string]: number;
   } | null>(null);
 
@@ -728,8 +728,8 @@ const Analytics: React.FC = () => {
           <div className="flex flex-col flex-1 bg-white shadow-md p-4 rounded-md h-1/2">
             <div className='flex justify-between'>
               <div className="flex items-center font-semibold text-sm">
-                <BsActivity className="mr-2" />
-                <p>Category Distribution</p>
+                <GiTomato className="mr-2" />
+                <p>Pomodoro Analytics</p>
               </div>
               <TooltipProvider>
                 <Tooltip>
@@ -744,7 +744,21 @@ const Analytics: React.FC = () => {
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <WeeklyCategoryPercentageChart data={topCategories} />
+            {/* Pomodoro Analytics */}
+            <div className="flex flex-1 bg-white shadow-md p-4 rounded-md">
+              {pomodoroAnalytics ? (
+                /* Assuming PomodoroAnalytics.weeklyPomodoro is suitable for BarChart */
+                <BarChart
+                  data={Object.entries(pomodoroAnalytics.weeklyPomodoro).map(
+                    ([date, count]) => ({ date, count }),
+                  )}
+                />
+              ) : (
+                <p className="text-center text-gray-500">
+                  No Pomodoro Analytics Data Available
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

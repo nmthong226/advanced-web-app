@@ -67,7 +67,16 @@ export function DataTableToolbar<TData>({
             />
           )}
         </div>
-
+        {/* Faceted Filters */}
+        <div className="flex gap-x-2">
+          {table.getColumn('status') && (
+            <DataTableFacetedFilter
+              column={table.getColumn('status')!}
+              title="Status"
+              options={statuses}
+            />
+          )}
+        </div>
         {/* <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" size="sm">

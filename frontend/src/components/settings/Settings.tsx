@@ -50,17 +50,18 @@ const Settings = () => {
   };
 
   const [nestedDialogOpen, setNestedDialogOpen] = useState(false);
+
   const handleUpgradeToPremium = async () => {
     if (userId === null || typeof userId !== 'string') return;
     try {
       const response = await updateUserAPI(userId, { userRole: 'premium' });
       console.log(response);
       if (response && response.userId) {
-        alert('you have upgrade to pro');
+        alert('You have upgraded to premium!');
         window.location.reload(); // Reload the page after the role is updated
       }
     } catch (error) {
-      console.log(error);
+      console.log('Error upgrading to premium:', error);
     }
   };
 
