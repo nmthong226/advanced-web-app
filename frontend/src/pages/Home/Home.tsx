@@ -8,7 +8,6 @@ import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
 //Import components
-import Chart from '../../components/charts/BarChart';
 import {
   Select,
   SelectContent,
@@ -18,12 +17,14 @@ import {
 } from '../../components/ui/select';
 import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import ChatAI from '../../components/AI/chatHistory';
+import BarChart from '../../components/charts/BarChart';
 
 //Import icons
 import { BsCheck, BsListTask } from 'react-icons/bs';
 import { GiTomato } from 'react-icons/gi';
-import { FaCheck } from 'react-icons/fa6';
+import { FaCheck, FaRegClock } from 'react-icons/fa6';
 import { RiRestTimeLine } from 'react-icons/ri';
+import { PiEmpty } from "react-icons/pi";
 
 //Import contexts
 import { useSettings } from '../../contexts/SettingsContext';
@@ -46,9 +47,11 @@ import { toast } from 'react-toastify';
 import { FaUndoAlt } from 'react-icons/fa';
 import axios from 'axios';
 import EventCalendar from '../Calendar/EventCalendar.tsx';
+import { fetchPomodoroAnalytics, PomodoroAnalytics } from '@/api/analytics.api.ts';
 
 const Home = () => {
   const { user } = useUser();
+  const userId = user?.id;
   const { settings, showLeftBar } = useSettings();
   const [currentTime, setCurrentTime] = useState<string>('');
   const [isMorning, setIsMorning] = useState<boolean>(true);
@@ -62,7 +65,9 @@ const Home = () => {
     new Map(),
   );
   const { setOpen, handleOpen } = useTasksContext();
-
+  const [pomodoroAnalytics, setPomodoroAnalytics] =
+    useState<PomodoroAnalytics | null>(null);
+  const [, setError] = useState<string | null>(null);
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
 
   const [, setSelectedEvent] = useState<{
@@ -72,6 +77,12 @@ const Home = () => {
     start: null,
     end: null,
   });
+
+  const [taskStatusCounts, setTaskStatusCounts] = useState({
+    completed: 0,
+    inProgress: 0,
+    pending: 0,
+  }); // State for task counts
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
@@ -125,7 +136,7 @@ const Home = () => {
     // Get the background color based on category or fallback to default
     const backgroundColor =
       categoryColors[
-        event?.category?.toLowerCase() as keyof typeof categoryColors
+      event?.category?.toLowerCase() as keyof typeof categoryColors
       ] || categoryColors.default;
 
     return {
@@ -244,6 +255,38 @@ const Home = () => {
     new Date(1970, 1, 1, new Date().getHours(), 0, 0) // Default to this hour
   );
 
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        console.log('Fetching Pomodoro Analytics from backend.');
+        const pomodoroData: PomodoroAnalytics = await fetchPomodoroAnalytics(userId as string);
+        console.log('Pomodoro Analytics Data:', pomodoroData);
+        setPomodoroAnalytics(pomodoroData);
+      } catch (pomodoroError) {
+        console.error('Error fetching Pomodoro Analytics:', pomodoroError);
+        setError('Failed to fetch Pomodoro analytics data.');
+        // Depending on requirements, you might want to continue processing or halt here
+      }
+    };
+    const calculateTaskStatusCounts = () => {
+      // Count tasks by their status
+      const completedCount = tasks.filter(task => task.status === "completed").length;
+      const inProgressCount = tasks.filter(task => task.status === "in-progress").length;
+      const pendingCount = tasks.filter(task => task.status === "pending").length;
+
+      // Update state with the counts
+      setTaskStatusCounts({
+        completed: completedCount,
+        inProgress: inProgressCount,
+        pending: pendingCount,
+      });
+    };
+
+    fetchAnalytics();
+    calculateTaskStatusCounts();
+  }, [userId, tasks]); // Include `userId` and `tasks` in the dependency array
+
+
   return (
     <div className="flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full overflow-y-hidden">
       {showLeftBar && (
@@ -279,7 +322,8 @@ const Home = () => {
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-center items-center w-full h-[50px] text-[12px]">
+                <div className="flex justify-center items-center mt-2 w-full text-[12px]">
+                  <FaRegClock className="mr-1" />
                   You have no upcoming activity.
                 </div>
               </div>
@@ -291,12 +335,6 @@ const Home = () => {
               <div className="flex flex-col w-full h-[85%]">
                 <div className="flex justify-between items-center border-b">
                   <p className="m-2 font-semibold text-sm">Task Overview</p>
-                  <div className="flex space-x-1">
-                    <div className="bg-indigo-400 rounded-full w-2 h-2 hover:cursor-pointer" />
-                    <div className="bg-slate-300 rounded-full w-2 h-2 hover:cursor-pointer" />
-                    <div className="bg-slate-300 rounded-full w-2 h-2 hover:cursor-pointer" />
-                    <div className="bg-slate-300 rounded-full w-2 h-2 hover:cursor-pointer" />
-                  </div>
                   <Select value="all">
                     <SelectTrigger className="m-2 w-[110px]">
                       <SelectValue placeholder="Theme" />
@@ -323,7 +361,13 @@ const Home = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
+                <div className="flex flex-col space-y-1 custom-scrollbar p-1 h-full overflow-y-auto">
+                  {tasks.length === 0 && (
+                    <div className='flex justify-center items-center mt-2'>
+                      <PiEmpty className='mr-1' />
+                      <p className='text-[12px]'>There is no task for now.</p>
+                    </div>
+                  )}
                   {Array.isArray(tasks) &&
                     tasks.map((task) => (
                       <div
@@ -367,13 +411,13 @@ const Home = () => {
               </div>
               <div className="flex items-center p-2 border-t-2 h-[15%]">
                 <p className="flex mr-2 text-[12px] text-nowrap">Progress: </p>
-                <ProgressBar completed={2} pending={2} todo={1} />
+                <ProgressBar completed={taskStatusCounts.completed} pending={taskStatusCounts.pending} inProgress={taskStatusCounts.inProgress} />
               </div>
             </div>
           )}
           {/*Chart Overview*/}
           {settings.showProductivityInsights && (
-            <div className="flex flex-col justify-between bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg w-full h-[30%]">
+            <div className="flex flex-col bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg w-full h-[30%]">
               <div className="flex justify-between items-center">
                 <p className="m-2 font-semibold text-sm">
                   Productivity Insights
@@ -398,7 +442,20 @@ const Home = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Chart data={[]} />
+              <hr />
+              {pomodoroAnalytics ? (
+                /* Assuming PomodoroAnalytics.weeklyPomodoro is suitable for BarChart */
+                <BarChart
+                  data={Object.entries(pomodoroAnalytics.weeklyPomodoro).map(
+                    ([date, count]) => ({ date, count }),
+                  )}
+                />
+              ) : (
+                <p className="flex justify-center items-center mt-2 text-[12px] text-gray-500">
+                  <GiTomato className='mr-2' />
+                  No Pomodoro Analytics Data Available
+                </p>
+              )}
             </div>
           )}
         </div>
@@ -412,7 +469,7 @@ const Home = () => {
           formats={{
             timeGutterFormat: 'h A',
           }}
-          
+
           scrollToTime={scrollToTime}
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
