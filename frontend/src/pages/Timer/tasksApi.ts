@@ -1,6 +1,6 @@
 // src/api/tasksApi.ts
 
-import { Task } from "./tasks";
+import { TaskItem } from "./tasks";
 
 const BASE_URL = `${import.meta.env.VITE_BACKEND}/tasks`;
 
@@ -10,7 +10,7 @@ const BASE_URL = `${import.meta.env.VITE_BACKEND}/tasks`;
  * @param data - Partial task data to update.
  * @returns The updated task.
  */
-export const updateTaskApi = async (id: string, data: Partial<Task>): Promise<Task> => {
+export const updateTaskApi = async (id: string, data: Partial<TaskItem>): Promise<TaskItem> => {
   try {
     const response = await fetch(`${BASE_URL}/${id}`, {
       method: 'PATCH',
@@ -61,7 +61,7 @@ export const deleteTaskApi = async (id: string): Promise<boolean> => {
  * @param data - The task data to add.
  * @returns The created task.
  */
-export const addTaskApi = async (data: Partial<Task>): Promise<Task> => {
+export const addTaskApi = async (data: Partial<TaskItem>): Promise<TaskItem> => {
   try {
     const response = await fetch(`${BASE_URL}`, {
       method: 'POST',
