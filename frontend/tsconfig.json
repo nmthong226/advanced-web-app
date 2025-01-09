@@ -9,6 +9,10 @@
     }
   ],
   "compilerOptions": {
+    "module": "NodeNext", // Use a compatible module system
+    "target": "es2020", // Ensure compatibility with modern JavaScript
+    "moduleResolution": "nodenext", // Add this
+    "lib": ["dom", "es2020"], // Include DOM and ES2020 libraries
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],
