@@ -34,6 +34,7 @@ import { DialogDescription, DialogTitle } from '@radix-ui/react-dialog';
 
 //Import icons
 import { FaCirclePlus } from "react-icons/fa6";
+import { RxUpdate } from "react-icons/rx";
 
 //Import context
 import { useTasksContext } from '../context/task-context'; // Task UI management
@@ -507,8 +508,8 @@ export function TasksMutateDrawer({ start, end }: { start: Date | null; end: Dat
               <Button variant="outline">Close</Button>
             </DialogTrigger>
             <Button form="tasks-form" type="submit" className='items-center bg-indigo-800'>
-              <FaCirclePlus className='' />
-              Create Task
+              {isUpdate ? <RxUpdate /> : <FaCirclePlus />}
+              {isUpdate ? 'Update Task' : 'Create Task'}
             </Button>
           </div>
         </DialogContent>

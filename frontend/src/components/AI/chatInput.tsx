@@ -17,6 +17,16 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageInput, setMessageInp
     }
   }, [messageInput]);
 
+  const handleSendMessage = () => {
+    if (messageInput.trim() !== "") {
+      sendMessage();
+      setMessageInput(""); // Clear the input
+      if (textareaRef.current) {
+        textareaRef.current.style.height = "auto"; // Reset height
+      }
+    }
+  };
+
   return (
     <div className="bottom-2 left-1/2 absolute flex flex-row w-full transform -translate-x-1/2">
       <div className="bottom-0 left-1/2 absolute flex w-[90%] transform -translate-x-1/2">
@@ -35,16 +45,27 @@ const MessageInput: React.FC<MessageInputProps> = ({ messageInput, setMessageInp
                     e.target.style.height = "auto"; // Reset height for recalculation
                     e.target.style.height = `${e.target.scrollHeight}px`; // Adjust to content
                   }}
-                  onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && !e.shiftKey) {
+                      e.preventDefault(); // Prevent newline
+                      handleSendMessage(); // Send message
+                    }
+                  }}
                 />
                 <div className="right-0 bottom-0 absolute flex flex-row mr-[2%] mb-[6px]">
                   <button
                     className={`p-3 transition duration-300 ${
-                      messageInput !== "" ? "bg-zinc-900 text-white hover:bg-zinc-800" : "bg-gray-200 text-gray-700 hover:bg-gray-300"
+                      messageInput.trim() !== ""
+                        ? "bg-zinc-900 text-white hover:bg-zinc-800"
+                        : "bg-gray-200 text-gray-700 hover:bg-gray-300"
                     } rounded-full`}
-                    onClick={sendMessage}
+                    onClick={handleSendMessage}
                   >
-                    <FaArrowUp className={`size-5 ${messageInput !== "" ? "text-white" : "text-gray-700"}`} />
+                    <FaArrowUp
+                      className={`size-5 ${
+                        messageInput.trim() !== "" ? "text-white" : "text-gray-700"
+                      }`}
+                    />
                   </button>
                 </div>
               </div>
