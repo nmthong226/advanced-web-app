@@ -41,12 +41,13 @@ const Tasks = () => {
   const [currentCategories, setCurrentCategories] = useState<
     [string, number][]
   >([]);
+  
   const { open, currentRow, setCurrentRow, setOpen, handleOpen } =
     useTasksContext();
   const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
     new Map(),
   );
-  const allCategories = ['Work', 'Leisure', 'Personal', 'Urgent'];
+  const allCategories = ['work', 'leisure', 'personal', 'urgent'];
 
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
@@ -220,11 +221,11 @@ const Tasks = () => {
               key={category}
               className="flex justify-between items-center py-1"
             >
-              <span className="flex items-center space-x-1 text-[12px] text-gray-700 dark:text-gray-200">
-                {category === 'Work' && <p>💼</p>}
-                {category === 'Leisure' && <p>🧩</p>}
-                {category === 'Personal' && <p>🪅</p>}
-                {category === 'Urgent' && <p>💥</p>}
+              <span className="flex items-center space-x-1 text-[12px] text-gray-700 dark:text-gray-200 capitalize">
+                {category === 'work' && <p>💼</p>}
+                {category === 'leisure' && <p>🧩</p>}
+                {category === 'personal' && <p>🪅</p>}
+                {category === 'urgent' && <p>💥</p>}
                 <p>{category}</p>
               </span>
               <span
