@@ -17,16 +17,18 @@ import { GrLanguage } from "react-icons/gr";
 import { HiOutlineCog6Tooth } from 'react-icons/hi2';
 import { IoDiamondOutline } from "react-icons/io5";
 import { FaCcVisa } from "react-icons/fa";
-import { FaCcPaypal } from "react-icons/fa";
 import { FaCcMastercard } from "react-icons/fa";
 
 //Import context
 import { useSettings } from '@/contexts/SettingsContext';
 import { FaPaypal } from 'react-icons/fa6';
+import { updateUserAPI } from '@/api/users.api';
+import { useAuth } from '@clerk/clerk-react';
 
 const Settings = () => {
     const [activeTab, setActiveTab] = useState('General'); // Track active tab
     const { settings, setSettings } = useSettings();
+    const {userId} = useAuth();
 
     const handleToggle = (key: keyof typeof settings) => {
         setSettings((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -48,7 +50,18 @@ const Settings = () => {
     };
 
     const [nestedDialogOpen, setNestedDialogOpen] = useState(false);
-
+    const handleUpgradeToPremium = async () => {
+        if (userId === null || typeof userId !== 'string') return;
+        try {
+            const response = await updateUserAPI(userId, {userRole: 'premium'});
+            console.log(response);
+            if (response && response.userId) {
+                alert('you have upgrade to pro');
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    }
 
     return (
         <Dialog>
@@ -292,7 +305,9 @@ const Settings = () => {
                                                             P/S: By providing your card information, you allow IntelliNote. to
                                                             charge your card for future payments
                                                         </p>
-                                                        <button className='hover:brightness-110 bg-indigo-600 rounded-md w-full h-10 font-semibold text-white'>Upgrade to Pro</button>
+                                                        <button 
+                                                            onClick={handleUpgradeToPremium}
+                                                        className='hover:brightness-110 bg-indigo-600 rounded-md w-full h-10 font-semibold text-white'>Upgrade to Pro</button>
                                                     </div>
                                                 </div>
                                             </div>

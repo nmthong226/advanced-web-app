@@ -7,22 +7,6 @@ export default {
 		'./index.html',
 		'./src/**/*.{js,ts,jsx,tsx}',
 	],
-	safelist: [
-		'row-span-1', 'row-span-2', 'row-span-3',
-		'row-span-4', 'row-span-5', 'row-span-6',
-		'row-span-7', 'row-span-8', 'row-span-9',
-		'row-span-10', 'row-span-11', 'row-span-12',
-		'row-span-13', 'row-span-14', 'row-span-15',
-		'row-span-16', 'row-span-17', 'row-span-18',
-		'row-span-19', 'row-span-20', 'row-span-21',
-		'row-span-22', 'row-span-23', 'row-span-24',
-		/^row-span-\d{1,2}$/, // Safelist all row-span classes up to two digits
-		//Safelist for colors
-		'bg-green-600', 'bg-blue-600', 'bg-red-600',
-		'bg-purple-600', 'bg-emerald-600', 'bg-sky-600',
-		'bg-orange-600', 'bg-amber-600', 'bg-pink-600',
-		'bg-rose-600', 'bg-teal-600', 'bg-lime-600',
-	],
 	theme: {
 		extend: {
 			transitionProperty: {
@@ -94,6 +78,9 @@ export default {
 			animation: {
 				fadeIn: 'fadeIn 0.5s ease-in-out',
 			},
+			screens: {
+				'xl' : '1280px',
+			}
 		}
 	},
 	plugins: [tailwindcssAnimate],

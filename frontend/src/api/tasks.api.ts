@@ -34,3 +34,23 @@ export const updateTaskApi = async (id: string, data: Partial<Task>): Promise<an
       throw error;
     }
   };
+
+  export const getTasksByUserId = async (userId: string): Promise<any> => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_BACKEND}/tasks/user/${userId}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to update the task');
+      }
+  
+      return await response.json();
+    } catch (error) {
+      console.error('Error updating task:', error);
+      throw error;
+    }
+  };

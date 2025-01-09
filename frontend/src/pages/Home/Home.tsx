@@ -4,11 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 //Import libs/packages
 import dayjs from 'dayjs';
 import moment from 'moment';
-import {
-  Calendar,
-  momentLocalizer,
-  Views,
-} from 'react-big-calendar';
+import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 
 //Import components
@@ -24,21 +20,21 @@ import ProgressBar from '../../components/ProgressBar/ProgressBar';
 import ChatAI from '../../components/AI/chatHistory';
 
 //Import icons
-import { BsCheck, BsListTask } from "react-icons/bs";
-import { GiTomato } from "react-icons/gi";
-import { FaCheck } from "react-icons/fa6";
-import { RiRestTimeLine } from "react-icons/ri";
+import { BsCheck, BsListTask } from 'react-icons/bs';
+import { GiTomato } from 'react-icons/gi';
+import { FaCheck } from 'react-icons/fa6';
+import { RiRestTimeLine } from 'react-icons/ri';
 
 //Import contexts
 import { useSettings } from '../../contexts/SettingsContext';
 import { useUser } from '@clerk/clerk-react';
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
-import CustomEvent from "../Calendar/Event.tsx";
-import { formatDate } from "date-fns";
-import { GoArrowDown, GoArrowRight, GoArrowUp } from "react-icons/go";
-import { Event, TaskItem } from "../../types/type.js";
-import { convertTasksToEvents } from "@/lib/utils.ts";
+import CustomEvent from '../Calendar/Event.tsx';
+import { formatDate } from 'date-fns';
+import { GoArrowDown, GoArrowRight, GoArrowUp } from 'react-icons/go';
+import { Event, TaskItem } from '../../types/type.js';
+import { convertTasksToEvents } from '@/lib/utils.ts';
 
 const localizer = momentLocalizer(moment);
 const DragAndDropCalendar = withDragAndDrop<Event>(Calendar);
@@ -58,9 +54,10 @@ const Home = () => {
   const [isMorning, setIsMorning] = useState<boolean>(true);
   const [greeting, setGreeting] = useState<string>('Good Morning');
   const [myEvents, setMyEvents] = useState<Event[]>([]);
-  const defaultDate = useMemo(() => new Date(), [])
+  const defaultDate = useMemo(() => new Date(), []);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedCalendarEvent, setSelectedCalendarEvent] = useState<Event | null>(null);
+  const [selectedCalendarEvent, setSelectedCalendarEvent] =
+    useState<Event | null>(null);
   const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
     new Map(),
   );
@@ -68,11 +65,13 @@ const Home = () => {
 
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
 
-  const [, setSelectedEvent] = useState<{ start: Date | null; end: Date | null }>({
+  const [, setSelectedEvent] = useState<{
+    start: Date | null;
+    end: Date | null;
+  }>({
     start: null,
     end: null,
   });
-
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
@@ -116,42 +115,47 @@ const Home = () => {
 
     // Define category-based colors
     const categoryColors: { [key: string]: string } = {
-      work: "#CDC1FF", // Blue
-      leisure: "#96E9C6", // Green
-      personal: "#FDE767", // Yellow
-      urgent: "#FF8F8F", // Red
-      default: "#EEF2FF", // Default color
+      work: '#CDC1FF', // Blue
+      leisure: '#96E9C6', // Green
+      personal: '#FDE767', // Yellow
+      urgent: '#FF8F8F', // Red
+      default: '#EEF2FF', // Default color
     };
 
     // Get the background color based on category or fallback to default
     const backgroundColor =
-      categoryColors[event?.category?.toLowerCase() as keyof typeof categoryColors] || categoryColors.default;
+      categoryColors[
+        event?.category?.toLowerCase() as keyof typeof categoryColors
+      ] || categoryColors.default;
 
     return {
-      className: "shadow-lg text-xs",
+      className: 'shadow-lg text-xs',
       style: {
-        backgroundColor: isSelected ? "#ccc" : backgroundColor, // Gray for selected, category color for others
-        color: isSelected ? "#555" : "black", // Adjust text color if needed
-        border: "1px solid #A7BBC7",
-        opacity: event.status === "completed" || event.status === "expired" ? 0.5 : 1,
-        textDecoration: event.status === "completed" || event.status === "expired" ? "line-through" : "none",
+        backgroundColor: isSelected ? '#ccc' : backgroundColor, // Gray for selected, category color for others
+        color: isSelected ? '#555' : 'black', // Adjust text color if needed
+        border: '1px solid #A7BBC7',
+        opacity:
+          event.status === 'completed' || event.status === 'expired' ? 0.5 : 1,
+        textDecoration:
+          event.status === 'completed' || event.status === 'expired'
+            ? 'line-through'
+            : 'none',
       },
     };
   };
 
-  console.log("myEvents:", myEvents);
+  console.log('myEvents:', myEvents);
 
   const handleSelectEvent = (event: Event) => {
     setSelectedCalendarEvent(event); // Set the selected event data
     setDialogOpen(true); // Open the dialog
   };
 
-
   const handleSelectSlot = (slotInfo: { start: Date; end: Date }) => {
     const { start, end } = slotInfo;
     setSelectedEvent({ start, end });
-    handleOpen("create");
-  }
+    handleOpen('create');
+  };
 
   const undoDelete = useCallback((task: TaskItem) => {
     setPendingDeletes((prev) => {
@@ -163,9 +167,7 @@ const Home = () => {
       return newMap;
     });
     setTasks((prevTasks) => [...prevTasks, task]);
-    toast.success(
-      <p className='text-sm'>Task restored successfully!</p>
-    );
+    toast.success(<p className="text-sm">Task restored successfully!</p>);
   }, []);
 
   const handleConfirmDelete = useCallback(() => {
@@ -182,17 +184,17 @@ const Home = () => {
 
     // Show toast with undo option
     const toastId = toast.error(
-      <div className='flex items-center space-x-2 text-sm'>
-        <p>Task deleted.{' '}</p>
+      <div className="flex items-center space-x-2 text-sm">
+        <p>Task deleted. </p>
         <button
           onClick={() => {
             undoDelete(taskToDelete); // Restore the task
             isUndone = true; // Mark as undone
             toast.dismiss(toastId); // Close the toast immediately
           }}
-          className='flex items-center border-white px-2 py-0.5 border rounded-md font-semibold text-indigo-100'
+          className="flex items-center border-white px-2 py-0.5 border rounded-md font-semibold text-indigo-100"
         >
-          <FaUndoAlt className='mr-1 size-3' />
+          <FaUndoAlt className="mr-1 size-3" />
           Undo
         </button>
       </div>,
@@ -204,7 +206,9 @@ const Home = () => {
             // Permanently delete if not undone
             const timeoutId = setTimeout(async () => {
               try {
-                await axios.delete(`${import.meta.env.VITE_BACKEND}/tasks/${taskId}`);
+                await axios.delete(
+                  `${import.meta.env.VITE_BACKEND}/tasks/${taskId}`,
+                );
               } catch (error) {
                 console.error('Error deleting task:', error);
                 setTasks((prevTasks) => [...prevTasks, taskToDelete]);
@@ -275,7 +279,9 @@ const Home = () => {
                     </button>
                   </div>
                 </div>
-                <div className="flex justify-center items-center w-full h-[50px] text-[12px]">You have no upcoming activity.</div>
+                <div className="flex justify-center items-center w-full h-[50px] text-[12px]">
+                  You have no upcoming activity.
+                </div>
               </div>
             </div>
           )}
@@ -318,29 +324,45 @@ const Home = () => {
                   </Select>
                 </div>
                 <div className="flex flex-col space-y-1 custom-scrollbar p-1 overflow-y-auto">
-                  {Array.isArray(tasks) && tasks.map((task) => (
-                    <div key={task._id} className="flex space-x-2 shadow-sm p-1.5 border rounded">
-                      <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
-                        {task.priority === 'high' && (<GoArrowUp />)}
-                        {task.priority === 'medium' && (<GoArrowRight />)}
-                        {task.priority === 'low' && (<GoArrowDown />)}
-                        <span className="mr-2">{task.title}</span>
+                  {Array.isArray(tasks) &&
+                    tasks.map((task) => (
+                      <div
+                        key={task._id}
+                        className="flex space-x-2 shadow-sm p-1.5 border rounded"
+                      >
+                        <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px] truncate">
+                          {task.priority === 'high' && <GoArrowUp />}
+                          {task.priority === 'medium' && <GoArrowRight />}
+                          {task.priority === 'low' && <GoArrowDown />}
+                          <span className="mr-2">{task.title}</span>
+                        </div>
+                        <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
+                          {task.status === 'pending' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'in-progress' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'completed' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          {task.status === 'expired' && (
+                            <BsCheck className="mr-1 size-3" />
+                          )}
+                          <span className="font-medium">{task.status}</span>
+                        </div>
+                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                          <span className=""> {task.category}</span>
+                        </div>
+                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
+                          <span className="">
+                            {task.dueTime
+                              ? formatDate(task.dueTime as string, 'dd-MM-yy')
+                              : 'N/A'}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
-                        {task.status === 'pending' && (<BsCheck className="mr-1 size-3" />)}
-                        {task.status === 'in-progress' && (<BsCheck className="mr-1 size-3" />)}
-                        {task.status === 'completed' && (<BsCheck className="mr-1 size-3" />)}
-                        {task.status === 'expired' && (<BsCheck className="mr-1 size-3" />)}
-                        <span className="font-medium">{task.status}</span>
-                      </div>
-                      <div className="w-[20%] text-[12px] text-gray-500 truncate">
-                        <span className=""> {task.category}</span>
-                      </div>
-                      <div className="w-[20%] text-[12px] text-gray-500 truncate">
-                        <span className="">{task.dueTime ? formatDate(task.dueTime as string, 'dd-MM-yy') : 'N/A'}</span>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
               <div className="flex items-center p-2 border-t-2 h-[15%]">
@@ -376,7 +398,7 @@ const Home = () => {
                   </SelectContent>
                 </Select>
               </div>
-              <Chart />
+              <Chart data={[]} />
             </div>
           )}
         </div>
@@ -406,7 +428,7 @@ const Home = () => {
           resizable
           selectable
           popup
-          style={{ height: "100%" }}
+          style={{ height: '100%' }}
           className="p-2"
           step={15}
           timeslots={4}

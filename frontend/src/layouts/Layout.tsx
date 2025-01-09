@@ -8,7 +8,7 @@ const Layout = () => {
   return (
     <div className="flex flex-row w-full h-screen">
       <SideBar />
-      <main className="flex-grow custom-scrollbar overflow-auto overflow-y-auto">
+      <main className="flex-grow bg-indigo-50 custom-scrollbar overflow-auto overflow-y-auto">
         <Outlet />
         <ToastContainer
           position="bottom-right"

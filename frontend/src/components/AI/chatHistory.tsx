@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Sheet,
   SheetContent,
@@ -8,13 +8,51 @@ import {
   SheetTrigger,
 } from '../../components/ui/sheet';
 import MessageInput from '../../components/AI/chatInput.tsx';
-import { chatWithAiAgent } from '@/api/ai-agent.api.ts';
+import { AIMessage, chatWithAiAgent } from '@/api/ai-agent.api.ts';
+import { useAuth } from '@clerk/clerk-react';
+import { getUserAPI } from '@/api/users.api.ts';
+import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
+import { getTasksByUserId } from '@/api/tasks.api.ts';
 
 const ChatAI = () => {
   const [messageInput, setMessageInput] = useState<string>('');
   const [chatHistory, setChatHistory] = useState<
     { sender: 'user' | 'ai'; message: string }[]
   >([]);
+  const [userInfo, setUserInfo] = useState({});
+  const {userId } = useAuth();
+  const { setTasks } = useTaskContext();
+
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        if (!userId) return;
+        const response = await getUserAPI(userId);
+        if (response && response.userId) {
+          setUserInfo(response);
+        }
+      } catch (error) {
+        console.log(error);        
+      }
+    }
+    getUser();
+  }, [userId])
+
+  useEffect(() => {
+    const storedChatHistory = sessionStorage.getItem('chatHistory');
+    if (storedChatHistory) {
+      try {
+        setChatHistory(JSON.parse(storedChatHistory));
+      } catch (error) {
+        console.error('Error parsing stored chat history:', error);
+        sessionStorage.removeItem('chatHistory'); // Clear invalid data
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    sessionStorage.setItem('chatHistory', JSON.stringify(chatHistory));
+  }, [chatHistory]);
 
   const sendMessage = async () => {
     if (messageInput.trim() !== '') {
@@ -28,22 +66,35 @@ const ChatAI = () => {
 
       try {
         // Send message to the AI agent
-        const response = await chatWithAiAgent(messageInput);
-
-        // Assume response contains a "response" field
+        if (!userId && typeof userId !== 'string' || !userInfo) {
+          alert('userId is invalid');
+          return;
+        }
+        const payload : AIMessage = {
+          userId,
+          userRole: userInfo.userRole, 
+          prompt: messageInput, 
+          preferredModel: 'gemini'
+        }
+        console.log('payload', payload);
+        const response: any = await chatWithAiAgent(payload);
+        console.log('response from ai agent', response);
         if (response && response.response) {
-          // Add AI's response to the chat history
           setChatHistory((prev) => [
             ...prev,
             { sender: 'ai', message: response.response },
           ]);
+          // refresh tasks          
+          const newTasks = await getTasksByUserId(userId);
+          setTasks(newTasks);
         }
       } catch (error) {
         console.error('Failed to send message:', error);
         // Optionally, you can add an error message to the chat history
+        const errorMessage = error?.response?.data ? error.response.data.message : 'something went wrong';
         setChatHistory((prev) => [
           ...prev,
-          { sender: 'ai', message: 'Sorry, something went wrong.' },
+          { sender: 'ai', message: errorMessage },
         ]);
       } finally {
       }

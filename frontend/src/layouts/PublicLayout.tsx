@@ -10,7 +10,7 @@ const Layout = () => {
             <SignedIn>
                 <div className="flex flex-row w-full h-screen">
                     <SideBar />
-                    <main className="flex-grow">
+                    <main className="flex-grow bg-indigo-50">
                         <Outlet />
                         {/* <Toaster /> */}
                         <ToastContainer
