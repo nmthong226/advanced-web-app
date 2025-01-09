@@ -1555,7 +1555,8 @@ const Timer = () => {
                     .filter(
                       (task) =>
                         !task.is_on_pomodoro_list &&
-                        task.status !== 'completed',
+                        task.status !== 'completed' &&
+                        task.status !== 'expired',
                     )
                     .map((task) => (
                       <li
