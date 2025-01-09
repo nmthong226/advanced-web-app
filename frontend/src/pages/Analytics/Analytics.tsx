@@ -54,7 +54,7 @@ import { useUser } from '@clerk/clerk-react';
 // Import react-spinners for loading indicator
 import { ClipLoader } from 'react-spinners';
 import { LuCalendarClock } from 'react-icons/lu';
-import { BarChart } from 'recharts';
+import BarChart from '../../components/charts/BarChart';
 
 // Define Task interface if not already defined
 interface TaskStatusCounts {

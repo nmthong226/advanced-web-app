@@ -79,6 +79,7 @@ const PomodoroChart: React.FC<PomodoroChartProps> = ({ data }) => {
       },
       y: {
         beginAtZero: true,
+        suggestedMax: 3, // Ensures the y-axis always displays at least up to 3
         ticks: {
           stepSize: 1,
           color: textColor,
@@ -96,9 +97,9 @@ const PomodoroChart: React.FC<PomodoroChartProps> = ({ data }) => {
       },
     },
   };
-
+  
   return (
-    <div className="flex flex-col items-center bg-white shadow-md p-4 rounded-lg w-full h-full">
+    <div className="flex flex-col items-center bg-white p-4 rounded-lg w-full h-full">
       <Bar data={chartData} options={options} />
     </div>
   );
