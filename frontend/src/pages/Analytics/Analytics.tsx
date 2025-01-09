@@ -14,11 +14,8 @@ import { FaExclamationCircle } from 'react-icons/fa';
 // Import chart components
 import BarChart from '../../components/charts/BarChart';
 import PieChart from '../../components/charts/PieChart';
-import StackChart from '../../components/charts/StackChart';
-import HorizontalBarChart from '../../components/charts/HorizontalBarChart';
 import DoubleBarChart from '../../components/charts/DoubleBarChart';
 import AIFeedback from '../../components/AI/analytics';
-import { useAuth } from '@clerk/clerk-react';
 import { getAISummary } from 'src/api/analytics.api';
 // Import UI components
 import {
@@ -46,8 +43,6 @@ import { useTaskContext } from '../../contexts/UserTaskContext';
 
 // Import Axios functions and interfaces
 import {
-  fetchCircleChartData,
-  fetchWeeklyTaskCounts,
   fetchPomodoroAnalytics,
   CircleChartData,
   WeeklyTaskCounts,
@@ -61,25 +56,11 @@ import { useUser } from '@clerk/clerk-react';
 import { ClipLoader } from 'react-spinners';
 
 // Define Task interface if not already defined
-interface Task {
-  _id: string;
-  userId: string;
-  title: string;
-  description?: string;
-  status: 'pending' | 'in-progress' | 'completed' | 'expired';
-  priority: 'low' | 'medium' | 'high';
-  category?: string;
-  startTime?: Date;
-  endTime?: Date;
-  dueTime?: Date;
-  estimatedTime?: number;
-  pomodoro_required_number: number;
-  pomodoro_number: number;
-  is_on_pomodoro_list: boolean;
-  style?: {
-    backgroundColor: string;
-    textColor: string;
-  };
+interface TaskStatusCounts {
+  completed: number;
+  'in-progress': number;
+  pending: number;
+  expired: number;
 }
 
 const Analytics: React.FC = () => {
@@ -117,33 +98,27 @@ const Analytics: React.FC = () => {
   }, [userId, aiSummaryInsights]);
   // Consume Task Context
   const { tasks } = useTaskContext();
-  console.log('Tasks:', tasks);
 
-  const [taskStatusCounts, setTaskStatusCounts] = useState<{
-    completed: number;
-    'in-Progress': number;
-    pending: number;
-    expired: number;
-  } | null>(null);
+  const [taskStatusCounts, setTaskStatusCounts] =
+    useState<TaskStatusCounts | null>(null);
 
-  const [categoryHours, setCategoryHours] = useState<{
+  const [, setCategoryHours] = useState<{
     [category: string]: number;
   } | null>(null);
 
-  const [timeVsTaskCompletion, setTimeVsTaskCompletion] = useState<{
+  const [, setTimeVsTaskCompletion] = useState<{
     timeSpent: number;
     tasksCompleted: number;
   } | null>(null);
 
-  const [topCategories, setTopCategories] = useState<{
+  const [, setTopCategories] = useState<{
     [category: string]: number;
   } | null>(null);
 
-  const [aiFeedback, setAIFeedback] = useState<string>('');
+  const [, setAIFeedback] = useState<string>('');
 
   // Additional State for API Data
-  const [circleChartData, setCircleChartData] =
-    useState<CircleChartData | null>(null);
+  const [, setCircleChartData] = useState<CircleChartData | null>(null);
   const [weeklyTaskCounts, setWeeklyTaskCounts] =
     useState<WeeklyTaskCounts | null>(null);
   const [pomodoroAnalytics, setPomodoroAnalytics] =
@@ -165,34 +140,6 @@ const Analytics: React.FC = () => {
     setIsCalendarVisible(!isCalendarVisible); // Toggle visibility
   };
 
-  // Function to calculate day streaks
-  const calculateDayStreaks = (tasks: Task[]): number => {
-    // Assuming tasks have a 'completedAt' date. Modify based on your Task interface.
-    // Since your Task interface does not include 'completedAt', you may need to add it or adjust accordingly.
-    // For simplicity, let's assume 'dueTime' or 'endTime' indicates when a task was completed.
-
-    const completedDates = tasks
-      .filter(
-        (task) => task.status === 'completed' && (task.dueTime || task.endTime),
-      )
-      .map((task) => new Date(task.dueTime || task.endTime).toDateString());
-
-    // Remove duplicates and sort
-    const uniqueDates = Array.from(new Set(completedDates)).sort(
-      (a, b) => new Date(a).getTime() - new Date(b).getTime(),
-    );
-
-    let streak = 0;
-    let currentDate = new Date();
-
-    while (uniqueDates.includes(currentDate.toDateString())) {
-      streak += 1;
-      currentDate.setDate(currentDate.getDate() - 1);
-    }
-
-    return streak;
-  };
-
   // Function to process tasks data
   useEffect(() => {
     // 1. User Authentication Check
@@ -206,7 +153,7 @@ const Analytics: React.FC = () => {
     // 2. Handle No Tasks Scenario
     if (tasks.length === 0) {
       console.info('No tasks found for the user. Resetting analytics data.');
-      setPomodoroStats(null);
+      setPomodoroStats({ pomodoroDone: 5, pomodoroRemaining: 5 });
       setTaskStatusCounts(null);
       setWeeklyTaskCounts(null);
       setCategoryHours(null);
@@ -234,16 +181,12 @@ const Analytics: React.FC = () => {
             activeDaysSet.add(new Date(task.startTime).toDateString());
           }
         });
-        const activeDays = activeDaysSet.size;
 
         // b. Calculate Spent Hours (sum of estimatedTime for completed tasks)
         const spentHours =
           tasks
             .filter((task) => task.status === 'completed' && task.estimatedTime)
             .reduce((acc, task) => acc + (task.estimatedTime || 0), 0) / 60; // Convert minutes to hours
-
-        // c. Calculate Day Streaks
-        const dayStreaks = calculateDayStreaks(tasks);
 
         // Calculate Pomodoro Stats
         let totalPomodoroDone = 0;
@@ -268,13 +211,9 @@ const Analytics: React.FC = () => {
               (pomodoroPerDayMap[date] || 0) + (task.pomodoro_number || 0);
           }
         });
-        const pomodoroPerDay = Object.keys(pomodoroPerDayMap).map((date) => ({
-          date,
-          count: pomodoroPerDayMap[date],
-        }));
 
         // e. Compute Task Status Counts on Frontend
-        const statusCounts: { [status: string]: number } = {
+        const statusCounts = {
           completed: 0,
           'in-progress': 0,
           pending: 0,
@@ -285,7 +224,8 @@ const Analytics: React.FC = () => {
             statusCounts[task.status] += 1;
           }
         });
-        console.log('Task Status Counts:', statusCounts);
+        console.log('ABC', statusCounts);
+
         setTaskStatusCounts(statusCounts);
 
         // f. Compute Weekly Task Counts on Frontend
@@ -680,10 +620,10 @@ const Analytics: React.FC = () => {
                             </li>
                             <li>
                               In-Progress Tasks:{' '}
-                              {taskStatusCounts['in-Progress']} tasks (
+                              {taskStatusCounts['in-progress']} tasks (
                               {tasks.length > 0
                                 ? (
-                                    (taskStatusCounts['in-Progress'] /
+                                    (taskStatusCounts['in-progress'] /
                                       tasks.length) *
                                     100
                                   ).toFixed(2)

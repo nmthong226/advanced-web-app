@@ -1,5 +1,4 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-import { any } from 'zod';
 interface FeedbackInterface {
     strengths: string;
     improvements: string;
@@ -29,9 +28,16 @@ export interface CircleChartData {
 
 // 2. Weekly Task Counts
 export interface WeeklyTaskCounts {
-  [status: string]: number;
-}
-
+    [date: string]: {
+      completed: number;
+      'in-progress': number;
+      pending: number;
+      expired: number;
+      timeSpent: number; // Total time spent (in minutes)
+      estimatedTime: number; // Total estimated time (in minutes)
+    };
+  }
+  
 // 3. Pomodoro Analytics
 export interface PomodoroAnalytics {
   weeklyPomodoro: { [date: string]: number };
