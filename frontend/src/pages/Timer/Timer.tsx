@@ -143,7 +143,7 @@ const Timer = () => {
     const fetchToken = async () => {
       try {
         const fetchedToken = await getToken({ template: 'supabase' }); // Replace with your Clerk template name if applicable
-        console.log('Fetched Token:', fetchedToken);
+
         if (fetchedToken) {
           setToken(fetchedToken);
         } else {
@@ -165,7 +165,6 @@ const Timer = () => {
 
           // Fetch all session settings
           const settings = await getAllSessionSettings(token);
-          console.log('Fetched Settings:', settings);
 
           if (settings) {
             setSessionSettings(settings);
