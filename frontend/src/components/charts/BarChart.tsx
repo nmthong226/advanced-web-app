@@ -1,8 +1,16 @@
 import { useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { useSettings } from '../../contexts/SettingsContext';
+// Define the type for the data prop
+interface PomodoroData {
+  date: string; // Date in string format
+  count: number; // Number of pomodoros completed on that date
+}
 
-const PomodoroChart = ({ data }) => {
+interface PomodoroChartProps {
+  data: PomodoroData[]; // Array of pomodoro data
+}
+const PomodoroChart: React.FC<PomodoroChartProps> = ({ data }) => {
   const { settings } = useSettings(); // "light" or "dark"
 
   // Debugging to check the received data
@@ -55,7 +63,7 @@ const PomodoroChart = ({ data }) => {
       },
       tooltip: {
         callbacks: {
-          label: function (context) {
+          label: function (context: { raw: any }) {
             return `${context.raw} Pomodoros`;
           },
         },
@@ -87,7 +95,10 @@ const PomodoroChart = ({ data }) => {
   };
 
   return (
-    <div className="w-[98%] h-[160px]">
+    <div className="w-full h-[300px] p-4 bg-white rounded-lg shadow-md">
+      <h2 className="text-center text-lg font-semibold mb-4 text-gray-800">
+        Pomodoro Analytics
+      </h2>
       <Bar data={chartData} options={options} />
     </div>
   );

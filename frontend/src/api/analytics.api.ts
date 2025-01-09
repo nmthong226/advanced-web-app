@@ -1,5 +1,10 @@
 import axios, { AxiosInstance, AxiosResponse } from 'axios';
-
+import { any } from 'zod';
+interface FeedbackInterface {
+    strengths: string;
+    improvements: string;
+    motivation: string;
+  }
 // Define the base URL for your backend API
 const API_BASE_URL = import.meta.env.VITE_BACKEND; // Ensure VITE_BACKEND is defined in your .env file
 
@@ -115,5 +120,23 @@ export const updateSessionSettings = async (
   }
 };
 
-// Export the Axios instance if you need to make additional requests elsewhere
-export default api;
+export const getAISummary = async (userId: string) => {
+    try {
+        const response = await axios.get(
+        `${API_BASE_URL}/ai-feedbacks/summary-insights/${userId}`
+        );
+        return response;
+    } catch (error) {
+        console.error('Error fetching tasks:', error);
+    }
+}
+export async function fetchAISummaryInsights(userId: string): Promise<FeedbackInterface> {
+    const url = `${API_BASE_URL}/ai-feedbacks/summary-insights/${userId}`;
+    try {
+        const response = await axios.get(url);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching AI Summary Insights:', error);
+        throw error;
+    }
+}

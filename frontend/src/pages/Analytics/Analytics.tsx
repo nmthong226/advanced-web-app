@@ -18,7 +18,8 @@ import StackChart from '../../components/charts/StackChart';
 import HorizontalBarChart from '../../components/charts/HorizontalBarChart';
 import DoubleBarChart from '../../components/charts/DoubleBarChart';
 import AIFeedback from '../../components/AI/analytics';
-
+import { useAuth } from '@clerk/clerk-react';
+import { getAISummary } from 'src/api/analytics.api';
 // Import UI components
 import {
   Tooltip,
@@ -82,12 +83,41 @@ interface Task {
 }
 
 const Analytics: React.FC = () => {
-  // Consume Task Context
-  const { tasks } = useTaskContext();
-  console.log('Tasks:', tasks);
   // Obtain user information from Clerk
   const { user } = useUser();
   const userId = user?.id;
+  const [aiSummaryInsights, setAiSummaryInsights] = useState(() => {
+    const cachedSummary = localStorage.getItem('aiSummaryInsights');
+    return cachedSummary ? JSON.parse(cachedSummary) : null;
+  });
+
+  useEffect(() => {
+    const getAiSummaryInsights = async () => {
+      if (userId) {
+        try {
+          const response = await getAISummary(userId);
+          if (response?.data) {
+            setAiSummaryInsights(response.data);
+            localStorage.setItem(
+              'aiSummaryInsights',
+              JSON.stringify(response.data),
+            );
+          } else {
+            alert('Something went wrong while fetching AI summary insights.');
+          }
+        } catch (error) {
+          console.error('Error fetching AI summary insights:', error);
+        }
+      }
+    };
+
+    if (!aiSummaryInsights) {
+      getAiSummaryInsights();
+    }
+  }, [userId, aiSummaryInsights]);
+  // Consume Task Context
+  const { tasks } = useTaskContext();
+  console.log('Tasks:', tasks);
 
   const [taskStatusCounts, setTaskStatusCounts] = useState<{
     completed: number;
@@ -756,19 +786,9 @@ const Analytics: React.FC = () => {
 
         {/* Right Column: Top Categories & AI Feedback */}
         <div className="flex flex-col lg:w-1/3 gap-4">
-          {/* Weekly Category Percentage Chart */}
-          <div className="flex bg-white p-4 rounded-md shadow-md h-40">
-            {topCategories ? (
-              <HorizontalBarChart data={topCategories} />
-            ) : (
-              <p className="text-center text-gray-500">
-                No Top Categories Data Available
-              </p>
-            )}
-          </div>
           {/* AI Feedback */}
           <div className="flex bg-white p-4 rounded-md shadow-md flex-1">
-            <AIFeedback feedback={aiFeedback} />
+            <AIFeedback />
           </div>
         </div>
       </div>

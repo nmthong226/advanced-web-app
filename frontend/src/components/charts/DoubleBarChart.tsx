@@ -150,30 +150,27 @@ const DoubleBarChart: React.FC<DoubleBarChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex flex-col justify-center items-center space-y-2 w-full h-full">
-      <div className="flex justify-between items-center w-full h-[10%]">
-        <div className="flex items-center font-semibold text-sm">
+    <div className="w-full h-[350px] bg-white p-4 rounded-lg shadow-md">
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center font-semibold text-base">
           <LuCalendarClock className="mr-2" />
-          <p className="mr-0.5">Weekly Task Counts</p>
-          <TooltipProvider>
-            <TooltipShadcn>
-              <TooltipTrigger asChild>
-                <div className="flex items-center hover:cursor-pointer">
-                  <AiFillInfoCircle className="text-gray-500/40 size-4" />
-                </div>
-              </TooltipTrigger>
-              <TooltipContent className="bg-white shadow-xl border text-muted-foreground text-zinc-700">
-                <p>Track your weekly task counts by status</p>
-              </TooltipContent>
-            </TooltipShadcn>
-          </TooltipProvider>
+          Weekly Task Counts
         </div>
+        <TooltipProvider>
+          <TooltipShadcn>
+            <TooltipTrigger asChild>
+              <div className="flex items-center hover:cursor-pointer">
+                <AiFillInfoCircle className="text-gray-500 size-4" />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-white shadow-xl border text-muted-foreground text-zinc-700">
+              <p>Track your weekly task counts by status</p>
+            </TooltipContent>
+          </TooltipShadcn>
+        </TooltipProvider>
       </div>
-      {/* Bar Chart */}
-      <div className="flex justify-center items-center border rounded-xl w-full h-[90%]">
-        <div className="flex justify-center items-center w-[80%] h-full">
-          <Bar data={chartData} options={options} />
-        </div>
+      <div className="w-full h-full">
+        <Bar data={chartData} options={options} />
       </div>
     </div>
   );
