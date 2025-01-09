@@ -236,6 +236,10 @@ const Home = () => {
     }, 100);
   };
 
+  const [scrollToTime] = useState(
+    new Date(1970, 1, 1, new Date().getHours(), 0, 0) // Default to this hour
+  );
+
   return (
     <div className="flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full overflow-y-hidden">
       {showLeftBar && (
@@ -250,7 +254,7 @@ const Home = () => {
                 <p className="font-base text-[13px] text-zinc-500 dark:text-gray-100">
                   {currentTime}
                 </p>
-                <p className="font-semibold text-lg text-zinc-700 dark:text-white truncate">
+                <p className="line-clamp-1 font-semibold text-sm text-zinc-700 md:text-base lg:text-lg dark:text-white">
                   {greeting}, {user?.fullName}!
                 </p>
               </div>
@@ -381,6 +385,13 @@ const Home = () => {
         className={`relative flex flex-col bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg ${showLeftBar ? 'w-[75%]' : 'w-full'} h-full`}
       >
         <DragAndDropCalendar
+          min={new Date(1970, 1, 1, 6, 0, 0)}
+          max={new Date(1970, 1, 1, 23, 59, 59)}
+          formats={{
+            timeGutterFormat: 'h A',
+          }}
+          
+          scrollToTime={scrollToTime}
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
           draggableAccessor={() => true}

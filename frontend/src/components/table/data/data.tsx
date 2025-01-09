@@ -5,29 +5,30 @@ import { TbCancel } from "react-icons/tb";
 // Labels for categorizing tasks
 export const labels = [
   {
-    value: 'bug',
-    label: 'Bug',
-    style: {
-      backgroundColor: 'bg-[#2F2F31]',
-      textColor: 'text-[#FFFFFF]',
-    }
+    value: 'work',
+    label: 'Work',
+    color: 'bg-[#CDC1FF]'
   },
   {
-    value: 'feature',
-    label: 'Feature',
-    style: {
-      backgroundColor: 'bg-[#2F2F31]',
-      textColor: 'text-[#FFFFFF]',
-    }
+    value: 'leisure',
+    label: 'Leisure',
+    color: 'bg-[#96E9C6]'
   },
   {
-    value: 'documentation',
-    label: 'Documentation',
-    style: {
-      backgroundColor: 'bg-[#2F2F31]',
-      textColor: 'text-[#FFFFFF]',
-    }
+    value: 'personal',
+    label: 'Personal',
+    color: "bg-[#FDE767]"
   },
+  {
+    value: 'urgent',
+    label: 'Urgent',
+    color: 'bg-[#FF8F8F]'
+  },
+  {
+    value: 'other',
+    label: 'Other',
+    color: 'bg-[#EEF2FF]'
+  }
 ];
 
 // Statuses for task state management

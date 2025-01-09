@@ -1143,7 +1143,7 @@ const Timer = () => {
         </div>
 
         {/* Tasks Section */}
-        <div className="flex flex-col justify-center items-center space-y-5 mt-3 px-4 w-full">
+        <div className="flex flex-col justify-center items-center space-y-5 mt-3 px-4 py-2 w-full">
           {/* Tasks Header */}
           <div className="flex sm:flex-row flex-col justify-between items-center border-gray-300 py-2 border-b-2 w-full max-w-xl lg:max-w-2xl">
             <p className="font-bold text-[#5f341f] text-lg sm:text-xl">Tasks</p>
@@ -1480,7 +1480,7 @@ const Timer = () => {
           </div>
 
           {/* Spotify Iframe */}
-          <div className="mt-6 w-full max-w-xl lg:max-w-2xl">
+          <div className="bg-white mt-4 p-1 border rounded-lg w-full max-w-xl lg:max-w-2xl">
             <div className="flex justify-center">
               <iframe
                 src="https://open.spotify.com/embed/playlist/0vvXsWCC9xrXsKd4FyS8kM?utm_source=generator&theme=0"

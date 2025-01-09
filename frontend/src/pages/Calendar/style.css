@@ -93,3 +93,8 @@ element.style {
 .dark .rbc-timeslot-group {
   border-bottom: 1px solid #727272;
 }
+
+.rbc-current-time-indicator {
+  background-color: #592cff !important;
+  height: 2px !important;
+}

@@ -31,6 +31,7 @@ import { GoTag } from 'react-icons/go';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Link } from 'react-router-dom';
+import { cn } from '@/lib/utils.ts';
 
 const MemoizedTasksMutateDrawer = React.memo(TasksMutateDrawer);
 const MemoizedConfirmDialog = React.memo(ConfirmDialog);
@@ -45,6 +46,7 @@ const Tasks = () => {
   const [, setPendingDeletes] = useState<Map<string, NodeJS.Timeout>>(
     new Map(),
   );
+  const allCategories = ['Work', 'Leisure', 'Personal', 'Urgent'];
 
   const handleConfirmDelete = useCallback(() => {
     if (!currentRow) return;
@@ -125,37 +127,45 @@ const Tasks = () => {
   const [date, setDate] = React.useState<Date | undefined>(new Date());
 
   // Step 1: Handle undefined or invalid tasks
-  function processTasks(tasks: { category?: string }[] | undefined) {
+  function processTasks(tasks: { category?: string }[] | undefined, allCategories: string[]) {
     if (!tasks || !Array.isArray(tasks)) {
       console.error('Tasks are undefined or not an array.');
       return { categoryCounts: {}, currentCategories: [] };
     }
 
-    // Step 2: Count tasks per category
-    const categoryCounts = tasks.reduce<Record<string, number>>(
-      (counts, task) => {
-        if (task.category) {
-          counts[task.category] = (counts[task.category] || 0) + 1;
-        }
-        return counts;
-      },
-      {},
-    );
+    // Step 1: Initialize counts for all categories (including zero-count ones)
+    const categoryCounts = allCategories.reduce<Record<string, number>>((counts, category) => {
+      counts[category] = 0; // Start with zero for all categories
+      return counts;
+    }, {});
 
-    // Step 3: Sort categories by task count and get the top 10
+    // Step 2: Count tasks per category
+    tasks.forEach((task) => {
+      if (task.category && categoryCounts.hasOwnProperty(task.category)) {
+        categoryCounts[task.category] += 1;
+      }
+    });
+
+    // Step 3: Sort categories by task count and get the top 10 (if needed)
     const currentCategories = Object.entries(categoryCounts)
-      .filter(([, count]) => count > 0) // Filter categories with tasks
-      .sort(([, countA], [, countB]) => countB - countA) // Sort by task count in descending order
-      .slice(0, 10); // Get top 10 or all current categories
+      .sort(([, countA], [, countB]) => countB - countA); // Sort by task count in descending order
 
     return { categoryCounts, currentCategories };
   }
 
   useEffect(() => {
-    // Process tasks whenever tasks in the context change
-    const { currentCategories } = processTasks(tasks);
+    const { currentCategories } = processTasks(tasks, allCategories);
     setCurrentCategories(currentCategories);
-  }, [tasks]); // Dependency array ensures this runs when `tasks` updates
+  }, [tasks]);
+
+  // Define category-based colors
+  const categoryColors: { [key: string]: string } = {
+    work: "#CDC1FF", // Blue
+    leisure: "#96E9C6", // Green
+    personal: "#FDE767", // Yellow
+    urgent: "#FF8F8F", // Red
+    default: "#EEF2FF", // Default color
+  };
 
   return (
     <div className="flex space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full overflow-x-hidden">
@@ -210,11 +220,20 @@ const Tasks = () => {
               key={category}
               className="flex justify-between items-center py-1"
             >
-              <span className="text-[12px] text-gray-700 dark:text-gray-200">
-                {category}
+              <span className="flex items-center space-x-1 text-[12px] text-gray-700 dark:text-gray-200">
+                {category === 'Work' && <p>💼</p>}
+                {category === 'Leisure' && <p>🧩</p>}
+                {category === 'Personal' && <p>🪅</p>}
+                {category === 'Urgent' && <p>💥</p>}
+                <p>{category}</p>
               </span>
-              <span className="text-[12px] text-gray-500 dark:text-gray-300">
-                {count} tasks
+              <span
+                className={cn(
+                  `text-[12px] px-2 text-gray-500 dark:text-gray-300 rounded-md`
+                )}
+                style={{ backgroundColor: categoryColors[category.toLowerCase()] || categoryColors.default }}
+              >
+                {count}
               </span>
             </li>
           ))}

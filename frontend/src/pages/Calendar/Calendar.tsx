@@ -144,10 +144,10 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === event._id
           ? {
-              ...task,
-              startTime: start.toISOString(),
-              endTime: end.toISOString(),
-            }
+            ...task,
+            startTime: start.toISOString(),
+            endTime: end.toISOString(),
+          }
           : task,
       );
 
@@ -396,6 +396,7 @@ const MyCalendar: React.FC = () => {
     if (!selectedCalendarEvent) return;
 
     const taskId = selectedCalendarEvent._id as string;
+    console.log(`Deleting task with ID ${taskId}`);
     const taskToDelete = selectedCalendarEvent;
 
     // Temporarily remove the task from the list
@@ -453,6 +454,10 @@ const MyCalendar: React.FC = () => {
     setOpen(null);
   }, [selectedCalendarEvent, setTasks, setOpen, setPendingDeletes]);
 
+  const [scrollToTime] = useState(
+    new Date(1970, 1, 1, new Date().getHours(), 0, 0) // Default to this hour
+  );
+
   return (
     <div className="relative flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full">
       <SideBarTask
@@ -480,6 +485,12 @@ const MyCalendar: React.FC = () => {
         </div>
         <hr className="mb-2 w-full" />
         <DragAndDropCalendar
+          min={ new Date(1970, 1, 1, 6, 0, 0) }
+          max={ new Date(1970, 1, 1, 23, 59, 59) }
+          formats={{
+            timeGutterFormat: 'h A',
+          }}
+          scrollToTime={scrollToTime}
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
           dragFromOutsideItem={
