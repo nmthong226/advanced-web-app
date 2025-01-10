@@ -139,7 +139,7 @@ const ChatAI = () => {
       <SheetTrigger asChild>
         <button
           aria-label="Open Chat"
-          className="fixed right-8 bottom-3 z-50 flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-14 h-14 transition-transform transform hover:scale-105"
+          className="right-10 bottom-4 z-50 fixed flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 shadow-xl p-[1px] rounded-full w-14 h-14 transform transition-transform hover:scale-105"
         >
           <div className="flex justify-center items-center bg-white dark:bg-gradient-to-b dark:from-indigo-600 dark:to-cyan-300 rounded-full w-12 h-12">
             <span role="img" aria-label="Robot" className="text-2xl">
@@ -148,19 +148,19 @@ const ChatAI = () => {
           </div>
         </button>
       </SheetTrigger>
-      <SheetContent className="flex flex-col bg-gradient-to-t from-indigo-50 to-white rounded-l-[26px] sm:max-w-[450px] md:max-w-[500px] h-full shadow-lg">
-        <SheetHeader className="flex flex-col p-5 border-b border-gray-200">
-          <SheetTitle className="text-xl font-semibold text-indigo-700">
+      <SheetContent className="flex flex-col bg-gradient-to-t from-indigo-50 to-white shadow-lg rounded-l-[26px] sm:max-w-[450px] md:max-w-[500px] h-full">
+        <SheetHeader className="flex flex-col border-gray-200 p-3">
+          <SheetTitle className="font-semibold text-indigo-700 text-xl">
             💡 Your AI Assistant
           </SheetTitle>
-          <SheetDescription className="text-sm text-gray-600 mt-1">
+          <SheetDescription className="mt-1 text-gray-600 text-sm">
             Your assistant is here to help you. Feel free to ask anything.
             <hr className="border-gray-300 my-2 w-full" />
           </SheetDescription>
         </SheetHeader>
 
         {/* Chat Messages Container */}
-        <div className="flex-1 custom-scrollbar px-4 py-3 overflow-y-auto overflow-x-hidden bg-gray-100">
+        <div className="flex-1 custom-scrollbar px-4 overflow-x-hidden overflow-y-auto">
           <div className="flex flex-col space-y-4">
             {/* Render Chat History */}
             {chatHistory.length === 0 && (
@@ -170,7 +170,6 @@ const ChatAI = () => {
                 </div>
               </div>
             )}
-
             {chatHistory.map((chat, index) => (
               <div
                 key={index}
@@ -183,7 +182,7 @@ const ChatAI = () => {
                     src="https://robohash.org/mail@ashallendesign.co.uk"
                     // Replace with actual assistant avatar path
                     alt="Assistant Avatar"
-                    className="w-8 h-8 rounded-full mr-2"
+                    className="mr-2 rounded-full w-8 h-8"
                   />
                 )}
 
@@ -213,7 +212,7 @@ const ChatAI = () => {
                   <img
                     src="https://www.gravatar.com/avatar/2c7d99fe281ecd3bcd65ab915bac6dd5?s=250" // Replace with actual user avatar path or use a placeholder
                     alt="User Avatar"
-                    className="w-8 h-8 rounded-full ml-2"
+                    className="ml-2 rounded-full w-8 h-8"
                   />
                 )}
               </div>
@@ -223,9 +222,8 @@ const ChatAI = () => {
             <div ref={messagesEndRef} />
           </div>
         </div>
-
         {/* Chat Input */}
-        <div className="p-4 border-t border-gray-200 bg-gray-50">
+        <div className="border-gray-200 bg-gray-50 p-4 border-t">
           <MessageInput
             messageInput={messageInput}
             setMessageInput={setMessageInput}
