@@ -31,11 +31,10 @@ export const columns: ColumnDef<Task>[] = [
     enableSorting: false,
     enableHiding: false,
   },
-
   {
-    accessorKey: 'title',
+    accessorKey: 'label',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Title" />
+      <DataTableColumnHeader column={column} title="Label" />
     ),
     cell: ({ row }) => {
       const label = labels.find(
@@ -44,7 +43,19 @@ export const columns: ColumnDef<Task>[] = [
       return (
         <div className="flex space-x-2">
           {label && <Badge variant="outline" className={`${label.color} font-thin border-[1px] border-black/10`}>{label.label}</Badge>}
-          <span className="max-w-32 sm:max-w-72 md:max-w-[24rem] font-medium truncate">
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: 'title',
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Title" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="max-w-32 sm:max-w-72 md:max-w-[24rem] font-medium text-sm truncate">
             {row.getValue('title')}
           </span>
         </div>
@@ -159,7 +170,7 @@ export const columns: ColumnDef<Task>[] = [
   //     if (isNaN(estimatedTime)) {
   //       return <div className="flex justify-center items-center w-[40px]">-</div>;
   //     }
-  
+
   //     let displayValue;
   //     if (estimatedTime < 24) {
   //       displayValue = `${estimatedTime}h`; // Less than 1 day in hours

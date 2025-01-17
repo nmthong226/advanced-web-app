@@ -25,6 +25,8 @@ import { IoTrashBinOutline } from "react-icons/io5";
 import { CiEdit } from "react-icons/ci";
 import { useTasksContext } from "../../components/table/context/task-context";
 import { Button } from "../../components/ui/button";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 interface EventTrigger {
     open: boolean;
@@ -85,8 +87,6 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
         }
         : null;
 
-    console.log(selectedEvent);
-
     const { handleOpen } = useTasksContext();
 
 
@@ -143,7 +143,7 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                     onCloseChange();
                 }
             }}>
-                <DialogContent className="flex flex-col custom-scrollbar min-w-[600px] max-h-[100vh] overflow-y-auto [&>button]:hidden" bgOverlay='bg-black/20'>
+                <DialogContent className="flex flex-col custom-scrollbar min-w-[600px] max-h-[100vh] overflow-y-auto [&>button]:hidden dark:bg-slate-700" bgOverlay='bg-black/20'>
                     <DialogHeader>
                         <DialogTitle className='text-lg'>
                             {/* Title Field */}
@@ -215,30 +215,38 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                         <div className="flex justify-between items-center w-full">
                             {/* Date Fields */}
                             <div className={`flex space-x-2 space-y-0 mr-4`}>
-                                <p className="flex items-center bg-zinc-100 px-3 p-1 border rounded-md h-8 text-[12px] text-center">
+                                <p className="flex items-center bg-zinc-100 dark:bg-slate-800 px-3 p-1 border rounded-md h-8 text-[12px] text-center">
                                     {formattedEvent?.startTime} - {formattedEvent?.endTime} {formattedEvent?.date}
                                     {" "}({formattedEvent?.duration})
                                 </p>
                             </div>
                             <div
-                                className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer"
+                                className="flex items-center space-y-0 bg-white dark:bg-slate-800 shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer"
                                 onClick={() => handleOpen("update")}
                             >
                                 <CiEdit className="mr-1 hover:cursor-pointer size-5" />
                                 <p className="text-[12px] text-muted-foreground">Edit</p>
                             </div>
                         </div>
-                        <hr className="my-2 border-t-1 w-full" />
+                        <hr className="dark:border-slate-400 my-2 border-t-1 w-full" />
                         <div className='flex flex-col justify-between w-full'>
                             {/* Task Description Field */}
-                            <div className="flex space-y-1 h-24">
-                                <p className="text-[12px]">{selectedEvent?.description || 'No description'}</p>
+                            <div className="flex flex-col custom-scrollbar h-24 overflow-y-auto">
+                                {selectedEvent?.description ? (
+                                    <ReactQuill
+                                        value={selectedEvent.description}
+                                        readOnly={true}
+                                        theme="bubble" // A clean and read-only theme for rendering
+                                    />
+                                ) : (
+                                    <p className="text-[12px] text-gray-500">No description</p>
+                                )}
                             </div>
-                            <hr className="my-2 border-t-1 w-full" />
+                            <hr className="dark:border-slate-400 my-2 border-t-1 w-full" />
                             <div className='flex flex-row justify-between space-x-2'>
                                 <div className="flex flex-row space-x-2">
                                     {/* Priority Field */}
-                                    <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8">
+                                    <div className="flex items-center space-y-0 bg-white dark:bg-slate-800 shadow-sm px-2 border rounded-md h-8">
                                         <div className="flex items-center space-x-2 text-[12px]">
                                             {selectedEvent?.priority === 'low' && <GoArrowDown className="mr-1" />}
                                             {selectedEvent?.priority === 'medium' && <GoArrowRight className="mr-1" />}
@@ -247,15 +255,15 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                                         </div>
                                     </div>
                                     {/* Category Field */}
-                                    <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8">
-                                        {selectedEvent?.category === 'leisure' && <p>🧩</p>}
-                                        {selectedEvent?.category === 'work' && <p>💼</p>}
-                                        {selectedEvent?.category === 'personal' && <p>🪅</p>}
-                                        {selectedEvent?.category === 'urgent' && <p>💥</p>}
+                                    <div className="flex justify-center items-center bg-white dark:bg-slate-800 shadow-sm px-2 border rounded-md h-8">
+                                        {selectedEvent?.category === 'leisure' && <p className="mb-1 text-sm">🧩</p>}
+                                        {selectedEvent?.category === 'work' && <p className="mb-1 text-sm">💼</p>}
+                                        {selectedEvent?.category === 'personal' && <p className="mb-1 text-sm">🪅</p>}
+                                        {selectedEvent?.category === 'urgent' && <p className="mb-1 text-sm">💥</p>}
                                         <div className="text-[12px] capitalize">{selectedEvent?.category || 'Uncategorized'}</div>
                                     </div>
                                     {/* Due Date Field */}
-                                    <div className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8">
+                                    <div className="flex items-center space-y-0 bg-white dark:bg-slate-800 shadow-sm px-2 border rounded-md h-8">
                                         <div className="text-[12px]">
                                             <p>Due:</p>
                                         </div>
@@ -279,7 +287,7 @@ const EventCalendar: React.FC<EventTrigger> = ({ open, onOpenChange, onCloseChan
                                 <Dialog>
                                     <DialogTrigger>
                                         <div
-                                            className="flex items-center space-y-0 bg-white shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer">
+                                            className="flex items-center space-y-0 bg-white dark:bg-slate-800 shadow-sm px-2 border rounded-md h-8 hover:cursor-pointer">
                                             <IoTrashBinOutline className="text-muted-foreground" />
                                         </div>
                                     </DialogTrigger>

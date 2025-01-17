@@ -27,6 +27,7 @@ export const convertTasksToEvents = (tasks: TaskItem[] = []): Event[] => {
         title: task.title,
         status: task.status,
         category: task.category,
+        description: task.description,
         priority: task.priority,
         start: startTime,
         end: endTime,

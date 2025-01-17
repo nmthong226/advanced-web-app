@@ -752,6 +752,7 @@ const Analytics: React.FC = () => {
                   data={Object.entries(pomodoroAnalytics.weeklyPomodoro).map(
                     ([date, count]) => ({ date, count }),
                   )}
+                  className='h-full'
                 />
               ) : (
                 <p className="text-center text-gray-500">

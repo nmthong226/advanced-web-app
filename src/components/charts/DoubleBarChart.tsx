@@ -141,7 +141,7 @@ const DoubleBarChart: React.FC<DoubleBarChartProps> = ({ data }) => {
         beginAtZero: true,
         stacked: true,
         title: {
-          display: true,
+          display: false,
           text: 'Task Count',
           font: {
             size: 12,
@@ -152,8 +152,8 @@ const DoubleBarChart: React.FC<DoubleBarChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="bg-white shadow-md p-4 rounded-lg w-full h-[350px]">
-      <div className="w-full h-full">
+    <div className="flex justify-center items-center bg-white shadow-md p-4 rounded-lg w-full h-[350px]">
+      <div className="flex items-center w-full h-full">
         <Bar data={chartData} options={options} />
       </div>
     </div>

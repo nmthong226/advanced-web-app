@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Bar } from 'react-chartjs-2';
 import { useSettings } from '../../contexts/SettingsContext';
+import { cn } from '@/lib/utils';
 
 interface PomodoroData {
   date: string; // Date in string format
@@ -9,9 +10,10 @@ interface PomodoroData {
 
 interface PomodoroChartProps {
   data: PomodoroData[]; // Array of pomodoro data
+  className: string;
 }
 
-const PomodoroChart: React.FC<PomodoroChartProps> = ({ data }) => {
+const PomodoroChart: React.FC<PomodoroChartProps> = ({ data, className }) => {
   const { settings } = useSettings(); // "light" or "dark"
 
   useEffect(() => {
@@ -97,9 +99,9 @@ const PomodoroChart: React.FC<PomodoroChartProps> = ({ data }) => {
       },
     },
   };
-  
+
   return (
-    <div className="flex flex-col items-center bg-white p-4 rounded-lg w-full h-full">
+    <div className={cn(`flex flex-col items-center bg-white p-4 rounded-lg w-full h-[160px]`, className)}>
       <Bar data={chartData} options={options} />
     </div>
   );

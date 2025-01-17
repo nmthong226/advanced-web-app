@@ -21,7 +21,7 @@ interface EventProps {
 
 const CustomEvent: React.FC<EventProps> = ({ event }) => {
     return (
-        <div className="flex">
+        <div className={`flex text-slate-800 ${event.status === 'expired' || event.status === 'completed' ? 'opacity-50' : ''}`}>
             <p className="line-clamp-1">{event.title}</p>
             <div className="top-0 right-0 absolute flex">
                 <div className='flex items-center w-full h-full'>

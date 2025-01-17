@@ -1,0 +1,19 @@
+.dark .ql-toolbar.ql-snow {
+    border: 1px solid #334155;
+}
+
+.dark .ql-header.ql-picker {
+    color: #CCCCCC !important;
+}
+
+.dark .ql-container.ql-snow {
+    border: 1px solid #334155;
+}
+
+.dark .ql-snow .ql-stroke {
+    stroke: #CCCCCC;
+}
+
+.dark .ql-editor {
+    color: #CCCCCC !important;
+}

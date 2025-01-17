@@ -60,6 +60,8 @@ div.rbc-header>button>span {
 
 .dark .rbc-time-view {
   background-color: #1e293b !important;
+  border: 1px solid #1e293b;
+  border-radius: 6px;
 }
 
 #root>div>main>div>div.relative.flex.flex-col.justify-center.bg-white.dark\:bg-slate-700.p-1.border.rounded-lg.w-\[84\%\].h-full>div.px-2.rbc-addons-dnd.rbc-calendar>div.rbc-time-view>div.rbc-time-header.rbc-overflowing>div.rbc-time-header-content>div.rbc-row.rbc-time-header-cell>div.rbc-header.rbc-today {

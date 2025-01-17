@@ -50,7 +50,7 @@ const TaskPieChart: React.FC<TaskPieChartProps> = ({ data }) => {
             size: 12, // Adjust font size
             family: 'Arial, sans-serif', // Customize font family
           },
-          padding: 12, // Add padding between labels
+          padding: 24, // Add padding between labels
           boxWidth: 12, // Adjust box width
           boxHeight: 12, // Adjust box height
           usePointStyle: true, // Use point style for labels
@@ -69,7 +69,7 @@ const TaskPieChart: React.FC<TaskPieChartProps> = ({ data }) => {
   };
 
   return (
-    <div className="flex justify-center items-center w-[340px] h-[340px]">
+    <div className="flex justify-center items-center w-[300px] h-[300px]">
       <Pie data={chartData} options={options}/>
     </div>
   );

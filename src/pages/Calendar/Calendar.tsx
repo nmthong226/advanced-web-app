@@ -78,7 +78,6 @@ const MyCalendar: React.FC = () => {
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
-    console.log('convert task to events', events);
     const draggableTask = convertTasksToDraggedEvents(tasks);
     setMyEvents(events);
     setDraggableTasks(draggableTask);
@@ -86,7 +85,7 @@ const MyCalendar: React.FC = () => {
 
   const eventPropGetter = (event: Event) => {
     const isSelected = event._id === selectedCalendarEvent?._id;
-  
+
     // Define category-based colors
     const categoryColors: { [key: string]: string } = {
       work: '(205, 193, 255, opacity_parameter)', // Blue in RGBA
@@ -95,19 +94,19 @@ const MyCalendar: React.FC = () => {
       urgent: '(255, 143, 143, opacity_parameter)', // Red
       default: '(238, 242, 255, opacity_parameter)', // Default color
     };
-  
+
     // Determine opacity based on the event's status
     const getOpacity = (status: string) => {
       switch (status) {
         case 'completed':
-          return 0.3; // Lower opacity for completed tasks
+          return 0.5; // Lower opacity for completed tasks
         case 'expired':
-          return 0.3; // Very low opacity for expired tasks
+          return 0.5; // Very low opacity for expired tasks
         default:
           return 1; // Default full opacity
       }
     };
-  
+
     // Function to format RGB(A) strings properly
     const formatColor = (color: string, opacity: number) => {
       if (color.startsWith('(')) {
@@ -115,25 +114,28 @@ const MyCalendar: React.FC = () => {
       }
       return color; // Return as-is for HEX values
     };
-  
+
     // Get the raw color based on the category or fallback to default
     const rawColor =
       categoryColors[
-        event?.category?.toLowerCase() as keyof typeof categoryColors
+      event?.category?.toLowerCase() as keyof typeof categoryColors
       ] || categoryColors.default;
-  
+
     // Calculate opacity based on event's status
     const opacity = getOpacity(event.status);
-  
-    // Format the color with the calculated opacity
+
+    // Format the background color with the calculated opacity
     const backgroundColor = formatColor(rawColor, opacity);
-  
+
+    // Calculate text color based on background opacity
+    const textColor = `rgba(71, 85, 105, ${opacity})`;
+
     return {
-      className: `shadow-lg text-xs`,
+      className: `shadow-lg text-xs text-gray-400`,
       style: {
         backgroundColor: isSelected ? '#ccc' : backgroundColor, // Gray for selected, category color for others
-        color: isSelected ? '#555' : 'black', // Adjust text color if needed
-        border: '1px solid #A7BBC7',
+        color: isSelected ? '#555' : textColor, // Adjust text color to match background opacity
+        border: '0.5px solid #FFFFFF',
         textDecoration:
           event.status === 'completed' || event.status === 'expired'
             ? 'line-through'
@@ -148,7 +150,7 @@ const MyCalendar: React.FC = () => {
   );
 
   const dragFromOutsideItem = useCallback(() => {
-    return (event: Event) => event.start; // Or another Date field, such as `event.end`
+    return (event: Event) => event.end; // Or another Date field, such as `event.end`
   }, [draggedEvent]);
 
   const moveEvent = useCallback(
@@ -185,10 +187,10 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === event._id
           ? {
-              ...task,
-              startTime: start.toISOString(),
-              endTime: end.toISOString(),
-            }
+            ...task,
+            startTime: start.toISOString(),
+            endTime: end.toISOString(),
+          }
           : task,
       );
 
@@ -233,11 +235,11 @@ const MyCalendar: React.FC = () => {
             prevTasks.map((task) =>
               task._id === event._id
                 ? {
-                    ...task,
-                    startTime: localStart.toISOString(),
-                    endTime: localEnd.toISOString(),
-                    status: newStatus,
-                  }
+                  ...task,
+                  startTime: localStart.toISOString(),
+                  endTime: localEnd.toISOString(),
+                  status: newStatus,
+                }
                 : task,
             ),
           );
@@ -300,10 +302,10 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === _id
           ? {
-              ...task,
-              startTime: localStart.toISOString(),
-              endTime: localEnd.toISOString(),
-            }
+            ...task,
+            startTime: localStart.toISOString(),
+            endTime: localEnd.toISOString(),
+          }
           : task,
       );
 
@@ -330,11 +332,11 @@ const MyCalendar: React.FC = () => {
             prevTasks.map((task) =>
               task._id === _id
                 ? {
-                    ...task,
-                    startTime: localStart.toISOString(),
-                    endTime: localEnd.toISOString(),
-                    status: newStatus,
-                  }
+                  ...task,
+                  startTime: localStart.toISOString(),
+                  endTime: localEnd.toISOString(),
+                  status: newStatus,
+                }
                 : task,
             ),
           );
@@ -369,10 +371,10 @@ const MyCalendar: React.FC = () => {
       const updatedTasks = tasks.map((task) =>
         task._id === event._id
           ? {
-              ...task,
-              startTime: localStart.toISOString(),
-              endTime: localEnd.toISOString(),
-            }
+            ...task,
+            startTime: localStart.toISOString(),
+            endTime: localEnd.toISOString(),
+          }
           : task,
       );
 
@@ -565,9 +567,7 @@ const MyCalendar: React.FC = () => {
           scrollToTime={scrollToTime}
           defaultDate={defaultDate}
           defaultView={Views.WEEK}
-          dragFromOutsideItem={
-            displayDragItemInCell ? dragFromOutsideItem : undefined
-          }
+          dragFromOutsideItem={displayDragItemInCell ? dragFromOutsideItem : undefined}
           draggableAccessor={() => true}
           eventPropGetter={eventPropGetter}
           events={myEvents}
@@ -578,8 +578,26 @@ const MyCalendar: React.FC = () => {
           onDropFromOutside={onDropFromOutside}
           onEventDrop={moveEvent}
           onEventResize={resizeEvent}
-          onSelectSlot={handleSelectSlot}
-          onSelectEvent={handleSelectEvent}
+          onSelectSlot={(slotInfo) => {
+            // Check the duration of the selected slot
+            const duration =
+              (slotInfo.end.getTime() - slotInfo.start.getTime()) / (1000 * 60 * 60); // Duration in hours
+            if (duration >= 24) {
+              alert('All-day tasks are not allowed!');
+              return;
+            }
+            handleSelectSlot(slotInfo);
+          }}
+          onSelectEvent={(event) => {
+            // Validate if the event spans the entire day
+            const eventDuration =
+              (event.end.getTime() - event.start.getTime()) / (1000 * 60 * 60); // Duration in hours
+            if (eventDuration >= 24) {
+              alert('All-day tasks are not allowed!');
+              return;
+            }
+            handleSelectEvent(event);
+          }}
           resizable
           selectable
           popup
@@ -588,6 +606,7 @@ const MyCalendar: React.FC = () => {
           step={15}
           timeslots={4}
         />
+
         <MemoizedTasksMutateDrawer
           start={selectedEvent.start}
           end={selectedEvent.end}

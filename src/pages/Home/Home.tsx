@@ -15,16 +15,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from '../../components/ui/select.tsx';
-import ProgressBar from '../../components/ProgressBar/ProgressBar.tsx';
 import ChatAI from '../../components/AI/chatHistory.tsx';
 import BarChart from '../../components/charts/BarChart.tsx';
 
 //Import icons
-import { BsCheck, BsListTask } from 'react-icons/bs';
+import { BsListTask } from 'react-icons/bs';
 import { GiTomato } from 'react-icons/gi';
-import { FaCheck, FaRegClock } from 'react-icons/fa6';
-import { RiRestTimeLine } from 'react-icons/ri';
-import { PiEmpty } from "react-icons/pi";
+import { FaRegClock } from 'react-icons/fa6';
+
 
 //Import contexts
 import { useSettings } from '../../contexts/SettingsContext.tsx';
@@ -32,8 +30,6 @@ import { useUser } from '@clerk/clerk-react';
 import { useTaskContext } from '@/contexts/UserTaskContext.tsx';
 
 import CustomEvent from '../Calendar/Event.tsx';
-import { formatDate } from 'date-fns';
-import { GoArrowDown, GoArrowRight, GoArrowUp } from 'react-icons/go';
 import { Event, TaskItem } from '../../types/type.js';
 import { convertTasksToEvents } from '@/lib/utils.ts';
 
@@ -48,6 +44,9 @@ import { FaUndoAlt } from 'react-icons/fa';
 import axios from 'axios';
 import EventCalendar from '../Calendar/EventCalendar.tsx';
 import { fetchPomodoroAnalytics, PomodoroAnalytics } from '@/api/analytics.api.ts';
+
+import MiniTaskTable from '../../components/table/minitable/MiniTaskTable.tsx';
+
 
 const Home = () => {
   const { user } = useUser();
@@ -69,12 +68,6 @@ const Home = () => {
     useState<PomodoroAnalytics | null>(null);
   const [, setError] = useState<string | null>(null);
   const { tasks, setTasks } = useTaskContext(); // Access tasks from context
-
-  const [taskStatusCounts, setTaskStatusCounts] = useState({
-    completed: 0,
-    inProgress: 0,
-    pending: 0,
-  }); // State for task counts
 
   useEffect(() => {
     const events = convertTasksToEvents(tasks);
@@ -254,24 +247,8 @@ const Home = () => {
         // Depending on requirements, you might want to continue processing or halt here
       }
     };
-    const calculateTaskStatusCounts = () => {
-      // Count tasks by their status
-      const completedCount = tasks.filter(task => task.status === "completed").length;
-      const inProgressCount = tasks.filter(task => task.status === "in-progress").length;
-      const pendingCount = tasks.filter(task => task.status === "pending").length;
-
-      // Update state with the counts
-      setTaskStatusCounts({
-        completed: completedCount,
-        inProgress: inProgressCount,
-        pending: pendingCount,
-      });
-    };
-
     fetchAnalytics();
-    calculateTaskStatusCounts();
   }, [userId, tasks]); // Include `userId` and `tasks` in the dependency array
-
 
   return (
     <div className="flex items-center space-x-2 bg-indigo-50 dark:bg-slate-800 p-2 w-full h-full overflow-y-hidden">
@@ -317,89 +294,7 @@ const Home = () => {
           )}
           {/*Task Overview*/}
           {settings.showTaskOverview && (
-            <div className="flex flex-col justify-between bg-white dark:bg-slate-700 shadow-md p-1 rounded-lg w-full h-[40%]">
-              <div className="flex flex-col w-full h-[85%]">
-                <div className="flex justify-between items-center border-b">
-                  <p className="m-2 font-semibold text-sm">Task Overview</p>
-                  <Select value="all">
-                    <SelectTrigger className="m-2 w-[110px]">
-                      <SelectValue placeholder="Theme" />
-                    </SelectTrigger>
-                    <SelectContent className="right-[14%]">
-                      <SelectItem value="all">
-                        <div className="flex items-center text-[12px]">
-                          <BsListTask className="mr-1 size-3" />
-                          All Tasks
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="completed">
-                        <div className="flex items-center text-[12px]">
-                          <FaCheck className="mr-1 size-3" />
-                          Completed
-                        </div>
-                      </SelectItem>
-                      <SelectItem value="pending">
-                        <div className="flex items-center text-[12px]">
-                          <RiRestTimeLine className="mr-1 size-3" />
-                          Pending
-                        </div>
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col space-y-1 custom-scrollbar p-1 h-full overflow-y-auto">
-                  {tasks.length === 0 && (
-                    <div className='flex justify-center items-center mt-2'>
-                      <PiEmpty className='mr-1' />
-                      <p className='text-[12px]'>There is no task for now.</p>
-                    </div>
-                  )}
-                  {Array.isArray(tasks) &&
-                    tasks.map((task) => (
-                      <div
-                        key={task._id}
-                        className="flex space-x-2 shadow-sm p-1.5 border rounded"
-                      >
-                        <div className="flex items-center space-x-1 w-[30%] font-semibold text-[12px]">
-                          {task.priority === 'high' && <GoArrowUp />}
-                          {task.priority === 'medium' && <GoArrowRight />}
-                          {task.priority === 'low' && <GoArrowDown />}
-                          <span className="mr-2 line-clamp-1">{task.title}</span>
-                        </div>
-                        <div className="flex items-center w-[30%] h-5 text-[12px] text-gray-500 truncate">
-                          {task.status === 'pending' && (
-                            <BsCheck className="mr-1 size-3" />
-                          )}
-                          {task.status === 'in-progress' && (
-                            <BsCheck className="mr-1 size-3" />
-                          )}
-                          {task.status === 'completed' && (
-                            <BsCheck className="mr-1 size-3" />
-                          )}
-                          {task.status === 'expired' && (
-                            <BsCheck className="mr-1 size-3" />
-                          )}
-                          <span className="font-medium">{task.status}</span>
-                        </div>
-                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
-                          <span className=""> {task.category}</span>
-                        </div>
-                        <div className="w-[20%] text-[12px] text-gray-500 truncate">
-                          <span className="">
-                            {task.dueTime
-                              ? formatDate(task.dueTime as string, 'dd-MM-yy')
-                              : 'N/A'}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              <div className="flex items-center p-2 border-t-2 h-[15%]">
-                <p className="flex mr-2 text-[12px] text-nowrap">Progress: </p>
-                <ProgressBar completed={taskStatusCounts.completed} pending={taskStatusCounts.pending} inProgress={taskStatusCounts.inProgress} />
-              </div>
-            </div>
+            <MiniTaskTable tasks={tasks}/>
           )}
           {/*Chart Overview*/}
           {settings.showProductivityInsights && (
@@ -435,6 +330,7 @@ const Home = () => {
                   data={Object.entries(pomodoroAnalytics.weeklyPomodoro).map(
                     ([date, count]) => ({ date, count }),
                   )}
+                  className="h-[160px]"
                 />
               ) : (
                 <p className="flex justify-center items-center mt-2 text-[12px] text-gray-500">
@@ -482,11 +378,6 @@ const Home = () => {
         />
         <ChatAI />
       </div>
-      {/* <button className="right-6 bottom-4 z-[100] absolute flex justify-center items-center bg-gradient-to-r from-indigo-500 to-cyan-400 p-[2px] rounded-full w-10 h-10">
-        <div className="flex justify-center items-center bg-white rounded-full w-full h-full">
-          <p className="bg-clip-text bg-gradient-to-r from-indigo-500 to-cyan-400 font-bold text-center text-transparent text-xl">✨</p>
-        </div>
-      </button> */}
     </div>
   );
 };
