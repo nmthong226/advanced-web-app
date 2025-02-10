@@ -1,5 +1,6 @@
 # Advanced Web App
 - This is a full-stack web application with a frontend built using React, TypeScript, and Vite, and a backend built using Node.js, Express, and MongoDB.
+- This repository is for Frontend management. For the backend, please follow this url: ```https://github.com/huyk21/be_awd.git```
 
 - **Application target**: in the development process.
 
